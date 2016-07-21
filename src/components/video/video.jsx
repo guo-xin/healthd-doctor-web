@@ -915,7 +915,7 @@ class Video extends React.Component {
 
         return (
             <div className={isShowVideo?styles.wrapperShow:styles.wrapper}>
-                <audio ref="audio" autoplay={true} loop="loop" src={ringFile} style={{display: "none"}}></audio>
+                <audio ref="audio" autoPlay={true} loop="loop" src={ringFile} style={{display: "none"}}></audio>
 
                 <Call answer={()=>this.answer()} hangUp={::this.hangUpFromDialog} busy={()=>this.busy()}
                       callbackFromCall={::this.callbackFromCall}/>
