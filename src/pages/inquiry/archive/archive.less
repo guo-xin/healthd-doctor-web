@@ -1,0 +1,238 @@
+@import "../../../assets/style/index";
+
+@menuHeight: 56px;
+@contentM: 4.1666666%;
+
+.wrapper {
+  height: 100%;
+
+  &>div{
+    height: 100%;
+  }
+}
+
+.top {
+  padding: 20px 0;
+  text-align: right;
+}
+
+.content {
+  position: absolute;
+  width: 100%;
+  top: @menuHeight;
+  bottom: 0;
+  overflow-y: auto;
+
+  & > div {
+    margin: 18px @contentM;
+  }
+}
+
+.panelHead {
+  composes: panel-head;
+
+  padding: 28px 36px;
+  background: #fbfbfb;
+  height: auto;
+}
+
+.panelBody {
+  composes: panel-body;
+  padding: 36px 46px;
+}
+
+.cardList {
+  composes: panelBody;
+
+  :global .ant-row {
+    margin: 0 - @gapSm;
+
+    & > div {
+      padding: @gapSm;
+    }
+  }
+}
+
+.card {
+  background: #f7f7f7;
+  border: 1px solid @borderColorBase;
+}
+
+.card:hover {
+  background: #eaf8fe;
+}
+
+.cardBody {
+  padding: 0 @gapLg;
+
+  :global {
+
+    .pic {
+      width: 80px;
+      float: left;
+      padding-top: 28px;
+
+      span {
+        display: inline-block;
+        width: 80px;
+        height: 80px;
+        line-height: 80px;
+        background: #fff;
+        text-align: center;
+        border-radius: 100%;
+        overflow: hidden;
+        border: 1px solid @borderColorBase;
+      }
+
+      img {
+        max-height: 100%;
+      }
+    }
+
+    .detail {
+      margin-left: 80px + @gap;
+      padding: @gapLg 0 0;
+    }
+
+    .top {
+      font-size: @fontSizeLg;
+      margin-bottom: @gapSm;
+
+      & > span {
+        margin-right: @gapLg;
+        display: inline-block;
+        height: 20px;
+        line-height: 20px;
+        vertical-align: top;
+      }
+
+      .name{
+        max-width: 160px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        word-break: break-all;
+        white-space: nowrap;
+      }
+      .serial {
+        font-size: @fontSizeSm;
+        color: @textLightGrey;
+      }
+
+      .gender {
+        float: right;
+        margin-right: 0;
+
+        img {
+          margin-top: 5px;
+        }
+      }
+    }
+
+    .middle {
+      overflow: auto;
+      margin-bottom: @gapLg;
+
+      li {
+        margin-bottom: @gap;
+        float: left;
+        width: 50%;
+        min-width: 160px;
+        font-size: @fontSizeSm;
+        color: @textLightGrey;
+      }
+
+      .patientName{
+        overflow: hidden;
+        display: -webkit-box;
+        -webkit-line-clamp: 1;
+        -webkit-box-orient: vertical;
+        word-break: break-all;
+      }
+
+      .lastInquery{
+        margin-bottom: 0;
+        height: 42px;
+        overflow: hidden;
+        word-break: break-all;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+      }
+    }
+
+    .bottom {
+      text-align: right;
+      margin-bottom: @gapLg;
+
+      .ant-btn {
+        min-width: 80px;
+        margin-left: 10px;
+        font-size: @fontSizeSm;
+      }
+
+      .ant-btn-ghost {
+        background: #fff;
+      }
+
+      .ant-btn-circle {
+        min-width: 0;
+        float: left;
+        width: 20px;
+        height: 20px;
+        margin-top: 10px;
+        line-height: 20px;
+        font-size: @fontSizeXs;
+      }
+    }
+  }
+}
+
+.cardFooter {
+  padding: 0 @gapLg;
+  line-height: 36px;
+  border-top: 1px solid @borderColorBase;
+}
+
+.footText {
+  font-size: @fontSizeSm;
+  color: @textLightGrey;
+}
+
+.footTextRight {
+  composes: footText;
+  float: right;
+}
+
+.footTextOrange {
+  composes: footTextRight;
+  float: right;
+  color: @orange;
+}
+
+.footTextRed {
+  composes: footTextRight;
+  float: right;
+  color: @red;
+}
+
+.textRed {
+  color: @red;
+}
+
+:global {
+  .assistant {
+    .ant-popover-inner {
+      min-width: 56px;
+    }
+    .ant-popover-inner-content {
+      font-size: @fontSizeXs;
+      padding: 2px;
+    }
+  }
+
+  .anticon-arrow-down, .anticon-arrow-up {
+    transform: rotate(45deg);
+    margin-right: 10px;
+    font-size: 16px;
+  }
+}

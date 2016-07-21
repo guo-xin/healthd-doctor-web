@@ -1,0 +1,90 @@
+@import "../../assets/style/index.less";
+
+@rowGap: 30px;
+@rowML: 20px;
+@contentM: 4.1666666%;
+@labelW: 114px;
+
+.wrapper {
+  overflow-y: auto;
+  height: 100%;
+
+  & > div {
+    margin: @gap @contentM;
+  }
+
+
+  :global {
+    .row {
+      margin: 0 @rowML 0;
+    }
+
+    .col {
+      float: left;
+      width: 20%;
+      min-width: 300px;
+    }
+
+    .ant-form-item {
+      margin-bottom: @rowGap;
+
+      & > label {
+        display: block;
+        float: left;
+        width: @labelW;
+        text-align: right;
+      }
+
+      .ant-form-item-control {
+        margin-left: @labelW + 1px;
+        margin-right: 30px;
+      }
+    }
+  }
+}
+
+.panel {
+  composes: panel;
+}
+
+.panelHead {
+  composes: panel-head;
+  &:not(:first-child) {
+    border-top: 1px solid @borderColorBase;
+  }
+}
+
+.panelTitle {
+  composes: panel-title;
+}
+
+.panelBody {
+  composes: panel-body;
+  padding: @rowGap 0;
+}
+
+.line {
+  height: 0;
+  border-bottom: 1px dashed @borderColorBase;
+  margin-bottom: @rowGap;
+}
+
+.textarea {
+  :global .ant-form-item {
+    width: 40%;
+  }
+}
+
+.action {
+  padding: 0 @labelW + @rowML @rowGap * 2;
+
+  :global .ant-btn {
+    width: 100px;
+
+    &:first-child {
+      margin-right: 30px;
+    }
+  }
+}
+
+

@@ -1,0 +1,65 @@
+@import "../../../../assets/style/index";
+
+@menuHeight: 56px;
+@videoWidth: 450px + @gap*2;
+@toolbarWidth: 400px;
+@toolbarWidthCollapse: 130px;
+@toolBodyWidth: 400px;
+@opHeight: 80px;
+
+.wrapper {
+  position: relative;
+  display: flex;
+  height: 100%;
+  flex-direction: column;
+  align-items: stretch;
+  flex: 1;
+  padding: @gap @gap @gap 0;
+}
+
+.edit {
+  margin-right: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  flex: 1;
+}
+
+.tools {
+  position: absolute;
+  top: @gap;
+  right: @gap;
+  width: auto;
+}
+
+.toolbar {
+  width: @toolbarWidthCollapse;
+  height: @opHeight;
+  overflow: hidden;
+}
+
+.operations {
+  margin-right: @toolbarWidthCollapse + @gap / 2;
+  margin-bottom: @gap / 2;
+}
+
+.showTool {
+  composes: wrapper;
+
+  .operations {
+    margin-right: @toolBodyWidth + @gap / 2;
+  }
+
+  .edit {
+    margin-right: @toolBodyWidth + @gap / 2;
+  }
+  .tools{
+    bottom: @gap;
+  }
+
+  .toolbar {
+    height: 100%;
+    width: @toolbarWidth;
+  }
+
+}

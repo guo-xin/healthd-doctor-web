@@ -1,0 +1,124 @@
+@import "../case";
+
+@labelW: 124px;
+@rowGap: 30px;
+
+.wrapper{
+  padding: @gap @gap @gap 0;
+  overflow-y: auto;
+
+  :global{
+    .col {
+      float: left;
+      min-width: 360px;
+      width: 33.333333%;
+      height: 72px;
+    }
+
+    .ant-form-item {
+      font-size: 0;
+      margin-bottom: @rowGap;
+
+      & > label {
+        display: block;
+        float: left;
+        width: @labelW;
+        text-align: right;
+        margin-top: 1px;
+      }
+
+      .ant-form-item-control {
+        margin-left: @labelW + 1px;
+        margin-right: 30px;
+      }
+
+      .ant-form-explain{
+        font-size: @fontSizeSm;
+      }
+    }
+
+    .textarea .ant-form-item {
+      width: 66.666666%;
+      height: 116px;
+    }
+
+    .ant-input{
+      resize: none;
+      vertical-align: middle;
+    }
+  }
+}
+
+.check{
+  composes: wrapper;
+
+  :global {
+    .ant-input,
+    .ant-select-selection,
+    .ant-input:hover,
+    .ant-select-selection:hover{
+      background-color: transparent;
+      border-color: transparent;
+      color: @textColor;
+      cursor: default;
+    }
+
+    .ant-select-arrow{
+      display: none;
+    }
+  }
+}
+
+.panelHead{
+  composes: panel-head;
+}
+
+.panelTitle{
+  composes: panel-title;
+}
+
+.panelBody{
+  composes: panel-body;
+  padding: @gapXl;
+}
+
+.switch {
+  position: relative;
+  margin: 55px 0;
+  width: 100%;
+  border-bottom: 1px solid @borderColorBase;
+
+  :global .ant-btn {
+    position: absolute;
+    top: -31px;
+    left: @labelW + 20px;
+    height: 32px;
+    padding: 0 40px;
+    font-size: @fontSizeSm;
+    white-space: nowrap;
+    background: #fbfbfb;
+    border-color: @borderColorBase;
+
+    span:last-child {
+      margin-left: 10px;
+      color: #1ac5f0;
+    }
+
+    .anticon {
+      margin-left: 6px;
+    }
+
+  }
+}
+
+.action {
+  :global {
+    .ant-btn{
+      width: 100px;
+    }
+
+    .ant-btn:first-child{
+      margin-right: 10px;
+    }
+  }
+}

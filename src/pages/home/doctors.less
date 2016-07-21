@@ -1,0 +1,79 @@
+@import "../../assets/style/index.less";
+
+.doctor {
+  .top {
+    height: 40px;
+    padding: 15px 0px 0px;
+    a {
+      position: absolute;
+      right: 10px;
+      color: #1ac5f0;
+      img {
+        float: none;
+        vertical-align: middle;
+        margin-left: 10px;
+      }
+    }
+  }
+
+  .head {
+    padding: 0px 40px 15px;
+  }
+
+  .title {
+    font-size: @fontSizeLg;
+    font-weight: bold;
+    padding: 0px 0px 15px;
+  }
+
+  .body {
+    padding: 0px 40px;
+    line-height: 28px;
+
+    p {
+      margin-top: 20px;
+    }
+
+    span {
+      overflow: hidden;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      word-break: break-all;
+    }
+
+    pre {
+      overflow: hidden;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      word-break: break-all;
+      white-space: pre-line;
+      font-family: "Helvetica Neue", Helvetica, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "\5FAE\8F6F\96C5\9ED1", Arial, sans-serif;
+    }
+  }
+
+  .footer {
+    position: absolute;
+    right: 40px;
+    bottom: 40px;
+  }
+
+  .btnWork {
+    width: 190px;
+    font-size: @fontSizeLg;
+
+    &.ant-btn-ghost {
+      border: 0;
+      background: #fff;
+    }
+  }
+  .endWork {
+    background: #87D068;
+    border: 0;
+    &:hover {
+      background: #5BE191;
+    }
+  }
+}
+

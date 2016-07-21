@@ -1,0 +1,158 @@
+@import "../../assets/style/index.less";
+
+@logoWidth: 160px;
+@logoImgHeight: 39px;
+@logoImgMT: (@headerHeight - @logoImgHeight) / 2;
+@logoImgML: 50px;
+@userWidth: 176px;
+@userMR: 15px;
+@menuWidth: 100px;
+
+.wrapper {
+  height: @headerHeight;
+  background: @headerBg;
+  color: @textLightGrey;
+}
+
+.logo {
+  display: inline-block;
+  float: left;
+  height: @headerHeight;
+  width: @logoWidth;
+  text-align: center;
+  img {
+    margin-top: @logoImgMT;
+  }
+}
+
+.navAndMessage {
+  position: absolute;
+  top: 0;
+  left: @logoWidth;
+  right: @userWidth + @userMR;
+  height: @headerHeight;
+}
+
+.nav {
+  float: left;
+  width: 100%;
+
+  li {
+    float: left;
+    height: 100%;
+    margin-left: 3.75%;
+  }
+
+  a {
+    display: block;
+    line-height: @headerHeight;
+    font-size: @headerNavFontSize;
+    font-weight: @headeNavFontWeight;
+    color: @textLightGrey;
+
+    &.active, &:hover {
+      color: #fff;
+    }
+  }
+}
+
+.message {
+  position: absolute;
+  top: 0;
+  right: @logoImgML;
+  height: 100%;
+  line-height: @headerHeight;
+
+  font-size: 16px;
+
+  span {
+    display: inline-block;
+    &:first-child {
+      margin-right: 25px;
+    }
+    &:hover {
+      color: #fff;
+    }
+  }
+}
+
+.user {
+  position: relative;
+  float: right;
+  width: @userWidth;
+  height: @headerHeight;
+  margin-right: @userMR;
+  text-align: right;
+  line-height: @headerHeight;
+
+  span:hover {
+    color: #fff;
+  }
+  .settingMenu {
+    left: -@menuWidth / 2 - 10px;
+  }
+
+  .dropdown {
+    compose: ant-drop-down from '~antd/lib/style/dropdown/index.less';
+    display: inline-block;
+    font-size: @fontSizeBase;
+    color: @textColor;
+
+    &:hover {
+      color: #fff;
+    }
+    &:first-child {
+      position: absolute;
+      left: -10px;
+      font-size: 25px;
+    }
+  }
+
+  .dropOnly {
+    margin-right: 30px;
+  }
+
+  .avatar {
+    background: #fff;
+    display: inline-block;
+    height: 46px;
+    width: 46px;
+    vertical-align: middle;
+    margin-right: @userMR;
+    text-align: center;
+    border-radius: 50%;
+    overflow: hidden;
+
+    img {
+      max-width: 100%;
+      vertical-align: top;
+    }
+  }
+
+  :global .ant-dropdown-menu {
+    margin-top: -4px;
+    border-radius: 0;
+    box-shadow: none;
+
+    &:after {
+      position: absolute;
+      top: -12px;
+      z-index: 3;
+      right: 26px;
+
+      display: block;
+      width: 0;
+      height: 0;
+      border: 6px solid transparent;
+      border-bottom-color: #fff;
+
+      content: '';
+    }
+  }
+
+  :global .ant-dropdown-menu-item {
+    width: @menuWidth;
+    font-size: 16px;
+    text-align: center;
+  }
+}

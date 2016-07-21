@@ -1,0 +1,141 @@
+@import "../../../../assets/style/index";
+
+.wrapper {
+  composes: panel;
+  position: relative;
+  flex: 1;
+  margin-bottom: 0;
+  padding: 0;
+
+  :global {
+    form {
+      padding: @gapLg;
+    }
+
+    .ant-form-item {
+      margin-bottom: @gapXl;
+    }
+
+    .ant-form-item.ant-form-item-with-help {
+      margin-bottom: 5px;
+    }
+
+    .ant-form-item > label {
+      display: inline-block;
+      padding: 0;
+      margin-bottom: @gap;
+      font-weight: @bolder;
+    }
+
+    textarea {
+      resize: none;
+    }
+
+    pre {
+      font-family: @font-family;
+      font-size: @fontSizeBase;
+      line-height: 1.5;
+      white-space: pre-wrap;
+      white-space: -moz-pre-wrap;
+    }
+  }
+}
+
+.panelHead {
+  composes: panel-head;
+}
+
+.panelTitle {
+  composes: panel-title;
+}
+
+.edit {
+  float: right;
+  font-size: @fontSizeBase;
+  font-weight: normal;
+  img {
+    margin-right: 5px;
+  }
+}
+
+.panelBody {
+  composes: panel-body;
+  position: absolute;
+  top: @panelHeadHeight;
+  right: 0;
+  left: 0;
+  bottom: 0;
+  overflow-y: auto;
+}
+
+.addFile {
+  display: block;
+  line-height: 100%;
+  margin-top: @gap;
+  width: 120px;
+  color: @textColor;
+  i {
+    margin-right: 5px;
+  }
+}
+
+.physicalExamination {
+  label {
+    margin-bottom: @gap;
+    display: inline-block;
+    margin-right: 20px;
+  }
+
+  :global {
+    .ant-form-item {
+      display: inline-block;
+      margin-bottom: @gap;
+      margin-right: @gapSm;
+
+      & > div {
+        display: inline-block;
+      }
+
+      label {
+        margin: 0 2px 0 0;
+        font-weight: normal;
+      }
+    }
+
+    .ant-form-text {
+      vertical-align: middle;
+    }
+
+    .ant-input-number {
+      width: 120px;
+      margin-right: 0;
+    }
+
+    .pressure {
+      width: 60px;
+    }
+  }
+}
+
+.pmhDetail {
+  position: relative;
+  margin-top: -10px;
+
+  :global {
+    .ant-form-item {
+      margin-bottom: 0;
+      position: absolute;
+      right: 0;
+      top: 0;
+      left: 150px;
+    }
+
+    .ant-checkbox-wrapper {
+      margin-left: 15px;
+    }
+
+    .ant-input {
+      height: 30px;
+    }
+  }
+}

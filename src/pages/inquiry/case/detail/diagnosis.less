@@ -1,0 +1,107 @@
+@import "../../../../assets/style/index";
+
+@checkBoxWidth: 68px;
+
+.wrapper {
+  padding: 0;
+
+  :global {
+    .ant-table th, .ant-table td, .ant-table-footer {
+      padding: 4px 8px;
+    }
+
+    .ant-table {
+      .btn-group {
+        & > span:first-child {
+          display: inline-block;
+          width: 58px;
+          margin-right: 5px;
+        }
+
+        .add {
+          color: #87d068;
+        }
+
+        .delete {
+          color: #ff5500;
+        }
+      }
+
+      td.cell-diagnose,
+      td.cell-desc {
+        padding: 0;
+
+        & > div {
+          height: 46px;
+          padding: 4px 8px;
+        }
+      }
+    }
+
+    .ant-table-row-spaced,
+    .ant-table-row-expanded {
+      display: none;
+    }
+
+    .ant-table-row-level-1 .cell-diagnose .text {
+      padding-left: @gapLg;
+    }
+
+    i {
+      margin-right: 1px;
+    }
+
+    .ant-table-footer a {
+      color: @textColor;
+
+      i {
+        margin-right: 5px;
+      }
+    }
+
+    .diagnosisDescWrapper .ant-input{
+      border-color: @borderColorBase;
+      box-shadow: none;
+    }
+
+    .selectWrapper {
+      position: relative;
+
+      .text {
+        display: inline-block;
+        padding-right: @checkBoxWidth;
+        overflow: hidden;
+        max-height: 100%;
+      }
+
+      .ant-select{
+        padding-right: @checkBoxWidth;
+      }
+
+      .ant-checkbox-wrapper {
+        position: absolute;
+        right: 0;
+        font-size: @fontSizeSm;
+        width: @checkBoxWidth;
+      }
+
+      .ant-checkbox-wrapper + span, .ant-checkbox + span {
+        margin-left: 2px;
+      }
+    }
+
+  }
+
+  .table{
+    tr td{
+      padding-right: 40px;
+    }
+    tr td:first-child{
+      padding-right: 2px;
+    }
+
+    .subDiagnosis{
+
+    }
+  }
+}

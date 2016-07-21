@@ -1,0 +1,117 @@
+@import "../../assets/style/index.less";
+
+@contentM: 4.16666%;
+
+.wrapper {
+  height: 100%;
+  overflow-y: auto;
+
+  & > div {
+    position: relative;
+    min-width: 1746px;
+    margin: 0 @contentM;
+  }
+
+  .top {
+    height: 516px;
+    margin: @gap @contentM;
+  }
+
+  .left {
+    position: relative;
+    background: #fff;
+    height: 100%;
+    margin-right: 750px + @gap;
+    overflow: hidden;
+
+    img {
+      float: left;
+      max-width: 324px;
+    }
+
+    & > div {
+      margin-left: 324px;
+    }
+  }
+
+  .right {
+    float: right;
+    width: 750px;
+    height: 100%;
+    text-align: right;
+
+    img {
+      width: 100%;
+    }
+  }
+
+  .bottom {
+    padding-bottom: @gap;
+    .panel {
+      padding-left: 40px;
+
+      .panel-title {
+        font-size: 18px;
+        font-weight: bold;
+        padding: 20px 0;
+      }
+      .item {
+        width: 14%;
+        background: #e7e7e7;
+        margin-right: 3px;
+        & > div {
+          padding-left: 20px;
+        }
+      }
+      .next {
+        float: right;
+        font-weight: normal;
+        margin-right: 30px;
+      }
+      i {
+        margin-right: 10px;
+      }
+      .current {
+        background: #eaf8fe;
+      }
+    }
+    .date {
+      margin-top: @gap;
+    }
+    .action {
+      margin: 20px 0;
+      p {
+        color: #2db7f5;
+      }
+    }
+    .schedule {
+      margin-bottom: @gap;
+      ul {
+        list-style: disc;
+        list-style-position: inside;
+      }
+    }
+
+  }
+
+  :global {
+    .ant-carousel .slick-dots {
+      bottom: 60px;
+      li {
+        margin: 0;
+      }
+
+      li button:before {
+        font-size: 32px;
+        color: #fff;
+        opacity: 1;
+      }
+
+      li.slick-active button:before {
+        color: #666;
+      }
+
+    }
+  }
+}
+

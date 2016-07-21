@@ -1,0 +1,111 @@
+@import "../../assets/style/index";
+.dialog{
+  padding: 0 25px;
+
+  :global {
+    .ant-modal-body{
+      position: relative;
+    }
+
+    .ant-modal-footer{
+      padding-bottom: 30px;
+      border-top: 0;
+
+      button{
+        img{
+          position: relative;
+          top: 2px;
+        }
+      }
+
+      button + button{
+        margin-left: @gap;
+      }
+
+      .answer-btn{
+        color: #fff;
+        background-color: #5be191;
+        border-color: #5be191;
+      }
+
+      .answer-btn:disabled{
+        background-color: #eee;
+        border-color: #eee;
+      }
+
+      .ant-btn-ghost:not([disabled]){
+        color: @textLightGrey;
+      }
+    }
+  }
+}
+
+.pic {
+  width: 80px;
+  float: left;
+  padding-top: @gap + 5px;
+
+  span{
+    display: inline-block;
+    width: 80px;
+    height: 80px;
+    line-height: 80px;
+    border: 1px solid @borderColorBase;
+    text-align: center;
+    border-radius: 100%;
+    overflow: hidden;
+  }
+
+  img {
+    max-height: 100%;
+  }
+}
+
+.detail {
+  margin-left: 80px + @gap;
+  padding: @gap 0;
+
+  :global {
+    .top {
+      font-size: @fontSizeLg;
+      margin-bottom: @gapLg;
+
+      & > span {
+        margin-right: @gapLg;
+        display: inline-block;
+        height: 20px;
+        line-height: 20px;
+      }
+
+      .serial {
+        font-size: @fontSizeSm;
+        color: @textLightGrey;
+      }
+
+      .gender {
+        float: right;
+        margin-right: 0;
+      }
+    }
+
+
+    .middle {
+      li {
+        margin-bottom: @gap;
+        float: left;
+        width: 50%;
+        font-size: @fontSizeSm;
+      }
+    }
+  }
+}
+
+.callTips{
+  position: absolute;
+  right: @gap;
+  bottom: 5px;
+  color: @red;
+  text-align: right;
+  font-size: @fontSizeBase;
+}
+

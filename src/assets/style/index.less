@@ -1,0 +1,28 @@
+@import "./themes/default";
+
+@import "./components/panel";
+
+:global {
+  .clearfix {
+    *zoom: 1;
+  }
+
+  .clearfix:before,
+  .clearfix:after {
+    display: table;
+    line-height: 0;
+    content: "";
+  }
+
+  .clearfix:after {
+    clear: both;
+  }
+
+  img{
+    vertical-align: middle;
+  }
+
+  .noData{
+    text-align: center;
+  }
+}

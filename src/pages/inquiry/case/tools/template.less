@@ -1,0 +1,50 @@
+@import "../detail/detail";
+
+.wrapper {
+  display: flex;
+  padding: 0;
+
+  dl {
+    font-size: @fontSizeSm;
+  }
+
+  dt {
+    font-weight: bolder;
+  }
+
+  dd {
+    margin-bottom: 20px;
+  }
+
+  ol {
+    list-style: decimal;
+    margin-left: 20px;
+  }
+}
+
+.applyBtn {
+  float: right;
+  margin-top: -8px;
+}
+
+.panelHead {
+  composes: panel-head;
+  border-top: 1px solid @borderColorBase;
+}
+
+.panelTitle {
+  composes: panel-title;
+  font-weight: normal;
+}
+
+.panelBody {
+  composes: panel-body;
+  padding: @gap;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.panelBodyDetail {
+  composes: panelBody;
+  flex: 1.5;
+}

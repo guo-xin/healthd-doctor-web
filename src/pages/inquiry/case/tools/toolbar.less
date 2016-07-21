@@ -1,0 +1,89 @@
+@import "../detail/detail";
+
+@toolBarHeight: @opHeight + @gap / 2;
+
+.wrapper {
+  padding: 0;
+  display: block;
+  height: 100%;
+  overflow: auto;
+  background-color: #fbfbfb;
+
+  ul {
+    height: 100%;
+  }
+
+  & > a {
+    float: left;
+    height: 100%;
+    display: inline-block;
+    padding-left: 15px;
+    text-align: center;
+    color: @textLightGrey;
+
+    i {
+      margin-top: 36px;
+    }
+
+    & > span {
+      float: right;
+      margin-right: 15px;
+      display: inline-block;
+      width: 50px;
+      text-align: center;
+
+      span {
+        font-size: @fontSizeSm;
+        display: block;
+      }
+    }
+
+    img {
+      margin-top: 20px;
+      margin-bottom: 2px;
+    }
+  }
+  .topTool {
+    li {
+      display: inline;
+      text-align: center;
+
+      a {
+        display: inline-block;
+        width: 70px;
+        height: 100%;
+        font-size: @fontSizeSm;
+        color: @textLightGrey;
+        img {
+          margin-top: 20px;
+          vertical-align: middle;
+          margin-bottom: 2px;
+        }
+      }
+
+      span {
+        display: block;
+      }
+    }
+  }
+
+  .toolBody {
+    width: 0;
+    overflow: hidden;
+    height: 0;
+  }
+
+  :global .active a {
+    background-color: #f6f6f6;
+  }
+}
+
+.showTool {
+  .toolBody {
+    width: @toolbarWidth;
+    position: absolute;
+    top: @opHeight;
+    bottom: 0;
+    height: auto;
+  }
+}

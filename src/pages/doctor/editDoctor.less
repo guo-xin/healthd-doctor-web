@@ -1,0 +1,251 @@
+@import "../../assets/style/index.less";
+
+@rowGap: 30px;
+@rowML: 20px;
+@contentM: 4.1666666%;
+@labelW: 114px;
+@marginL: 50px;
+@lineHeight: 38px;
+
+.wrapper {
+  overflow-y: auto;
+  height: 100%;
+
+  & > div {
+    margin: 0px @contentM;
+    min-height: 100%;
+    display: flex;
+  }
+  & > div > .panel{
+    margin-top: 15px;
+  }
+  :global {
+    .row {
+      margin: 0 @rowML 0;
+    }
+
+    .col {
+      float: left;
+      width: 40%;
+      min-width: 300px;
+    }
+
+    .ant-form-item {
+      margin-bottom: @rowGap;
+
+      & > label {
+        display: block;
+        float: left;
+        width: @labelW;
+        text-align: right;
+      }
+
+      .ant-form-item-control {
+        margin-left: @labelW + 1px;
+        margin-right: 30px;
+      }
+    }
+  }
+
+  :global .safeBotton {
+    width: 49% !important;
+
+    .ant-btn {
+      width: auto;
+    }
+  }
+}
+.panel {
+  composes: panel;
+}
+
+.left {
+  width: 300px;
+  position: absolute;
+  height: 100%;
+  border-right: 1px solid #ececec;
+  .panelTitle {
+    padding: 25px;
+    border-bottom: 1px solid #ececec;
+  }
+  ul {
+    border-bottom: 1px solid #ececec;
+  }
+  li {
+    padding-left: @marginL;
+    line-height: 48px;
+  }
+  li:hover, li.active {
+    background: #fbfbfb;
+  }
+  a {
+    color: @textColor;
+  }
+}
+
+.right {
+  margin-left: 300px;
+}
+
+.panelHead {
+  height: @panelHeadHeight;
+  padding: 50px @marginL 30px;
+  &:not(:first-child) {
+    border-top: 1px solid @borderColorBase;
+    clear: both;
+  }
+}
+
+.panelTitle {
+  composes: panel-title;
+  font-weight: bold;
+
+  span {
+    font-size: @fontSizeSm;
+    font-weight: @headeNavFontWeight;
+  }
+}
+.panelTitle{
+  font-size: @fontSizeBase;
+}
+
+.panelBody {
+  composes: panel-body;
+  padding: 15px 0;
+  .panelTitle {
+    font-weight: bold;
+    padding: 0px @marginL 30px;
+  }
+  .textarea {
+    :global .ant-form-item {
+      width: 90%;
+    }
+    :global .ant-form-item-control {
+      margin-left: @marginL - @rowML;
+    }
+    textarea{
+      resize: none;
+    }
+  }
+  .wordTip{
+    position: absolute;
+    margin-top: -30px;
+    right: 10px;
+    span{
+      color:#999;
+      font-size: @fontSizeXs;
+    }
+  }
+}
+
+.action {
+  padding: 0 @labelW + @rowML 40px;
+  text-align: right;
+
+  :global .ant-btn {
+    width: 100px;
+
+    &:first-child {
+      margin-right: 30px;
+    }
+  }
+}
+
+.safe {
+  .panelBody{
+    padding-left:@marginL ;
+  }
+  :global .col {
+    width: 51%;
+  }
+  .action {
+    padding: 0;
+    text-align: left;
+  }
+
+}
+
+.labelContent {
+  line-height: @lineHeight;
+}
+
+.safeModal{
+  :global .ant-modal {
+    .ant-modal-header {
+      border-bottom: none;
+
+      .ant-modal-title {
+        font-size: 18px;
+      }
+    }
+    .ant-modal-body {
+      margin: 0px 80px;
+      padding: 16px 0px;
+      span {
+        color: #ccc;
+        font-size: @fontSizeXs;
+      }
+      .col {
+        .ant-form-item > label {
+          display: block;
+          float: left;
+          width: 114px;
+          text-align: right;
+        }
+        .ant-form-item-control {
+          margin-left: 115px;
+        }
+      }
+      .ant-form-item-required:before{
+        content: "";
+      }
+
+      .check, .send {
+        display: inline-flex;
+        button {
+          height: 38px;
+          margin-left: 15px;
+          width: 100px;
+          margin-top: 3px;
+          background: #ececec;
+          &:hover {
+            background: #fff;
+            span {
+              color: #48d1f3;
+            }
+          }
+          span {
+            color: #717171;
+            font-size: @fontSizeBase;
+          }
+        }
+        button:disabled{
+          background: #fff;
+          span{
+            color: #ccc;
+            font-size: @fontSizeBase;
+          }
+        }
+      }
+
+      .send {
+        .ant-form-item {
+          margin-bottom: 0px;
+        }
+      }
+      .has-info {
+        margin-left: 115px;
+      }
+      .ant-form-explain{
+        font-size: 12px;
+      }
+    }
+    .ant-modal-footer {
+      border-top: none;
+    }
+    .ant-form-item.ant-form-item-with-help{
+      margin-bottom: 3px;
+    }
+  }
+}
+

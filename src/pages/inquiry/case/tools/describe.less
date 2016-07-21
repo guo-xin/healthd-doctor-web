@@ -1,0 +1,122 @@
+@import "../detail/detail";
+
+.wrapper {
+  display: flex;
+  padding: 0;
+
+  .date {
+    font-size: @fontSizeBase;
+    font-weight: bold;
+    padding: 20px 0 10px;
+  }
+  .part {
+    display: inline;
+  }
+  .partDay {
+    .date {
+      border-top: 1px solid #ececec;
+      margin-top: 20px;
+    }
+  }
+  .item {
+    width: 80px;
+    margin-bottom: 6px;
+    margin-right: 6px;
+    display: inline-flex;
+  }
+  .time {
+    text-align: left;
+    display: block;
+    font-size: @fontSizeSm;
+    color: @grey;
+    padding: 6px 0 0;
+  }
+  .pictureList {
+    img {
+      width: 80px;
+      height: 80px;
+      cursor: pointer;
+    }
+  }
+
+}
+
+.panelHead {
+  composes: panel-head;
+  padding: 0;
+  border-top: 1px solid @borderColorBase;
+
+}
+
+.panelElement {
+  display: inline-block;
+  padding: 0 10px;
+  height: @panelHeadHeight - 2;
+  border-bottom: 2px solid @blue;
+}
+
+.panelTitle {
+  font-weight: normal;
+  color: @blue;
+  line-height: @panelHeadHeight;
+}
+
+.panelBody {
+  composes: panel-body;
+  padding: @gap;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.dialogModal {
+  position: fixed;
+  width: 100%;
+  top: 0;
+  right: 0;
+  background: rgba(0, 0, 0, 0.75);
+  z-index: 1000;
+  bottom: 0;
+  overflow-y: auto;
+}
+
+.dialogPicture {
+  height: 650px;
+  text-align: center;
+  background: #000;
+  width: 1100px;
+  margin: auto;
+  margin-top: 86px;
+  & > img {
+    height: 540px;
+    width: 540px;
+  }
+}
+
+.dialogClose {
+  height: 60px;
+  text-align: right;
+  span {
+    font-size: 24px;
+    cursor: pointer;
+  }
+  i{
+    color: @grey;
+  }
+  i:hover {
+    color: #D3D3D3;
+  }
+}
+
+.dialogButton {
+  margin: auto;
+  width: 540px;
+}
+
+.dialogFonter {
+  width: 270px;
+  display: inline-block;
+  cursor: pointer;
+  img {
+    padding-top: 15px;
+  }
+}

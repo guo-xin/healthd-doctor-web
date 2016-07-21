@@ -1,0 +1,82 @@
+@import "../../assets/style/index.less";
+
+.panel {
+  padding: 0 40px;
+  .item {
+    width: 14%;
+    background: #f7f7f7;
+    min-height: 280px;
+    & > div {
+      padding:0 20px;
+    }
+  }
+
+  .current {
+    background: #eaf8fe;
+  }
+
+  i {
+    margin-right: 10px;
+  }
+
+  .next {
+    float: right;
+    font-weight: normal;
+  }
+
+  .date {
+    padding: @gap 0;
+    border-bottom: 1px dashed #ececec;
+
+    .week {
+      font-size: @fontSizeLg;
+      font-weight: bold;
+    }
+  }
+
+  .action {
+    color: @grey;
+  }
+  .schedule {
+    margin: 10px 0;
+    color: @blue;
+    ul {
+      list-style: none;
+    }
+  }
+  .change {
+    padding: @gap 0;
+    border-top: 1px dashed #ececec;
+
+    ul {
+      list-style: disc;
+      list-style-position: inside;
+
+      li {
+        padding: 5px 0;
+      }
+    }
+  }
+
+  :global {
+    .ant-row-flex {
+      flex-flow: row wrap;
+      justify-content: space-between;
+    }
+
+    .ant-carousel .slick-slider {
+      padding-bottom: @gapXl;
+    }
+  }
+}
+
+.panelTitle {
+  composes: panel-title;
+  font-size: 18px;
+  font-weight: bold;
+  padding: 20px 0;
+}
+
+
+
+

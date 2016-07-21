@@ -1,0 +1,27 @@
+@import "../../../assets/style/index";
+
+@videoWidthPadding: @videoWidth + @gap*2;
+
+
+.wrapper {
+  padding: 0;
+  height: 100%;
+  position: relative;
+}
+
+.video {
+  width: @videoWidthPadding;
+  height: @videoHeight;
+  padding: @gap;
+  float: left;
+  overflow: hidden;
+
+  img{
+    width: 100%;
+  }
+}
+
+.content {
+  margin-left: @videoWidthPadding;
+  height: 100%;
+}

@@ -1,0 +1,38 @@
+@import "../detail/detail";
+
+@toolWidth: 400px;
+@opHeight: 80px;
+
+.wrapper {
+  display: block;
+  padding: 0;
+  overflow: auto;
+  background: #fff;
+  height: 80px;
+
+  li {
+    display: block;
+    float: left;
+    height: @opHeight;;
+    margin-left: @gapXl;
+  }
+
+  a {
+    display: inline-block;
+    height: 100%;
+    width: 80px;
+    text-align: center;
+    color: @textColor;
+
+    img {
+      vertical-align: middle;
+      margin-top: 18px;
+      margin-bottom: 2px;
+      height: 22px;
+      vertical-align: middle;
+    }
+    span {
+      display: block;
+    }
+  }
+}
