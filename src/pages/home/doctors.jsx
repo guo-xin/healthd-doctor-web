@@ -47,6 +47,7 @@ class Doctors extends Component {
         }
 
     };
+    
 
     showConfirm1() {
         confirm({
