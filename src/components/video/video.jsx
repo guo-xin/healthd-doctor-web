@@ -850,6 +850,10 @@ class Video extends React.Component {
         this._togglePlay();
     }
 
+    onPause(e){
+        this.state.isPlay = false;
+    }
+
     onError(e) {
         this.setState({
             isPlay: false
@@ -939,6 +943,7 @@ class Video extends React.Component {
                                     ref="video"
                                     controls="controls"
                                     preload="none"
+                                    onPause={::this.onPause}
                                     onEnded={::this.onEnd}
                                     onError={::this.onError}>
                                     您的浏览器不支持 video 标签。

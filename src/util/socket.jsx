@@ -11,101 +11,108 @@ import {
     getDoctorAttendance
 } from 'redux/actions/doctor';
 
-let source,source1;
+class Events {
+    constructor(name, url) {
+        this.ErrorCount = 0;
+        this.name = name;
+        this.url = url;
+        this.createSource();
+    }
+
+    createSource(){
+        if (typeof(EventSource) != "undefined" && this.url) {
+            this.source = new EventSource(this.url);
+
+            this.source.onmessage = this.onMessage;
+
+            this.source.onopen = this.onOpen;
+
+            this.source.onerror = this.onError;
+
+            console.log(this.name + '-'+ '---------------initEvent');
+        }else{
+            console.log('SSE not supported by browser.');
+        }
+    }
+
+    onMessage(event){
+        console.info(this.name + '-'+ 'Received onmessage event: ' + event.data);
+    }
+
+    onOpen(event){
+        this.ErrorCount = 0;
+        console.info(this.name + '-'+ "event source opened");
+    }
+
+    onError(event){
+        let ErrorCount = this.ErrorCount;
+        if (ErrorCount < 10) {
+            setTimeout(()=> {
+                //this.createSource();
+                ErrorCount++;
+            }, 5000);
+        } else if (ErrorCount === 10) {
+            this.close();
+            ErrorCount = 0;
+            setTimeout(()=> {
+                this.createSource();
+            }, 1000);
+        }
+        console.info(this.name + '-'+ 'Received error event voicecall');
+    }
+
+    addEvent(event, fn){
+        if(this.source && event && typeof fn === 'function'){
+            this.source.addEventListener(event, fn, false);
+        }
+    }
+
+    close(){
+        if(this.source){
+            this.source.close();
+            this.source = null;
+        }
+    }
+
+}
+
+
+let phoneSource, queueSource;
 
 export const receiveMessages = ()=> {
-    let ErrorCount = 0;
     let doctorId = store.getState().authStore.id;
 
     function seEvents() {
-        if (typeof(EventSource) != "undefined") {
-            console.info('start listening events from server');
+        phoneSource = new Events('phone', "v2/message/events/" + doctorId);
+        phoneSource.addEvent("voicecall/" + doctorId, function (event) {
+            console.info('Received addEventListener event ' + event.type + ': ' + event.data);
 
-            source = new EventSource("v2/message/events/" + doctorId);
-            source1 = new EventSource("v2/queue-message/events/" + doctorId);
+            if (event.data) {
+                let preWorkingStatus = store.getState().doctorStore.data.workingStatus;
 
-            source.onmessage = function (event) {
-                console.info('Received onmessage event: ' + event.data);
-            };
-            source1.onmessage = function (event) {
-                console.info('Received onmessage1 event: ' + event.data);
-            };
+                store.dispatch(changeDoctorState({
+                    workingStatus: 1
+                }));
+                store.dispatch(showCallingDialog(true, 0, Object.assign({workingStatus: preWorkingStatus}, JSON.parse(event.data))));
 
-            source.addEventListener("voicecall/" + doctorId, function (event) {
-                console.info('Received addEventListener event ' + event.type + ': ' + event.data);
+                store.dispatch(postCloseSe(doctorId)).then(()=> {
+                    console.log('event source closed')
+                });
+            }
+        });
 
-                if (event.data) {
-                    let preWorkingStatus = store.getState().doctorStore.data.workingStatus;
 
-                    store.dispatch(changeDoctorState({
-                        workingStatus: 1
-                    }));
-                    store.dispatch(showCallingDialog(true, 0, Object.assign({workingStatus: preWorkingStatus}, JSON.parse(event.data))));
+        queueSource = new Events('queue', "v2/queue-message/events/" + doctorId);
+        queueSource.addEvent("queue/" + doctorId, function () {
+            console.info('Received addEventListener event ' + event.type + ': ' + event.data);
 
-                    store.dispatch(postCloseSe(doctorId)).then(()=> {
-                        console.log('event source closed')
-                    });
-                }
-
-            }, false);
-
-            source1.addEventListener("queue/" + doctorId, function (event) {
-                console.info('Received addEventListener event ' + event.type + ': ' + event.data);
-
-                if (event.data) {
-                    store.dispatch(setDoctorQueueCount(JSON.parse(event.data)));
-                    store.dispatch(postCloseSe(doctorId)).then(()=> {
-                        console.log('event source closed')
-                    });
-                }
-            }, false);
-
-            source.onopen = function (event) {
-                console.info("event source opened");
-                ErrorCount = 0;
-            };
-
-            source1.onopen = function (event) {
-                console.info("event source opened1");
-                ErrorCount = 0;
-            };
-
-            source.onerror = function (event) {
-                if (ErrorCount < 10) {
-                    setTimeout(()=> {
-                        //seEvents();
-                        ErrorCount++;
-                    }, 5000);
-                } else if (ErrorCount === 10) {
-                    seClose();
-                    ErrorCount = 0;
-                    setTimeout(()=> {
-                        seEvents();
-                    }, 1000);
-                }
-                console.info('Received error event voicecall: ' + ErrorCount);
-            };
-
-            source1.onerror = function (event) {
-                if (ErrorCount < 10) {
-                    setTimeout(()=> {
-                        //seEvents();
-                        ErrorCount++;
-                    }, 5000);
-                } else if (ErrorCount === 10) {
-                    seClose();
-                    ErrorCount = 0;
-                    setTimeout(()=> {
-                        seEvents();
-                    }, 1000);
-                }
-                console.info('Received error event queue: ' + ErrorCount);
-            };
-
-        } else {
-            // Sorry! No server-sent events support..
-            console.log('SSE not supported by browser.');
-        }
+            if (event.data) {
+                store.dispatch(setDoctorQueueCount(JSON.parse(event.data)));
+                store.dispatch(postCloseSe(doctorId)).then(()=> {
+                    console.log('event source closed')
+                });
+            }
+        });
     }
 
     seEvents();
@@ -113,17 +120,16 @@ export const receiveMessages = ()=> {
 
 //关闭se消息推送
 export const seClose = ()=> {
-    if (source && source.close) {
-        source.close();
+    if (phoneSource && phoneSource.close) {
+        phoneSource.close();
+        phoneSource = null;
         console.log('event source closed');
-        source = null;
     }
-    if (source1 && source1.close) {
-        source1.close();
+    if (queueSource && queueSource.close) {
+        queueSource.close();
+        queueSource = null;
         console.log('event source closed');
-        source1 = null;
     }
-
 };
 
 //页面相关的监听动作
