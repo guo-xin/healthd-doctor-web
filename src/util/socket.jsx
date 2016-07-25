@@ -49,7 +49,7 @@ class Events {
     }
 
     onError(event) {
-        console.info(this.name + '-' + 'Received error event voicecall', event);
+        console.info(this.name + '-' + 'Received error event voicecall');
     }
 
     addEvent(event, fn) {
