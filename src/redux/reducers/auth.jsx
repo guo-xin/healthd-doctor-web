@@ -17,7 +17,8 @@ const auth = (state = {
         subAccountPwd: "",
         voipId: "",
         voipPwd: ""
-    }
+    },
+    isResetting: true
 }, action) => {
     let data, result;
 
@@ -70,6 +71,8 @@ const auth = (state = {
                     }),{expires: exp});
                 }
             }
+
+            state.isResetting = false;
 
             return Object.assign({}, state);
 

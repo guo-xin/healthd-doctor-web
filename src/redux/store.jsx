@@ -48,9 +48,9 @@ function callAsyncActionsMiddleware({dispatch, getState}) {
 
             return response.json();
         }).then(json => {
-            let rt = (json || {}).data || {};
+            let rt = (json || {}).code;
 
-            if(rt.code === -14){
+            if(rt === -14){
                 message.warning('登录超时，请重新登录');
             }
 
