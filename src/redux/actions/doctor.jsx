@@ -4,25 +4,6 @@ import fetch from 'isomorphic-fetch';
 //推送排队人数
 export const setDoctorQueueCount = actions.create(actions.SET_DOCTOR_QUEUE_COUNT, 'queue');
 
-//关闭消息推送
-export const postCloseSe = (doctorId) => {
-    let action = actions.POST_CLOSE_SE;
-    return {
-        // 要在之前和之后发送的 action types
-        types: [action + '_REQUEST', action + '_SUCCESS', action + '_FAILURE'],
-      
-        // 进行取：
-        callAPI: (token) => fetch(`${actions.WEB_API_URI}/message/close/${doctorId}`,{
-            method: 'POST',
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json; charset=UTF-8',
-                [actions.HEADER_AUTH_FIELD]: actions.HEADER_AUTH_PREFIX
-            }
-        })
-    };
-};
-
 //医生忘记密码验证邮箱发送密码
 export const getDoctorResetPwd = (email) => {
     let action = actions.GET_DOCTOR_RESET_PWD;

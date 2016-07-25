@@ -5,7 +5,6 @@ import {autoSaveCase} from 'redux/actions/case';
 
 import {
     setDoctorQueueCount,
-    postCloseSe,
     changeDoctorState,
     getDoctorEndInquery,
     getDoctorAttendance
@@ -13,67 +12,58 @@ import {
 
 class Events {
     constructor(name, url) {
-        this.ErrorCount = 0;
         this.name = name;
         this.url = url;
         this.createSource();
     }
 
-    createSource(){
+    createSource() {
         if (typeof(EventSource) != "undefined" && this.url) {
+            let self = this;
             this.source = new EventSource(this.url);
 
-            this.source.onmessage = this.onMessage;
+            /*this.source.onmessage = function (event) {
+             self.onMessage.call(self, event);
+             };*/
 
-            this.source.onopen = this.onOpen;
+            this.source.onopen = function (event) {
+                self.onOpen.call(self, event);
+            };
 
-            this.source.onerror = this.onError;
+            this.source.onerror = function (event) {
+                self.onError.call(self, event);
+            };
 
-            console.log(this.name + '-'+ '---------------initEvent');
-        }else{
+            console.log(this.name + '-' + 'start listening events from server');
+        } else {
             console.log('SSE not supported by browser.');
         }
     }
 
-    onMessage(event){
-        console.info(this.name + '-'+ 'Received onmessage event: ' + event.data);
+    onMessage(event) {
+        console.info(this.name + '-' + 'Received onmessage event: ' + event.data);
     }
 
-    onOpen(event){
-        this.ErrorCount = 0;
-        console.info(this.name + '-'+ "event source opened");
+    onOpen(event) {
+        console.info(this.name + '-' + "event source opened,");
     }
 
-    onError(event){
-        let ErrorCount = this.ErrorCount;
-        if (ErrorCount < 10) {
-            setTimeout(()=> {
-                //this.createSource();
-                ErrorCount++;
-            }, 5000);
-        } else if (ErrorCount === 10) {
-            this.close();
-            ErrorCount = 0;
-            setTimeout(()=> {
-                this.createSource();
-            }, 1000);
-        }
-        console.info(this.name + '-'+ 'Received error event voicecall');
+    onError(event) {
+        console.info(this.name + '-' + 'Received error event voicecall', event);
     }
 
-    addEvent(event, fn){
-        if(this.source && event && typeof fn === 'function'){
+    addEvent(event, fn) {
+        if (this.source && event && typeof fn === 'function') {
             this.source.addEventListener(event, fn, false);
         }
     }
 
-    close(){
-        if(this.source){
+    close() {
+        if (this.source) {
             this.source.close();
             this.source = null;
         }
     }
-
 }
 
 
@@ -82,11 +72,11 @@ let phoneSource, queueSource;
 export const receiveMessages = ()=> {
     let doctorId = store.getState().authStore.id;
 
-    function seEvents() {
+    function seMessage() {
+        //电话推送
         phoneSource = new Events('phone', "v2/message/events/" + doctorId);
         phoneSource.addEvent("voicecall/" + doctorId, function (event) {
             console.info('Received addEventListener event ' + event.type + ': ' + event.data);
-
             if (event.data) {
                 let preWorkingStatus = store.getState().doctorStore.data.workingStatus;
 
@@ -94,50 +84,68 @@ export const receiveMessages = ()=> {
                     workingStatus: 1
                 }));
                 store.dispatch(showCallingDialog(true, 0, Object.assign({workingStatus: preWorkingStatus}, JSON.parse(event.data))));
-
-                store.dispatch(postCloseSe(doctorId)).then(()=> {
-                    console.log('event source closed')
-                });
             }
+
         });
 
-
-        queueSource = new Events('queue', "v2/queue-message/events/" + doctorId);
-        queueSource.addEvent("queue/" + doctorId, function () {
-            console.info('Received addEventListener event ' + event.type + ': ' + event.data);
-
-            if (event.data) {
-                store.dispatch(setDoctorQueueCount(JSON.parse(event.data)));
-                store.dispatch(postCloseSe(doctorId)).then(()=> {
-                    console.log('event source closed')
-                });
+        let SSECheck = setInterval(function () {
+            if (phoneSource.source && phoneSource.source.readyState == 2) {
+                clearInterval(SSECheck);
+                phoneSource.close();
+                seMessage();
+                console.log('event phoneSource restart');
             }
-        });
+
+        }, 1000);
     }
 
-    seEvents();
+    function seQueueMessage() {
+
+        //排队推送
+        queueSource = new Events('queue', "v2/queue-message/events/" + doctorId);
+        queueSource.addEvent("queue/" + doctorId, function (event) {
+            console.info('Received addEventListener event ' + event.type + ': ' + event.data);
+            if (event.data) {
+                store.dispatch(setDoctorQueueCount(JSON.parse(event.data)));
+            }
+
+        });
+
+        let SSECheck = setInterval(function () {
+
+
+            if (queueSource.source && queueSource.source.readyState == 2) {
+                clearInterval(SSECheck);
+                queueSource.close();
+                seQueueMessage();
+                console.log('event queueSource restart');
+            }
+
+        }, 1000);
+    }
+
+    seQueueMessage();
+    seMessage();
 };
 
 //关闭se消息推送
 export const seClose = ()=> {
     if (phoneSource && phoneSource.close) {
         phoneSource.close();
-        phoneSource = null;
-        console.log('event source closed');
+        console.log('event phoneSource closed');
     }
     if (queueSource && queueSource.close) {
         queueSource.close();
-        queueSource = null;
-        console.log('event source closed');
+        console.log('event queueSource closed');
     }
 };
 
 //页面相关的监听动作
 export const windowListen = ()=> {
-    
+
     window.onbeforeunload = function () {
         store.dispatch(autoSaveCase());
-        
+
         return '数据可能会丢失!';
     };
 

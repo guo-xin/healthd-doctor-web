@@ -49,8 +49,6 @@ export const GET_OCX_ACCOUNT = "GET_OCX_ACCOUNT"; //获取荣联账号
 /* ---------- 登录认证相关操作 end ---------- */
 
 
-export const POST_CLOSE_SE = "POST_CLOSE_SE";//关闭消息推送
-
 /* ---------- 医生相关操作 start ---------- */
 export const SET_DOCTOR_QUEUE_COUNT = "SET_DOCTOR_QUEUE_COUNT";//推送医生排队人数
 export const GET_DOCTOR_RESET_PWD = "GET_DOCTOR_RESET_PWD";//医生忘记密码验证邮箱发送密码
