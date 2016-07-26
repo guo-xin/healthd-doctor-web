@@ -39,7 +39,7 @@ const auth = (state = {
                     state.id = data.id || '';
                     state.headPic = data.headPic || '';
                     let exp = new Date();
-                    exp.setTime(exp.getTime() + 4 * 60 * 60 * 1000);
+                    exp.setTime(exp.getTime() + 14 * 60 * 60 * 1000);
 
                     cookie.save('healthD', {
                         id: state.id,
@@ -49,6 +49,8 @@ const auth = (state = {
                     },{expires: exp});
                 }
             }
+
+            state.isResetting = false;
 
             return Object.assign({}, state);
 
@@ -61,7 +63,7 @@ const auth = (state = {
 
                 if(data['access_token']){
                     let exp = new Date();
-                    exp.setTime(exp.getTime() + 4 * 60 * 60 * 1000);
+                    exp.setTime(exp.getTime() + 14 * 60 * 60 * 1000);
 
                     state.token = data['access_token'];
 
