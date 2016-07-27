@@ -88,8 +88,11 @@
   span:hover {
     color: #fff;
   }
-  .informMenu {
-    left: 40px;
+  ul.informMenu {
+    left: 75px;
+    &:after {
+      right: 80px;
+    }
 
     li {
       width: 240px;
@@ -103,6 +106,11 @@
       color: #1ac5f0;
       font-size: 14px;
     }
+  }
+
+  li.informationNull {
+    text-align: center;
+    line-height: 50px;
   }
 
   .circle {
@@ -184,7 +192,7 @@
     font-size: 16px;
     text-align: left;
 
-    i{
+    i {
       margin-right: 15px;
       position: inherit;
     }

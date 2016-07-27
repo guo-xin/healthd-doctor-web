@@ -43,12 +43,7 @@ export default class User extends Component {
     getDoctorList() {
         const {dispatch, doctorId = {}} = this.props;
         let dateInfo = global.getDateRange();
-        dispatch(getDoctorPictureMessage(doctorId)).then(()=> {
-            const {message = []} =this.props;
-            if (Array.isArray(message) && message.length > 0) {
-                this.state.newMessage = true;
-            }
-        });
+        dispatch(getDoctorPictureMessage(doctorId));
         dispatch(getDoctorByUserIdDate(doctorId, dateInfo.startTime, dateInfo.endTime));
         dispatch(getDoctorByUserId()).then(()=> {
             const {data = {}} = this.props;
@@ -61,8 +56,7 @@ export default class User extends Component {
 
     state = {
         changeState: false,
-        menuName: '在线',
-        newMessage: false
+        menuName: '在线'
     };
 
     logout() {
@@ -152,16 +146,14 @@ export default class User extends Component {
     }
 
     onSettingClick(menu) {
-        console.log(menu.item.props.content);
         let info = menu.item.props.content;
-        const {dispatch,router} = this.props;
+        const {dispatch, router} = this.props;
         dispatch(setCurrentCase({
             patientId: info.patientId,
             caseId: info.caseId,
-            inquiryId: info.inquiryInfoId,
+            inquiryId: info.inquiryId,
             state: 1
         }));
-
         router.push(`/inquire/case/detail`);
     }
 
@@ -173,11 +165,14 @@ export default class User extends Component {
                 return (<Menu.Item key={index} content={content}>患者 {content.realName} 上传{content.count}张新图片 <a
                     className={styles.check}>查看</a></Menu.Item>);
             });
-
+            return (<Menu onClick={::this.onSettingClick} className={styles.informMenu}>
+                {menuList}
+            </Menu>);
+        } else {
+            return (<Menu className={styles.informMenu}>
+                <Menu.Item key='2' className={styles.informationNull}>暂无新消息</Menu.Item>
+            </Menu>);
         }
-        return (<Menu onClick={::this.onSettingClick} className={styles.informMenu}>
-            {menuList}
-        </Menu>);
     }
 
     onMenuChange = ({item})=> {
@@ -202,6 +197,11 @@ export default class User extends Component {
 
     render() {
         const {data = {}, message = []} = this.props;
+        let newMessage = false;
+        if (Array.isArray(message) && message.length > 0) {
+            newMessage = true;
+        }
+
         const informMenu = this.getInformMenu(message);
         const menu = this.getMenu();
         return (
@@ -209,7 +209,7 @@ export default class User extends Component {
                 <Dropdown overlay={informMenu} getPopupContainer={()=>document.getElementById('headerUser')}>
                     <a className={styles.dropdown} href="javascript:void(0)">
                         <Icon type="notification"/>
-                        {this.state.newMessage ? (<span className={styles.circle}></span>) : ""}
+                        {newMessage ? (<span className={styles.circle}></span>) : ""}
                     </a>
                 </Dropdown>
 

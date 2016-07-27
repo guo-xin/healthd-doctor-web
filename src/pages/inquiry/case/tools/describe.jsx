@@ -3,7 +3,7 @@ import {Icon} from 'antd';
 import styles from './describe.less';
 import {connect} from 'react-redux';
 import * as global from 'util/global';
-import {getPatientPicture} from 'redux/actions/tool';
+import {getCurrentInqueryPicture} from 'redux/actions/tool';
 
 class Describe extends Component {
     state = {
@@ -20,7 +20,7 @@ class Describe extends Component {
         const {dispatch, currentCase = {}} = this.props;
 
         if (currentCase.caseId) {
-            dispatch(getPatientPicture(currentCase.caseId));
+            dispatch(getCurrentInqueryPicture(currentCase.caseId));
         }
     }
 
@@ -80,8 +80,8 @@ class Describe extends Component {
     }
 
     render() {
-        let {data = [],currentCase = {}} = this.props;
-        if(!currentCase.caseId){
+        let {data = [], message = [], currentCase = {}} = this.props;
+        if (!currentCase.caseId) {
             data = [];
         }
         let time = new Date().getTime();
@@ -152,7 +152,6 @@ class Describe extends Component {
                     <div className={styles.panelElement}>
                         <a href="javascript:;" className={styles.panelTitle}>所 有</a>
                     </div>
-
                 </div>
 
                 <div className={styles.panelBody}>
@@ -179,11 +178,12 @@ class Describe extends Component {
 }
 
 const mapStateToProps = (globalStore) => {
-    const {caseStore, toolStore}  = globalStore;
-    const response = (toolStore.picture || []).slice().reverse();
+    const {caseStore, toolStore, doctorStore}  = globalStore;
+    const response = toolStore.picture || [];
     return {
         data: response,
-        currentCase: caseStore.currentCase
+        currentCase: caseStore.currentCase,
+        message: doctorStore.message
     };
 };
 
