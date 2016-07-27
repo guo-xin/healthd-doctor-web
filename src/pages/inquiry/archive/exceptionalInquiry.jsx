@@ -58,20 +58,22 @@ class ExceptionalInquiry extends React.Component {
 
     render() {
         let status = {
-            '1': '挂断',
-            '2': '挂断',
-            '3': '挂断',
-            '4': '挂断',
-            '-1': '挂断',
-            '-2': '未呼通',
-            '-3': '挂断',
-            '-4': '拒接',
-            '-5': '拒接',
-            '-8': '未呼通',
-            '-9': '拒接',
-            '-10': '挂断',
-            '-14': '挂断'
-        };
+                '1': '挂断',
+                '2': '挂断',
+                '3': '挂断',
+                '4': '挂断',
+                '-1': '挂断',
+                '-2': '未呼通',
+                '-3': '挂断',
+                '-4': '拒接',
+                '-5': '拒接',
+                '-8': '未呼通',
+                '-9': '拒接',
+                '-10': '挂断',
+                '-12': '未呼通',
+                '-14': '挂断'
+            }
+            ;
         let list = this.props.list.map((item, index)=> {
             let callStatus = status[item.byeType + ''];
             let inqueryType = '';
@@ -105,7 +107,7 @@ class ExceptionalInquiry extends React.Component {
                             <div className="detail">
                                 <div className="top">
                                     <span className="name">患者：{item.realName || '--'}</span>
-                                    <span className="age">{global.getAge(item.birthday)  || '--'}岁</span>
+                                    <span className="age">{global.getAge(item.birthday) || '--'}岁</span>
                                     <span
                                         className="serial">ID:{global.formatPatientCode(item.patientCode) || '--'}</span>
                                     <span className="gender">

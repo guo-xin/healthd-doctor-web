@@ -5,6 +5,7 @@ import {autoSaveCase} from 'redux/actions/case';
 
 import {
     setDoctorQueueCount,
+    setDoctorMessageInfo,
     changeDoctorState,
     getDoctorEndInquery,
     getDoctorAttendance
@@ -67,13 +68,13 @@ class Events {
 }
 
 
-let phoneSource, queueSource;
+let phoneSource, queueSource,infoSource;
 
 export const receiveMessages = ()=> {
     let doctorId = store.getState().authStore.id;
 
+    //电话推送
     function seMessage() {
-        //电话推送
         phoneSource = new Events('phone', "v2/message/events/" + doctorId);
         phoneSource.addEvent("voicecall/" + doctorId, function (event) {
             console.info('Received addEventListener event ' + event.type + ': ' + event.data);
@@ -99,9 +100,8 @@ export const receiveMessages = ()=> {
         }, 1000);
     }
 
+    //排队推送
     function seQueueMessage() {
-
-        //排队推送
         queueSource = new Events('queue', "v2/queue-message/events/" + doctorId);
         queueSource.addEvent("queue/" + doctorId, function (event) {
             console.info('Received addEventListener event ' + event.type + ': ' + event.data);
@@ -112,8 +112,6 @@ export const receiveMessages = ()=> {
         });
 
         let SSECheck = setInterval(function () {
-
-
             if (queueSource.source && queueSource.source.readyState == 2) {
                 clearInterval(SSECheck);
                 queueSource.close();
@@ -124,8 +122,31 @@ export const receiveMessages = ()=> {
         }, 1000);
     }
 
-    seQueueMessage();
+    //图片新消息推送
+    function seMessageInfo() {
+        infoSource = new Events('messageInfo', "v2/message-info-push/events/" + doctorId);
+        infoSource.addEvent("messageInfo/" + doctorId, function (event) {
+            console.info('Received addEventListener event ' + event.type + ': ' + event.data);
+            if (event.data) {
+                store.dispatch(setDoctorMessageInfo(JSON.parse(event.data)));
+            }
+
+        });
+
+        let SSECheck = setInterval(function () {
+            if (infoSource.source && infoSource.source.readyState == 2) {
+                clearInterval(SSECheck);
+                infoSource.close();
+                seMessageInfo();
+                console.log('event infoSource restart');
+            }
+
+        }, 1000);
+    }
+
     seMessage();
+    seQueueMessage();
+    seMessageInfo();
 };
 
 //关闭se消息推送
@@ -137,6 +158,11 @@ export const seClose = ()=> {
     if (queueSource && queueSource.close) {
         queueSource.close();
         console.log('event queueSource closed');
+    }
+
+    if (infoSource && infoSource.close) {
+        infoSource.close();
+        console.log('event infoSource closed');
     }
 };
 

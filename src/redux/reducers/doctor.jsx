@@ -7,7 +7,9 @@ const doctor = (state = {
     queue: {},  //排队人数
     inquiry: {}, //问诊人数
     result: {}, //返回的结果
-    response: {} //重置密码
+    response: {}, //重置密码
+    message: [],//图片消息通知
+    messageInfo: {}//图片新消息推送
 }, action) => {
 
     let obj;
@@ -72,6 +74,22 @@ const doctor = (state = {
 
             return Object.assign({}, state);
 
+        case actions.SET_DOCTOR_MESSAGE_INFO:
+            let info = action.messageInfo || {};
+            if (info.data) {
+                state.messageInfo = {
+                    messageList: info.data.queueCount
+                };
+            }
+
+            return Object.assign({}, state);
+
+        case actions.GET_DOCTOR_PICTURE_MESSAGE + "_SUCCESS":
+            obj = Object.assign({}, state, {
+                message: action.response.data
+            },);
+            return obj;
+
         case actions.DOCTOR_BY_USER_ID_QUEUE + "_SUCCESS":
             obj = Object.assign({}, state, {
                 queue: action.response.data
@@ -129,7 +147,7 @@ const doctor = (state = {
 
         case actions.NOTICE_CHANGE_DOCTOR_STATE + "_REQUEST":
 
-            if(action){
+            if (action) {
                 state.data.workingStatus = +action.workingStatus;
 
                 return Object.assign({}, state);
