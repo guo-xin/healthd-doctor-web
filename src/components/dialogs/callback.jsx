@@ -6,6 +6,7 @@ import {withRouter} from 'react-router';
 import {connect} from 'react-redux';
 import {getUserById} from 'redux/actions/user';
 import {showCallbackDialog, setIncomingUserId, setCallbackUserId, addCallRecord} from 'redux/actions/call';
+import {setCurrentCase} from 'redux/actions/case'
 
 import Image from '../image/image.jsx';
 import * as global from 'util/global';
@@ -22,8 +23,8 @@ class Callback extends Component {
         super(props);
     }
 
-    toSelectPatientPage() {
-        let {dispatch} = this.props;
+    toNextPage() {
+        let {dispatch, callbackUser, router} = this.props;
 
         this.setVisible(false);
 
@@ -32,7 +33,16 @@ class Callback extends Component {
             dispatch(setIncomingUserId(user.userId, user));
         });*/
 
-        this.props.router.push(`/inquire/case/selectPatient`);
+        if(callbackUser.patientId){
+            dispatch(setCurrentCase({
+                patientId: callbackUser.patientId,
+                caseId: null,
+                state: -1
+            }));
+            router.push(`/inquire/case/detail`);
+        }else{
+            router.push(`/inquire/case/selectPatient`);
+        }
 
         setTimeout(()=>{
             let user = this.state.user || {};
@@ -52,7 +62,7 @@ class Callback extends Component {
             else if (nextProps.callState === 1) {
                 this.state.disabled = false;
                 this.state.tip = '';
-                this.toSelectPatientPage();
+                this.toNextPage();
             }
             else {
                 //由呼叫中直接到挂断为呼叫失败

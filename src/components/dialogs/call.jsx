@@ -4,8 +4,9 @@ import {Modal, Button, message} from 'antd';
 import {withRouter} from 'react-router';
 
 import {connect} from 'react-redux';
-import {getUserByPhone} from 'redux/actions/user';
+import {getUserByMPTV} from 'redux/actions/user';
 import {showCallingDialog, setIncomingUserId, getInquiryRecord, addCallRecord} from 'redux/actions/call';
+import {setCurrentCase} from 'redux/actions/case';
 import Image from '../image/image.jsx';
 import * as global from 'util/global';
 
@@ -32,22 +33,27 @@ class Call extends Component {
             this.state.user = {};
             if (nextProps.phone) {
                 this.state.disabled = true;
-                dispatch(getUserByPhone(nextProps.phone)).then(
+                dispatch(getUserByMPTV({
+                    mobilephone: nextProps.phone,
+                    callType: nextProps.callType + 1,
+                    voipId: nextProps.account.voipId,
+                    patientId: nextProps.patientId
+                })).then(
                     (action)=> {
                         let user = (action.response || {}).data || {};
                         let result = (action.response || {}).result;
 
-                        if(result===0){
+                        if (result === 0) {
                             this.setState({
                                 disabled: false,
                                 user: user
                             });
-                        }else{
+                        } else {
                             message.info('由于网络异常用户信息获取失败，请挂断');
                         }
 
                     },
-                    ()=>{
+                    ()=> {
                         message.info('由于网络异常用户信息获取失败，请挂断');
                     }
                 );
@@ -77,7 +83,16 @@ class Call extends Component {
 
         this.setVisible(false);
 
-        router.push(`/inquire/case/selectPatient`);
+        if (user.patientId) {
+            dispatch(setCurrentCase({
+                patientId: user.patientId,
+                caseId: null,
+                state: -1
+            }));
+            router.push(`/inquire/case/detail`);
+        } else {
+            router.push(`/inquire/case/selectPatient`);
+        }
 
         setTimeout(()=> {
             dispatch(setIncomingUserId(user.userId, user));
@@ -249,19 +264,19 @@ class Call extends Component {
                 </div>
                 <div className={styles.detail}>
                     <div className="top">
-                        <span className="name">患者：{'--' || user.realName || '--'}</span>
-                        <span className="age">{'--' || global.getAge(user.birthday) || '--岁'}</span>
-                        <span className="serial">ID:{'--' || global.formatPatientCode(user.patientCode) || '--'}</span>
-                        <span className="gender" style={{display:'none'}}>
+                        <span className="name">患者：{user.realName || '--'}</span>
+                        <span className="age">{global.getAge(user.birthday) || '--岁'}</span>
+                        <span className="serial">ID:{global.formatPatientCode(user.patientCode) || '--'}</span>
+                        <span className="gender">
                              <img src={global.getGenderUrl(user.sex)} alt=""/>
                         </span>
                     </div>
                     <div className="middle clearfix">
                         <ul>
                             <li>问诊人：{user.userName || '--'}</li>
-                            <li>与问诊人关系：{'--' || global.getRelationText(user.relation) || '--'}</li>
-                            <li>就诊次数：{'--' || (user.inquiryCount || 0)}</li>
-                            <li>上次诊断：{'--' || user.diagnosisName || '--'}</li>
+                            <li>与问诊人关系：{global.getRelationText(user.relation) || '--'}</li>
+                            <li>就诊次数：{(user.inquiryCount || 0)}</li>
+                            <li>上次诊断：{user.diagnosisName || '--'}</li>
                         </ul>
                     </div>
                 </div>
@@ -275,11 +290,14 @@ class Call extends Component {
 const mapStateToProps = (globalStore) => {
     const {callStore, doctorStore, authStore} = globalStore;
 
-    let phone = callStore.incomingCallInfo.phone;
+    let {incomingCallInfo={}} = callStore;
+    let phone = incomingCallInfo.phone;
+    let patientId = incomingCallInfo.patientId;
 
     return {
         account: authStore.ocxAccount,
         phone: phone,
+        patientId: patientId,
         doctor: Object.assign({}, doctorStore.data),
         isVisible: callStore.isShowCallingDialog,
         incomingCallInfo: callStore.incomingCallInfo,

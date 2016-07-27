@@ -74,6 +74,7 @@ export const NOTICE_CHANGE_DOCTOR_STATE = "NOTICE_CHANGE_DOCTOR_STATE"; //通知
 /* ---------- 用户相关操作 start ---------- */
 export const GET_USER_BY_ID = "GET_USER_BY_ID"; //根据用户ID获取用户信息
 export const GET_USER_BY_PHONE = "GET_USER_BY_PHONE"; //根据用户手机号获取用户信息
+export const GET_USER_BY_MPTV = "GET_USER_BY_MPTV"; //根据用户手机号、患者ID、呼叫类型、获取用户信息
 /* ---------- 用户相关操作 end ---------- */
 
 
