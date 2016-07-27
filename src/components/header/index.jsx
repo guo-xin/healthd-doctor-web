@@ -6,7 +6,6 @@ import Logo from './logo';
 import User from  './user';
 import Message from  './message';
 
-
 export default class Header extends React.Component{
     render(){
         return(

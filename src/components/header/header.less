@@ -4,7 +4,7 @@
 @logoImgHeight: 39px;
 @logoImgMT: (@headerHeight - @logoImgHeight) / 2;
 @logoImgML: 50px;
-@userWidth: 176px;
+@userWidth: 200px;
 @userMR: 15px;
 @menuWidth: 100px;
 
@@ -88,8 +88,39 @@
   span:hover {
     color: #fff;
   }
-  .settingMenu {
-    left: -@menuWidth / 2 - 10px;
+  .informMenu {
+    left: 40px;
+
+    li {
+      width: 240px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      height: 60px;
+    }
+    .check {
+      text-align: right;
+      color: #1ac5f0;
+      font-size: 14px;
+    }
+  }
+
+  .circle {
+    display: inline-block;
+    width: @gapSm;
+    height: @gapSm;
+    background: @red;
+    border-radius: 50%;
+    vertical-align: middle;
+    position: absolute;
+    left: 18px;
+    top: 35px;
+  }
+  .online {
+    background: #87D068;
+  }
+  .yizhu {
+    background: @blue;
   }
 
   .dropdown {
@@ -139,20 +170,23 @@
       top: -12px;
       z-index: 3;
       right: 26px;
-
       display: block;
       width: 0;
       height: 0;
       border: 6px solid transparent;
       border-bottom-color: #fff;
-
       content: '';
     }
   }
 
   :global .ant-dropdown-menu-item {
-    width: @menuWidth;
+    width: @menuWidth*1.5;
     font-size: 16px;
-    text-align: center;
+    text-align: left;
+
+    i{
+      margin-right: 15px;
+      position: inherit;
+    }
   }
 }

@@ -4,6 +4,28 @@ import fetch from 'isomorphic-fetch';
 //推送排队人数
 export const setDoctorQueueCount = actions.create(actions.SET_DOCTOR_QUEUE_COUNT, 'queue');
 
+//推送图片新消息通知
+export const setDoctorMessageInfo = actions.create(actions.SET_DOCTOR_MESSAGE_INFO, 'messageInfo');
+
+
+//首页图片消息通知
+export const getDoctorPictureMessage = (doctorId) => {
+    let action = actions.GET_DOCTOR_PICTURE_MESSAGE;
+    return {
+        // 要在之前和之后发送的 action types
+        types: [action + '_REQUEST', action + '_SUCCESS', action + '_FAILURE'],
+        // 检查缓存 (可选):
+        //shouldCallAPI: (state) => !state.users[userId],
+        // 进行取：https://test.d.healthdoc.cn/v2/messageInfo/list?sender=90&receiver=56
+        callAPI: (token) => fetch(`${actions.WEB_API_URI}/message-info/list?receiver=${doctorId}`, {
+            method: 'GET',
+            headers: {
+                [actions.HEADER_AUTH_FIELD]: actions.HEADER_AUTH_PREFIX + token
+            }
+        })
+    };
+};
+
 //医生忘记密码验证邮箱发送密码
 export const getDoctorResetPwd = (email) => {
     let action = actions.GET_DOCTOR_RESET_PWD;
@@ -13,7 +35,7 @@ export const getDoctorResetPwd = (email) => {
         // 检查缓存 (可选):
         //shouldCallAPI: (state) => !state.users[userId],
         // 进行取：
-        callAPI: (token) => fetch(`${actions.WEB_API_URI}/auth/reset-pwd/${email}`,{
+        callAPI: (token) => fetch(`${actions.WEB_API_URI}/auth/reset-pwd/${email}`, {
             method: 'GET',
             headers: {
                 [actions.HEADER_AUTH_FIELD]: actions.HEADER_AUTH_PREFIX + token
@@ -32,7 +54,7 @@ export const getDoctorStartInquery = () => {
         // 检查缓存 (可选):
         //shouldCallAPI: (state) => !state.users[userId],
         // 进行取：
-        callAPI: (token) => fetch(`${actions.WEB_API_URI}/doctor/start-inquiry`,{
+        callAPI: (token) => fetch(`${actions.WEB_API_URI}/doctor/start-inquiry`, {
             method: 'GET',
             headers: {
                 [actions.HEADER_AUTH_FIELD]: actions.HEADER_AUTH_PREFIX + token
@@ -52,7 +74,7 @@ export const getDoctorEndInquery = () => {
         // 检查缓存 (可选):
         //shouldCallAPI: (state) => !state.users[userId],
         // 进行取：
-        callAPI: (token) => fetch(`${actions.WEB_API_URI}/doctor/end-inquiry`,{
+        callAPI: (token) => fetch(`${actions.WEB_API_URI}/doctor/end-inquiry`, {
             method: 'GET',
             headers: {
                 [actions.HEADER_AUTH_FIELD]: actions.HEADER_AUTH_PREFIX + token
@@ -72,7 +94,7 @@ export const getDoctorAttendance = () => {
         // 检查缓存 (可选):
         //shouldCallAPI: (state) => !state.users[userId],
         // 进行取：
-        callAPI: (token) => fetch(`${actions.WEB_API_URI}/doctor/attendance`,{
+        callAPI: (token) => fetch(`${actions.WEB_API_URI}/doctor/attendance`, {
             method: 'GET',
             headers: {
                 [actions.HEADER_AUTH_FIELD]: actions.HEADER_AUTH_PREFIX + token
@@ -92,7 +114,7 @@ export const getDoctorByUserId = () => {
         // 检查缓存 (可选):
         //shouldCallAPI: (state) => !state.users[userId],
         // 进行取：
-        callAPI: (token) => fetch(`${actions.WEB_API_URI}/doctor/detail`,{
+        callAPI: (token) => fetch(`${actions.WEB_API_URI}/doctor/detail`, {
             method: 'GET',
             headers: {
                 [actions.HEADER_AUTH_FIELD]: actions.HEADER_AUTH_PREFIX + token
@@ -102,7 +124,7 @@ export const getDoctorByUserId = () => {
 };
 
 //查询医生排班
-export const getDoctorByUserIdDate = (doctorId,startTime,endTime) => {
+export const getDoctorByUserIdDate = (doctorId, startTime, endTime) => {
     let action = actions.DOCTOR_BY_USER_ID_DATE;
 
     return {
@@ -111,7 +133,7 @@ export const getDoctorByUserIdDate = (doctorId,startTime,endTime) => {
         // 检查缓存 (可选):
         //shouldCallAPI: (state) => !state.users[userId],
         // 进行取：
-        callAPI: (token) => fetch(`${actions.WEB_API_URI}/doctor/query-workplan?doctorId=${doctorId}&startTime=${startTime}&endTime=${endTime}`,{
+        callAPI: (token) => fetch(`${actions.WEB_API_URI}/doctor/query-workplan?doctorId=${doctorId}&startTime=${startTime}&endTime=${endTime}`, {
             method: 'GET',
             headers: {
                 [actions.HEADER_AUTH_FIELD]: actions.HEADER_AUTH_PREFIX + token
@@ -130,7 +152,7 @@ export const getDoctorQueueCountByUserId = (doctorId) => {
         // 检查缓存 (可选):
         //shouldCallAPI: (state) => !state.users[userId],
         // 进行取：
-        callAPI: (token) => fetch(`${actions.WEB_API_URI}/queue/queue-count/${doctorId}`,{
+        callAPI: (token) => fetch(`${actions.WEB_API_URI}/queue/queue-count/${doctorId}`, {
             method: 'GET',
             headers: {
                 [actions.HEADER_AUTH_FIELD]: actions.HEADER_AUTH_PREFIX + token
@@ -149,7 +171,7 @@ export const getDoctorInquiryCountByUserId = (doctorId) => {
         // 检查缓存 (可选):
         //shouldCallAPI: (state) => !state.users[userId],
         // 进行取：
-        callAPI: (token) => fetch(`${actions.WEB_API_URI}/inquiry/inquiry-count/${doctorId}`,{
+        callAPI: (token) => fetch(`${actions.WEB_API_URI}/inquiry/inquiry-count/${doctorId}`, {
             method: 'GET',
             headers: {
                 [actions.HEADER_AUTH_FIELD]: actions.HEADER_AUTH_PREFIX + token
@@ -167,7 +189,7 @@ export const postDoctorChangeIntroduce = (params) => {
         // 检查缓存 (可选):
         //shouldCallAPI: (state) => !state.users[userId],
         // 进行取：
-        callAPI: (token) => fetch(`${actions.WEB_API_URI}/doctor/update`,{
+        callAPI: (token) => fetch(`${actions.WEB_API_URI}/doctor/update`, {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
@@ -187,7 +209,7 @@ export const postDoctorCheckPwd = (params) => {
         // 检查缓存 (可选):
         //shouldCallAPI: (state) => !state.users[userId],
         // 进行取：
-        callAPI: (token) => fetch(`${actions.WEB_API_URI}/doctor/check-doctorpwd`,{
+        callAPI: (token) => fetch(`${actions.WEB_API_URI}/doctor/check-doctorpwd`, {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
@@ -208,7 +230,7 @@ export const postDoctorCheckPhone = (params) => {
         // 检查缓存 (可选):
         //shouldCallAPI: (state) => !state.users[userId],
         // 进行取：
-        callAPI: (token) => fetch(`${actions.WEB_API_URI}/doctor/send-authcode`,{
+        callAPI: (token) => fetch(`${actions.WEB_API_URI}/doctor/send-authcode`, {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
@@ -229,7 +251,7 @@ export const postDoctorCheckCode = (params) => {
         // 检查缓存 (可选):
         //shouldCallAPI: (state) => !state.users[userId],
         // 进行取：
-        callAPI: (token) => fetch(`${actions.WEB_API_URI}/doctor/update-phone`,{
+        callAPI: (token) => fetch(`${actions.WEB_API_URI}/doctor/update-phone`, {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
@@ -251,7 +273,7 @@ export const postDoctorChangePwd = (params) => {
         // 检查缓存 (可选):
         //shouldCallAPI: (state) => !state.users[userId],
         // 进行取：
-        callAPI: (token) => fetch(`${actions.WEB_API_URI}/doctor/update-pwd`,{
+        callAPI: (token) => fetch(`${actions.WEB_API_URI}/doctor/update-pwd`, {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
@@ -272,7 +294,7 @@ export const changeDoctorState = (params) => {
         // 检查缓存 (可选):
         //shouldCallAPI: (state) => !state.users[userId],
         // 进行取：
-        callAPI: (token) => fetch(`${actions.WEB_API_URI}/doctor/change-doctorstatus`,{
+        callAPI: (token) => fetch(`${actions.WEB_API_URI}/doctor/change-doctorstatus`, {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
@@ -296,7 +318,7 @@ export const noticeChangeDoctorState = (params) => {
         // 检查缓存 (可选):
         //shouldCallAPI: (state) => !state.users[userId],
         // 进行取：
-        callAPI: (token) => fetch(`${actions.WEB_API_URI}/doctor/notice-doctorstatus`,{
+        callAPI: (token) => fetch(`${actions.WEB_API_URI}/doctor/notice-doctorstatus`, {
             method: 'GET',
             headers: {
                 [actions.HEADER_AUTH_FIELD]: actions.HEADER_AUTH_PREFIX + token

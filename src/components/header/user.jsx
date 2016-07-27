@@ -10,10 +10,13 @@ import {autoSaveCase} from 'redux/actions/case';
 import * as global from 'util/global';
 import cookie from 'react-cookie';
 import * as socket from 'util/socket.jsx';
+
+import {setCurrentCase} from 'redux/actions/case';
 import {
     changeDoctorState,
     getDoctorByUserId,
     getDoctorQueueCountByUserId,
+    getDoctorPictureMessage,
     getDoctorByUserIdDate,
     getDoctorEndInquery
 } from 'redux/actions/doctor';
@@ -40,6 +43,12 @@ export default class User extends Component {
     getDoctorList() {
         const {dispatch, doctorId = {}} = this.props;
         let dateInfo = global.getDateRange();
+        dispatch(getDoctorPictureMessage(doctorId)).then(()=> {
+            const {message = []} =this.props;
+            if (Array.isArray(message) && message.length > 0) {
+                this.state.newMessage = true;
+            }
+        });
         dispatch(getDoctorByUserIdDate(doctorId, dateInfo.startTime, dateInfo.endTime));
         dispatch(getDoctorByUserId()).then(()=> {
             const {data = {}} = this.props;
@@ -52,7 +61,8 @@ export default class User extends Component {
 
     state = {
         changeState: false,
-        menuName: '在线'
+        menuName: '在线',
+        newMessage: false
     };
 
     logout() {
@@ -116,28 +126,23 @@ export default class User extends Component {
         }
     }
 
-
-    onSettingClick(item) {
-        if (item.key === '2') {
-            this.logout();
-        }
-    }
-
     getMenu() {
         if (this.props) {
             let {data} = this.props;
             if (data && (data.workingStatus || data.workingStatus === 0)) {
                 this.state.menuName = this.status[data.workingStatus];
-                if (!(data.workingStatus === 9)) {
+                if (data.workingStatus === 9) {
                     return (<Menu onClick={this.onMenuChange}>
-                        <Menu.Item key="0" name="在线">
-                            在线
-                        </Menu.Item>
-                        <Menu.Item key="2" name="忙碌">
-                            忙碌
-                        </Menu.Item>
+                        <Menu.Item key="5" name="退出"><Icon type="logout"/>退出</Menu.Item>
+                    </Menu>);
+                } else {
+                    return (<Menu onClick={this.onMenuChange}>
+                        <Menu.Item key="0" name="在线"><i className={styles.circle+" "+styles.online}></i>在线</Menu.Item>
+                        <Menu.Item key="2" name="忙碌"><i className={styles.circle}></i>忙碌</Menu.Item>
+                        <Menu.Item key="4" name="医助在线"><i
+                            className={styles.circle+" "+styles.yizhu}></i>医助在线</Menu.Item>
                         <Menu.Divider />
-                        <Menu.Item key="4" name="医助在线">医助在线</Menu.Item>
+                        <Menu.Item key="5" name="退出"><Icon type="logout"/>退出</Menu.Item>
                     </Menu>);
                 }
             }
@@ -146,44 +151,65 @@ export default class User extends Component {
         return [];
     }
 
-    constructor(props) {
-        super(props);
+    onSettingClick(menu) {
+        console.log(menu.item.props.content);
+        let info = menu.item.props.content;
+        const {dispatch,router} = this.props;
+        dispatch(setCurrentCase({
+            patientId: info.patientId,
+            caseId: info.caseId,
+            inquiryId: info.inquiryInfoId,
+            state: 1
+        }));
 
-        this.settingMenu = (<Menu onClick={::this.onSettingClick} className={styles.settingMenu}>
-            {/* <Menu.Item key="1" name="锁屏">
-             锁屏
-             </Menu.Item>*/}
-            <Menu.Item key="2" name="退出">
-                退出
-            </Menu.Item>
+        router.push(`/inquire/case/detail`);
+    }
+
+    getInformMenu(message) {
+        let menuList;
+        if (Array.isArray(message) && message.length > 0) {
+            menuList = message.map((item, index)=> {
+                let content = JSON.parse(item.content);
+                return (<Menu.Item key={index} content={content}>患者 {content.realName} 上传{content.count}张新图片 <a
+                    className={styles.check}>查看</a></Menu.Item>);
+            });
+
+        }
+        return (<Menu onClick={::this.onSettingClick} className={styles.informMenu}>
+            {menuList}
         </Menu>);
     }
 
     onMenuChange = ({item})=> {
         const {dispatch, doctorId} = this.props;
-        let params = {
-            id: doctorId,
-            workingStatus: item.props.eventKey
-        };
-        dispatch(changeDoctorState(params)).then(()=> {
-            if (this.props.result === 1) {
+        if (item.props.eventKey == 5) {
+            //退出操作
+            this.logout();
+        } else {
+            let params = {
+                id: doctorId,
+                workingStatus: item.props.eventKey
+            };
+            dispatch(changeDoctorState(params)).then(()=> {
+                if (this.props.result === 1) {
+                    message.error('请求失败');
+                }
+            }, () => {
                 message.error('请求失败');
-            }
-        }, () => {
-            message.error('请求失败');
-        });
-
-
+            });
+        }
     };
 
     render() {
-        const {data = {}} = this.props;
+        const {data = {}, message = []} = this.props;
+        const informMenu = this.getInformMenu(message);
         const menu = this.getMenu();
         return (
             <div className={styles.user} id="headerUser">
-                <Dropdown overlay={this.settingMenu} getPopupContainer={()=>document.getElementById('headerUser')}>
+                <Dropdown overlay={informMenu} getPopupContainer={()=>document.getElementById('headerUser')}>
                     <a className={styles.dropdown} href="javascript:void(0)">
-                        <Icon type="setting"/>
+                        <Icon type="notification"/>
+                        {this.state.newMessage ? (<span className={styles.circle}></span>) : ""}
                     </a>
                 </Dropdown>
 
@@ -191,15 +217,12 @@ export default class User extends Component {
                     <span className={styles.avatar}>
                         <Image src={data.headPic+"@46h_46w_0e"} defaultImg={global.defaultDocHead}/>
                     </span></Link>
-
-                {(this.state.menuName === '离线' || this.state.menuName === '占线') ? (
-                    <span className={styles.dropOnly} href="javascript:void(0)">
-                    {this.state.menuName}</span>)
-                    : (<Dropdown overlay={menu} getPopupContainer={()=>document.getElementById('headerUser')}>
+                <Dropdown overlay={menu} getPopupContainer={()=>document.getElementById('headerUser')}>
                     <a className={styles.dropdown} href="javascript:void(0)">
                         {this.state.menuName} <Icon type="down"/>
                     </a>
-                </Dropdown>)}
+                </Dropdown>
+
             </div>
         );
     }
@@ -211,7 +234,8 @@ const mapStateToProps = (globalStore, ownProps) => {
         data: Object.assign({}, doctorStore.data),
         doctorId: authStore.id,
         scheduletList: doctorStore.scheduletList,
-        queue: doctorStore.queue
+        queue: doctorStore.queue,
+        message: doctorStore.message
     };
 };
 
