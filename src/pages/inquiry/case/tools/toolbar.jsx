@@ -2,12 +2,13 @@ import React, {Component} from 'react';
 import {Icon} from 'antd';
 import styles from './toolbar.less';
 import Template from '../tools/template';
+import Message from '../tools/message';
 import Describe from '../tools/describe';
 
 export default class Toolbar extends Component {
     state = {
         toolType: 2
-    }
+    };
 
     constructor(props) {
         super(props);
@@ -62,12 +63,19 @@ export default class Toolbar extends Component {
                                 <span>历史纪录</span>
                             </a>
                         </li>*/}
-                        <li className="active">
+                        <li className={toolType === 3?'active':''} onClick={()=>this.changeNav(3)}>
+                            <a href="javascript:;">
+                                <img src={require('../../../../assets/images/tool6.png')} alt=""/>
+                                <span>发短信</span>
+                            </a>
+                        </li>
+                        <li className={toolType === 2?'active':''}  onClick={()=>this.changeNav(2)}>
                             <a href="javascript:;">
                                 <img src={require('../../../../assets/images/tool4.png')} alt=""/>
                                 <span>患者描述</span>
                             </a>
                         </li>
+
                         {/*<li>
                             <a href="javascript:;">
                                 <img src={require('../../../../assets/images/tool5.png')} alt=""/>
@@ -80,6 +88,7 @@ export default class Toolbar extends Component {
                     showTool && (<div className={styles.toolBody}>
                         {/*{toolType === 1 && <Template/>}*/}
                         {toolType === 2 && <Describe/>}
+                        {toolType === 3 && <Message/>}
                     </div>)
                 }
             </div>

@@ -1,0 +1,135 @@
+@import "../detail/detail";
+
+.wrapper {
+  display: flex;
+  padding: 0;
+  background: #fff;
+
+  :global {
+    .ant-tabs {
+      height: 100%;
+    }
+    .ant-tabs-bar {
+      border-top: 1px solid @borderColorBase;
+      background: #f7f7f7;
+      margin-bottom: 0;
+      height: 48px;
+    }
+
+    .ant-tabs-nav {
+      margin: 0 @gap;
+    }
+
+    .ant-tabs-nav .ant-tabs-tab-inner {
+      font-size: @fontSizeBase;
+      padding: 12px 20px;
+    }
+
+    .ant-tabs-content {
+      position: absolute;
+      top: 48px;
+      bottom: 0;
+
+      & > div {
+        height: 100%;
+      }
+    }
+
+    .ant-tabs-tabpane {
+      height: 100%;
+    }
+
+    .ant-input-wrapper {
+      display: block;
+      padding: 0 @gap;
+    }
+  }
+}
+
+.userInfo {
+  background: #fbfbfb;
+  overflow: hidden;
+  padding: @gap 0;
+  border-bottom: 1px solid @borderColorBase;
+  height: 97px;
+
+  li {
+    font-size: @fontSizeSm;
+    float: left;
+    width: 50%;
+    padding: 0 @gap;
+    line-height: @gapXl;
+  }
+
+  .even {
+    text-align: right;
+  }
+}
+
+.msgTemplate {
+  color: @textLightGrey;
+  padding: @gap;
+  font-size: @fontSizeSm;
+}
+
+.msgContent {
+  resize: none;
+  font-size: @fontSizeSm;
+  min-height: 100px;
+}
+
+.wish {
+  text-align: right;
+  font-size: @fontSizeSm;
+  color: @textLightGrey;
+  margin-top: @gapSm;
+  padding: 0 @gap;
+}
+
+.actions {
+  padding: @gap;
+  text-align: right;
+
+  button {
+    width: 100px;
+  }
+}
+
+.msgList {
+  margin: @gapLg @gap 0;
+  font-size: @fontSizeSm;
+
+  li {
+    border-bottom: 1px dotted @borderColorBase;
+    margin-bottom: @gap;
+
+    & > span {
+      display: block;
+    }
+  }
+
+  :global {
+    .date {
+      color: @textLightGrey;
+      margin-bottom: 12px;
+    }
+
+    .msg {
+      background: #f7f7f7;
+      border: 1px solid @borderColorBase;
+      padding: @gapLg @gap;
+      margin-bottom: @gap;
+    }
+  }
+}
+
+.listWrapper {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+
+  & > div {
+    flex: 1;
+    overflow-y: auto;
+  }
+}

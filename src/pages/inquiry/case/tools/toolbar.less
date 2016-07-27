@@ -9,8 +9,8 @@
   overflow: auto;
   background-color: #fbfbfb;
 
-  ul {
-    height: 100%;
+  & > ul {
+    height: @toolBarHeight;
   }
 
   & > a {
@@ -22,6 +22,7 @@
     color: @textLightGrey;
 
     i {
+      width: 16px;
       margin-top: 36px;
     }
 
@@ -82,7 +83,7 @@
   .toolBody {
     width: @toolbarWidth;
     position: absolute;
-    top: @opHeight;
+    top: @toolBarHeight;
     bottom: 0;
     height: auto;
   }
