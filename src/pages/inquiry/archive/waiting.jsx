@@ -65,10 +65,10 @@ class Waiting extends React.Component {
                             </div>
                             <div className="detail">
                                 <div className="top">
-                                    <span className="name">患者：{'--' || item.realName || '--'}</span>
-                                    <span className="age">{'--' || item.age || '--'}岁</span>
+                                    <span className="name">患者：{item.realName || '--'}</span>
+                                    <span className="age">{global.getAge(item.birthday)|| '--'}岁</span>
                                     <span
-                                        className="serial">ID:{'--' || global.formatPatientCode(item.patientCode) || '--'}</span>
+                                        className="serial">ID:{global.formatPatientCode(item.patientCode) || '--'}</span>
                                     <span className="gender" style={{display:'none'}}>
                                         <img src={global.getGenderUrl(item.sex)} alt=""/>
                                     </span>
@@ -76,8 +76,8 @@ class Waiting extends React.Component {
                                 <div className="middle clearfix">
                                     <ul>
                                         <li className="patientName">问诊人：{data.userName || '--'}</li>
-                                        <li>与问诊人关系：{'--' || global.getRelationText(item.relation) || '--'}</li>
-                                        <li className="lastInquery">上次诊断：{'--' || item.diagnosisName || '--'}</li>
+                                        <li>与问诊人关系：{global.getRelationText(item.relation) || '--'}</li>
+                                        <li className="lastInquery">上次诊断：{item.diagnosisName || '--'}</li>
                                     </ul>
                                 </div>
                                 <div className="bottom">

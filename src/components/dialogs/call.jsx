@@ -273,11 +273,12 @@ class Call extends Component {
 }
 
 const mapStateToProps = (globalStore) => {
-    const {callStore, doctorStore} = globalStore;
+    const {callStore, doctorStore, authStore} = globalStore;
 
     let phone = callStore.incomingCallInfo.phone;
 
     return {
+        account: authStore.ocxAccount,
         phone: phone,
         doctor: Object.assign({}, doctorStore.data),
         isVisible: callStore.isShowCallingDialog,

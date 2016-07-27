@@ -118,7 +118,6 @@ class Message extends Component {
                     <li key={date + index}>
                         <span className="date">{global.formatDate(+item.startTime, 'yyyy-MM-dd HH:mm')}</span>
                         <span className="msg">{item.content}</span>
-                        <span className="state"></span>
                     </li>
                 )
             });
