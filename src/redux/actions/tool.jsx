@@ -5,8 +5,8 @@ export const clearPatientPics = actions.create(actions.CLEAR_PATIENT_PICS);
 
 
 //将未读图片设置为已读
-export const setInqueryPictureRead = (messageId) => {
-    let action = actions.SET_INQUERY_PICTURE_READY;
+export const setInquiryPictureRead = (messageId) => {
+    let action = actions.SET_INQUIRY_PICTURE_READY;
     return {
         // 要在之前和之后发送的 action types
         types: [action + '_REQUEST', action + '_SUCCESS', action + '_FAILURE'],
@@ -40,9 +40,27 @@ export const getPatientAllPicture = (patientId) => {
     };
 };
 
+//本次问诊诊前图片
+export const getInquiryForwardPicture = (patientId,userId) => {
+    let action = actions.GET_INQUIRY_FORWARD_PICTURE;
+    return {
+        // 要在之前和之后发送的 action types
+        types: [action + '_REQUEST', action + '_SUCCESS', action + '_FAILURE'],
+        // 检查缓存 (可选):
+        //shouldCallAPI: (state) => !state.users[userId],
+        // 进行取：https://test.d.healthdoc.cn/v2/inquiry-info-attachment/current?patientId=4&userId=375
+        callAPI: (token) => fetch(`${actions.WEB_API_URI}/inquiry-info-attachment/current?patientId=${patientId}&userId=${userId}`, {
+            method: 'GET',
+            headers: {
+                [actions.HEADER_AUTH_FIELD]: actions.HEADER_AUTH_PREFIX + token
+            }
+        })
+    };
+};
+
 //本次问诊患者描述图片
-export const getCurrentInqueryPicture = (caseId) => {
-    let action = actions.GET_CURRENT_INQUERY_PICTURE;
+export const getCurrentInquiryPicture = (caseId) => {
+    let action = actions.GET_CURRENT_INQUIRY_PICTURE;
     return {
         // 要在之前和之后发送的 action types
         types: [action + '_REQUEST', action + '_SUCCESS', action + '_FAILURE'],
