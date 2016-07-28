@@ -77,3 +77,23 @@ export const getInquireCallbackNumber = (params) => {
         })
     };
 };
+
+
+//查询挂断后，患者第几次问诊次数
+export const getMaterialBeforeCase = (params) => {
+    let action = actions.GET_MATERIAL_BEFORE_CASE;
+
+    return {
+        // 要在之前和之后发送的 action types
+        types: [action + '_REQUEST', action + '_SUCCESS', action + '_FAILURE'],
+        // 检查缓存 (可选):
+        //shouldCallAPI: (state) => !state.users[userId],
+        // 进行取：
+        callAPI: (token) => fetch(`${actions.WEB_API_URI}/inquiry/query/beforecase-pic?userId=${params.userId}&patientId=${params.patientId}`,{
+            method: 'GET',
+            headers: {
+                [actions.HEADER_AUTH_FIELD]: actions.HEADER_AUTH_PREFIX + token
+            }
+        })
+    };
+};

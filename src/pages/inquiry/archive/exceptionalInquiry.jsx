@@ -5,14 +5,15 @@ import styles from './archive.less';
 import Image from 'components/image/image.jsx';
 import {connect} from 'react-redux';
 import {withRouter} from 'react-router';
-import {getInquireQueueException} from 'redux/actions/inquire';
+import {getInquireQueueException, getMaterialBeforeCase} from 'redux/actions/inquire';
 import {showCallbackDialog, setCallbackUserId} from 'redux/actions/call';
 import * as global from 'util/global';
 
 class ExceptionalInquiry extends React.Component {
     state = {
         loading: true,
-        callTime: false
+        callTime: false,
+        selectedCardId: null
     };
 
     componentWillMount() {
@@ -53,24 +54,103 @@ class ExceptionalInquiry extends React.Component {
         }
     }
 
+    toggleMaterial(item) {
+        let selectedCardId = this.state.selectedCardId;
+        if (item.id != selectedCardId) {
+            if (item.isLoading === undefined && item.userId && item.patientId) {
+                item.isLoading = true;
+                this.getMaterial(item);
+            }
+
+            this.setState({
+                selectedCardId: item.id
+            });
+
+        } else {
+            this.setState({
+                selectedCardId: null
+            });
+        }
+    }
+
+    getMaterial(item) {
+        this.props.dispatch(getMaterialBeforeCase({
+            userId: item.userId,
+            patientId: item.patientId
+        })).then(
+            (action)=> {
+                let data = (action.response || {}).data;
+
+                item.isLoading = false;
+
+                if (data) {
+                    item.material = data;
+                }
+
+                this.setState({
+                    timestamp: new Date().valueOf()
+                });
+            },
+            ()=> {
+                item.isLoading = false;
+
+                this.setState({
+                    timestamp: new Date().valueOf()
+                });
+            }
+        );
+    }
+
+    formatMaterial(item) {
+        if (item.isLoading === true) {
+            return <span className="loading">数据加载中...</span>
+        } else {
+            let material = item.material;
+            if (material) {
+                if (material.length > 0) {
+                    let des = material[0].description;
+                    let pics = material.map((item, index)=> {
+                        return <img key={index} src={item.savePath+"@80h_80w_0e"} alt=""/>
+                    });
+
+                    return (
+                        <div>
+                            <p>{des}</p>
+                            <div className="picList">
+                                {pics}
+                            </div>
+                        </div>
+                    );
+                }
+
+                return <span className="loading">11111</span>
+            } else {
+                return <span className="empty">暂无描述</span>
+            }
+        }
+
+    }
+
     render() {
         let status = {
-                '1': '挂断',
-                '2': '挂断',
-                '3': '挂断',
-                '4': '挂断',
-                '-1': '挂断',
-                '-2': '未呼通',
-                '-3': '挂断',
-                '-4': '拒接',
-                '-5': '拒接',
-                '-8': '未呼通',
-                '-9': '拒接',
-                '-10': '挂断',
-                '-12': '未呼通',
-                '-14': '挂断'
-            }
-            ;
+            '1': '挂断',
+            '2': '挂断',
+            '3': '挂断',
+            '4': '挂断',
+            '-1': '挂断',
+            '-2': '未呼通',
+            '-3': '挂断',
+            '-4': '拒接',
+            '-5': '拒接',
+            '-8': '未呼通',
+            '-9': '拒接',
+            '-10': '挂断',
+            '-12': '未呼通',
+            '-14': '挂断'
+        };
+
+        let selectedCardId = this.state.selectedCardId;
+        
         let list = this.props.list.map((item, index)=> {
             let callStatus = status[item.byeType + ''];
             let inqueryType = '';
@@ -91,6 +171,8 @@ class ExceptionalInquiry extends React.Component {
                     this.state.callTime = false;
                 }
             }
+
+            let material = this.formatMaterial(item);
 
             return (
                 <Col key={index} span="8" className="item" onMouseEnter={(e)=>this.onMouseEnter(e)}>
@@ -132,6 +214,15 @@ class ExceptionalInquiry extends React.Component {
                             <span className={styles.footTextRed}>{callStatus}</span>
                             {this.state.callTime ? (<span
                                 className={styles.footTextRed}>{item.callType === 1 ? ("通话") : ("视频")}{global.formatTime((item.endTime - item.startTime) / 1000) + "　"}</span>) : ""}
+                        </div>
+                        <div className={styles.material}>
+                            <div className="title">
+                                <a href="javascript: void(0)" onClick={()=>{this.toggleMaterial(item)}}>患者描述<Icon
+                                    type={item.id==selectedCardId?'up':'down'}/></a>
+                            </div>
+                            <div className="detail">
+                                {material}
+                            </div>
                         </div>
                     </div>
                 </Col>
