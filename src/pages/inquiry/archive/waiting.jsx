@@ -66,7 +66,7 @@ class Waiting extends React.Component {
                             <div className="detail">
                                 <div className="top">
                                     <span className="name">患者：{item.realName || '--'}</span>
-                                    <span className="age">{global.getAge(item.birthday)|| '--'}岁</span>
+                                    <span className="age">{global.getAge(item.birthday)|| '--岁'}</span>
                                     <span
                                         className="serial">ID:{global.formatPatientCode(item.patientCode) || '--'}</span>
                                     <span className="gender" style={{display:'none'}}>
@@ -90,7 +90,7 @@ class Waiting extends React.Component {
                             <span
                                 className={styles.footText}>上次问诊：{item.diagnosisName ? (item.createdTime && global.formatDate(item.createdTime, 'yyyy-MM-dd HH:mm') || '--') : '--'}</span>
                             <span
-                                className={styles.footTextOrange}>等待{global.formatTime((item.currentTime - item.createdTime) / 1000) || '--'}</span>
+                                className={styles.footTextOrange}>等待{global.formatTime((item.currentTime - item.startTime) / 1000) || '--'}</span>
                         </div>
                     </div>
                 </Col>

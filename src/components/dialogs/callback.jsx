@@ -202,7 +202,7 @@ class Callback extends Component {
                 <div className={styles.detail}>
                     <div className="top">
                         <span className="name">患者：{user.realName || '--'}</span>
-                        <span className="age">{global.getAge(user.birthday) || '--'}岁</span>
+                        <span className="age">{global.getAge(user.birthday) || '--岁'}</span>
                         <span className="serial">ID:{global.formatPatientCode(user.patientCode) || '--'}</span>
                         <span className="gender">
                              <img src={global.getGenderUrl(user.sex)} alt=""/>
@@ -212,7 +212,6 @@ class Callback extends Component {
                         <ul>
                             <li>问诊人：{user.userName || user.userMobilePhone || '--'}</li>
                             <li>与问诊人关系：{global.getRelationText(user.relation) || '--'}</li>
-                            <li>就诊次数：{(user.caseCount || 0)}</li>
                             <li>上次诊断：{user.diagnosisName || '--'}</li>
                         </ul>
                     </div>
