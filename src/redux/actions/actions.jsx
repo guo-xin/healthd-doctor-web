@@ -137,6 +137,7 @@ export const GET_INQUIRE_NUMBER = "GET_INQUIRE_NUMBER"; //点击问诊优先进�
 export const GET_INQUIRE_QUEUE = "GET_INQUIRE_QUEUE"; //等待问诊
 export const GET_INQUIRE_QUEUE_EXCEPTION = "GET_INQUIRE_QUEUE_EXCEPTION"; //异常问诊
 export const GET_INQUIRE_CALLBACK_NUMBER = 'GET_INQUIRE_CALLBACK_NUMBER';
+export const GET_MATERIAL_BEFORE_CASE = "GET_MATERIAL_BEFORE_CASE"; //查询患者资料
 /* ---------- 问诊相关 end ---------- */
 
 

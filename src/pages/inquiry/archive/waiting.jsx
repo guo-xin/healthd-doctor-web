@@ -1,17 +1,18 @@
 import React from 'react';
-import {Row, Col, Button, message, Spin} from 'antd';
+import {Row, Col, Button, message, Spin, Icon} from 'antd';
 import DisplayMode from './components/displayMode';
 import styles from './archive.less';
 import Image from 'components/image/image.jsx';
 import {connect} from 'react-redux';
 import {withRouter} from 'react-router';
-import {getInquireQueue} from 'redux/actions/inquire';
+import {getInquireQueue, getMaterialBeforeCase} from 'redux/actions/inquire';
 import {showCallbackDialog, setCallbackUserId} from 'redux/actions/call';
 import * as global from 'util/global';
 
 class Waiting extends React.Component {
     state = {
-        loading: true
+        loading: true,
+        selectedCardId: null
     };
 
     componentWillMount() {
@@ -51,11 +52,91 @@ class Waiting extends React.Component {
         }
     }
 
+    toggleMaterial(item) {
+        let selectedCardId = this.state.selectedCardId;
+        if (item.id != selectedCardId) {
+            if (item.isLoading === undefined && item.userId && item.patientId) {
+                item.isLoading = true;
+                this.getMaterial(item);
+            }
+
+            this.setState({
+                selectedCardId: item.id
+            });
+
+        } else {
+            this.setState({
+                selectedCardId: null
+            });
+        }
+    }
+
+    getMaterial(item) {
+        this.props.dispatch(getMaterialBeforeCase({
+            userId: item.userId,
+            patientId: item.patientId
+        })).then(
+            (action)=> {
+                let data = (action.response || {}).data;
+
+                item.isLoading = false;
+
+                if (data) {
+                    item.material = data;
+                }
+
+                this.setState({
+                    timestamp: new Date().valueOf()
+                });
+            },
+            ()=> {
+                item.isLoading = false;
+
+                this.setState({
+                    timestamp: new Date().valueOf()
+                });
+            }
+        );
+    }
+
+    formatMaterial(item) {
+        if (item.isLoading === true) {
+            return <span className="loading">数据加载中...</span>
+        } else {
+            let material = item.material;
+            if (material) {
+                if (material.length > 0) {
+                    let des = material[0].description;
+                    let pics = material.map((item, index)=> {
+                        return <img key={index} src={item.savePath+"@80h_80w_0e"} alt=""/>
+                    });
+
+                    return (
+                        <div>
+                            <p>{des}</p>
+                            <div className="picList">
+                                {pics}
+                            </div>
+                        </div>
+                    );
+                }
+
+                return <span className="loading">11111</span>
+            } else {
+                return <span className="empty">暂无描述</span>
+            }
+        }
+
+    }
+
     render() {
+        let selectedCardId = this.state.selectedCardId;
         let list = this.props.list.map((data, index)=> {
             let item = data;
+            let material = this.formatMaterial(item);
             return (
-                <Col key={index} span="8" className="item" onMouseEnter={(e)=>this.onMouseEnter(e)}>
+                <Col key={index} span="8" className={"item" + (item.id==selectedCardId?(' '+styles.active):'')}
+                     onMouseEnter={(e)=>this.onMouseEnter(e)}>
                     <div className={styles.card}>
                         <div className={styles.cardBody}>
                             <div className="pic">
@@ -66,7 +147,7 @@ class Waiting extends React.Component {
                             <div className="detail">
                                 <div className="top">
                                     <span className="name">患者：{item.realName || '--'}</span>
-                                    <span className="age">{global.getAge(item.birthday)|| '--岁'}</span>
+                                    <span className="age">{global.getAge(item.birthday) || '--岁'}</span>
                                     <span
                                         className="serial">ID:{global.formatPatientCode(item.patientCode) || '--'}</span>
                                     <span className="gender" style={{display:'none'}}>
@@ -91,6 +172,16 @@ class Waiting extends React.Component {
                                 className={styles.footText}>上次问诊：{item.diagnosisName ? (item.createdTime && global.formatDate(item.createdTime, 'yyyy-MM-dd HH:mm') || '--') : '--'}</span>
                             <span
                                 className={styles.footTextOrange}>等待{global.formatTime((item.currentTime - item.startTime) / 1000) || '--'}</span>
+                        </div>
+
+                        <div className={styles.material}>
+                            <div className="title">
+                                <a href="javascript: void(0)" onClick={()=>{this.toggleMaterial(item)}}>患者描述<Icon
+                                    type={item.id==selectedCardId?'up':'down'}/></a>
+                            </div>
+                            <div className="detail">
+                                {material}
+                            </div>
                         </div>
                     </div>
                 </Col>

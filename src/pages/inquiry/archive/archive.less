@@ -6,7 +6,7 @@
 .wrapper {
   height: 100%;
 
-  &>div{
+  & > div {
     height: 100%;
   }
 }
@@ -106,7 +106,7 @@
         vertical-align: top;
       }
 
-      .name{
+      .name {
         max-width: 160px;
         overflow: hidden;
         text-overflow: ellipsis;
@@ -141,11 +141,11 @@
         color: @textLightGrey;
       }
 
-      li:last-child{
+      li:last-child {
         width: 100%;
       }
 
-      .patientName{
+      .patientName {
         overflow: hidden;
         display: -webkit-box;
         -webkit-line-clamp: 1;
@@ -153,7 +153,7 @@
         word-break: break-all;
       }
 
-      .lastInquery{
+      .lastInquery {
         margin-bottom: 0;
         height: 42px;
         overflow: hidden;
@@ -195,6 +195,46 @@
   padding: 0 @gapLg;
   line-height: 36px;
   border-top: 1px solid @borderColorBase;
+}
+
+.material {
+  border-top: 1px solid @borderColorBase;
+  font-size: @fontSizeSm;
+
+  :global {
+    .title {
+      line-height: 36px;
+      padding: 0 @gapLg;
+      text-align: right;
+    }
+
+    .detail{
+      height: 0;
+      overflow: hidden;
+    }
+
+    .anticon{
+      margin-left: 5px;
+      vertical-align: middle;
+    }
+
+    .picList{
+      margin: 0 -@gapSm/2;
+
+      img{
+        margin: @gapSm/2 @gapSm/2;
+      }
+    }
+  }
+}
+
+.active .material{
+  :global {
+    .detail{
+      padding: 0 @gapLg @gap;
+      height: auto;
+    }
+  }
 }
 
 .footText {
