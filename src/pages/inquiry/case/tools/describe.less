@@ -54,9 +54,38 @@
   }
 
   :global {
+    .ant-tabs {
+      height: 100%;
+    }
+    .ant-tabs-bar {
+      border-top: 1px solid @borderColorBase;
+      background: #f7f7f7;
+      margin-bottom: 0;
+      height: 48px;
+    }
+
+    .ant-tabs-nav {
+      margin: 0 @gap;
+    }
+
     .ant-tabs-nav .ant-tabs-tab-inner {
       font-size: @fontSizeBase;
       padding: 12px 20px;
+    }
+
+    .ant-tabs-content {
+      position: absolute;
+      top: 48px;
+      bottom: 0;
+
+      & > div {
+        height: 100%;
+      }
+    }
+
+    .ant-tabs-tabpane {
+      height: 100%;
+      overflow-y: auto;
     }
   }
 }
