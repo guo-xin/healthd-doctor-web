@@ -4,26 +4,8 @@ import fetch from 'isomorphic-fetch';
 export const clearPatientPics = actions.create(actions.CLEAR_PATIENT_PICS);
 
 
-//患者描述图片
-export const getPatientPicture = (caseId) => {
-    let action = actions.GET_PATIENT_PICTURE;
-    return {
-        // 要在之前和之后发送的 action types
-        types: [action + '_REQUEST', action + '_SUCCESS', action + '_FAILURE'],
-        // 检查缓存 (可选):
-        //shouldCallAPI: (state) => !state.users[userId],
-        // 进行取：
-        callAPI: (token) => fetch(`${actions.WEB_API_URI}/case/pic/list/${caseId}`, {
-            method: 'GET',
-            headers: {
-                [actions.HEADER_AUTH_FIELD]: actions.HEADER_AUTH_PREFIX + token
-            }
-        })
-    };
-};
-
 //将未读图片设置为已读
-export const setInqueryPictureRead = (pictureId) => {
+export const setInqueryPictureRead = (messageId) => {
     let action = actions.SET_INQUERY_PICTURE_READY;
     return {
         // 要在之前和之后发送的 action types
@@ -31,7 +13,7 @@ export const setInqueryPictureRead = (pictureId) => {
         // 检查缓存 (可选):
         //shouldCallAPI: (state) => !state.users[userId],
         // 进行取：https://test.d.healthdoc.cn/v2/message-info/is-read?id=1
-        callAPI: (token) => fetch(`${actions.WEB_API_URI}/message-info/is-read?id=${pictureId}`, {
+        callAPI: (token) => fetch(`${actions.WEB_API_URI}/message-info/is-read?id=${messageId}`, {
             method: 'GET',
             headers: {
                 [actions.HEADER_AUTH_FIELD]: actions.HEADER_AUTH_PREFIX + token
