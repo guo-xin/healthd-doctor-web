@@ -49,16 +49,20 @@
 
     & > div {
       padding: @gapSm;
+
+      .columnItem:not(:last-child){
+        margin-bottom: @gap;
+      }
     }
   }
 }
 
-.card {
+.card{
   background: #f7f7f7;
   border: 1px solid @borderColorBase;
 }
 
-.card:hover {
+.card:hover{
   background: #eaf8fe;
 }
 
@@ -130,19 +134,15 @@
 
     .middle {
       overflow: auto;
-      margin-bottom: @gapLg;
+      margin-bottom: 0;
 
       li {
-        margin-bottom: @gap;
+        margin-bottom: @gapSm;
         float: left;
         width: 50%;
         min-width: 160px;
         font-size: @fontSizeSm;
         color: @textLightGrey;
-      }
-
-      li:last-child {
-        width: 100%;
       }
 
       .patientName {

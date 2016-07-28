@@ -266,7 +266,7 @@ class CallbackFromCase extends Component {
                         <ul>
                             <li>问诊人：{user.userName || patient.userName || '--'}</li>
                             <li>与问诊人关系：{global.getRelationText(patient.relation) || '--'}</li>
-                            <li>本次诊断：{diagnosisName || '--'}</li>
+                            <li style={{width:"100%"}}>本次诊断：{diagnosisName || '--'}</li>
                         </ul>
                     </div>
                 </div>

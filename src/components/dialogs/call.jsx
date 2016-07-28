@@ -275,7 +275,7 @@ class Call extends Component {
                         <ul>
                             <li>问诊人：{user.userName || '--'}</li>
                             <li>与问诊人关系：{global.getRelationText(user.relation) || '--'}</li>
-                            <li>上次诊断：{user.diagnosisName || '--'}</li>
+                            <li style={{width:"100%"}}>上次诊断：{user.diagnosisName || '--'}</li>
                         </ul>
                     </div>
                 </div>

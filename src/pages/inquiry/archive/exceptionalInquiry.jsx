@@ -29,11 +29,6 @@ class ExceptionalInquiry extends React.Component {
         );
     }
 
-    onMouseEnter(e) {
-        // console.log(e.target.className);
-
-    }
-
     onCallBack(data, callType) {
 
         let item = Object.assign({}, data);
@@ -150,7 +145,11 @@ class ExceptionalInquiry extends React.Component {
         };
 
         let selectedCardId = this.state.selectedCardId;
-        
+        let listMap = {
+            list0: [],
+            list1: [],
+            list2: []
+        };
         let list = this.props.list.map((item, index)=> {
             let callStatus = status[item.byeType + ''];
             let inqueryType = '';
@@ -174,59 +173,59 @@ class ExceptionalInquiry extends React.Component {
 
             let material = this.formatMaterial(item);
 
-            return (
-                <Col key={index} span="8" className="item" onMouseEnter={(e)=>this.onMouseEnter(e)}>
-                    <div className={styles.card}>
-                        <div className={styles.cardBody}>
-                            <div className="pic">
+            let rt = <div key={index} className={"item columnItem" + (item.id==selectedCardId?(' '+styles.active):'')}>
+                <div className={styles.card}>
+                    <div className={styles.cardBody}>
+                        <div className="pic">
                                 <span>
                                     <Image src={item.head || global.defaultHead} defaultImg={global.defaultHead}/>
                                 </span>
-                            </div>
-                            <div className="detail">
-                                <div className="top">
-                                    <span className="name">患者：{item.realName || '--'}</span>
-                                    <span className="age">{global.getAge(item.birthday) || '--岁'}</span>
+                        </div>
+                        <div className="detail">
+                            <div className="top">
+                                <span className="name">患者：{item.realName || '--'}</span>
+                                <span className="age">{global.getAge(item.birthday) || '--岁'}</span>
                                     <span
                                         className="serial">ID:{global.formatPatientCode(item.patientCode) || '--'}</span>
                                     <span className="gender">
                                         <img src={global.getGenderUrl(item.sex)} alt=""/>
                                     </span>
-                                </div>
-                                <div className="middle clearfix">
-                                    <ul>
-                                        <li className="patientName">问诊人：{item.userName || item.phoneNumber || '--'}</li>
-                                        <li>与问诊人关系：{global.getRelationText(item.relation) || '--'}</li>
-                                        <li className="lastInquery">上次诊断：{item.diagnosisName || '--'}</li>
-                                    </ul>
-                                </div>
-                                <div className="bottom">
-                                    <Button type="ghost" onClick={()=>this.onCallBack(item, 0)}>电话回呼</Button>
-                                    <Button type="primary" onClick={()=>this.onCallBack(item, 1)}>视频回呼</Button>
-                                </div>
+                            </div>
+                            <div className="middle clearfix">
+                                <ul>
+                                    <li className="patientName">问诊人：{item.userName || item.phoneNumber || '--'}</li>
+                                    <li>与问诊人关系：{global.getRelationText(item.relation) || '--'}</li>
+                                    <li className="lastInquery" style={{width:"100%"}}>上次诊断：{item.diagnosisName || '--'}</li>
+                                </ul>
+                            </div>
+                            <div className="bottom">
+                                <Button type="ghost" onClick={()=>this.onCallBack(item, 0)}>电话回呼</Button>
+                                <Button type="primary" onClick={()=>this.onCallBack(item, 1)}>视频回呼</Button>
                             </div>
                         </div>
-                        <div className={styles.cardFooter}>
+                    </div>
+                    <div className={styles.cardFooter}>
                             <span className={styles.footText}>
                                 {inqueryType}
                                 {item.callType === 1 ? ("电话问诊：") : ("视频问诊：")}{item.startTime && global.formatDate(item.startTime, 'yyyy-MM-dd HH:mm')}
                             </span>
-                            <span className={styles.footTextRed}>{callStatus}</span>
-                            {this.state.callTime ? (<span
-                                className={styles.footTextRed}>{item.callType === 1 ? ("通话") : ("视频")}{global.formatTime((item.endTime - item.startTime) / 1000) + "　"}</span>) : ""}
+                        <span className={styles.footTextRed}>{callStatus}</span>
+                        {this.state.callTime ? (<span
+                            className={styles.footTextRed}>{item.callType === 1 ? ("通话") : ("视频")}{global.formatTime((item.endTime - item.startTime) / 1000) + "　"}</span>) : ""}
+                    </div>
+                    <div className={styles.material}>
+                        <div className="title">
+                            <a href="javascript: void(0)" onClick={()=>{this.toggleMaterial(item)}}>患者描述<Icon
+                                type={item.id==selectedCardId?'up':'down'}/></a>
                         </div>
-                        <div className={styles.material}>
-                            <div className="title">
-                                <a href="javascript: void(0)" onClick={()=>{this.toggleMaterial(item)}}>患者描述<Icon
-                                    type={item.id==selectedCardId?'up':'down'}/></a>
-                            </div>
-                            <div className="detail">
-                                {material}
-                            </div>
+                        <div className="detail">
+                            {material}
                         </div>
                     </div>
-                </Col>
-            );
+                </div>
+            </div>;
+
+            listMap['list'+ index%3].push(rt);
         });
 
         return (
@@ -238,7 +237,9 @@ class ExceptionalInquiry extends React.Component {
                     <div className={styles.cardList}>
                         {list.length > 0 && (
                             <Row>
-                                {list}
+                                <Col span="8">{listMap.list0}</Col>
+                                <Col span="8">{listMap.list1}</Col>
+                                <Col span="8">{listMap.list2}</Col>
                             </Row>
                         )}
 
