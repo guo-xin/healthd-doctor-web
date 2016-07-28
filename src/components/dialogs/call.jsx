@@ -77,8 +77,8 @@ class Call extends Component {
         }
     }
 
-    toSelectPatientPage() {
-        let {dispatch, router} = this.props;
+    toSelectPatientPage(props) {
+        let {dispatch, router} = props;
         let {user} = this.state;
 
         this.setVisible(false);
@@ -110,7 +110,7 @@ class Call extends Component {
             }
             else if (nextProps.callState === 1) {
                 this.state.tip = '';
-                this.toSelectPatientPage();
+                this.toSelectPatientPage(nextProps);
             }
             else {
                 //由呼叫中直接到挂断为呼叫失败
@@ -129,8 +129,8 @@ class Call extends Component {
 
     //接听
     answer() {
-        let {answer, dispatch, router} = this.props;
-        let {user} = this.state;
+        let props = this.props;
+        let {answer, dispatch} = props;
 
         this.setVisible(false);
 
@@ -139,12 +139,12 @@ class Call extends Component {
                 let result = (action.response || {}).result;
 
                 if (result === 0) {
-                    router.push(`/inquire/case/selectPatient`);
+                    this.toSelectPatientPage(props);
 
                     setTimeout(()=> {
-                        dispatch(setIncomingUserId(user.userId, user));
                         answer();
                     }, 100);
+
                 } else {
                     message.error('接听失败');
                     console.log('呼叫失败-------------查询会话（inquireId）失败');
@@ -275,7 +275,6 @@ class Call extends Component {
                         <ul>
                             <li>问诊人：{user.userName || '--'}</li>
                             <li>与问诊人关系：{global.getRelationText(user.relation) || '--'}</li>
-                            <li>就诊次数：{(user.inquiryCount || 0)}</li>
                             <li>上次诊断：{user.diagnosisName || '--'}</li>
                         </ul>
                     </div>

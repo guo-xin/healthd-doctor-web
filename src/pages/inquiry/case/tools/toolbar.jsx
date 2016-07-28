@@ -63,19 +63,18 @@ export default class Toolbar extends Component {
                                 <span>历史纪录</span>
                             </a>
                         </li>*/}
-                        <li className={toolType === 3?'active':''} onClick={()=>this.changeNav(3)}>
-                            <a href="javascript:;">
-                                <img src={require('../../../../assets/images/tool6.png')} alt=""/>
-                                <span>发短信</span>
-                            </a>
-                        </li>
                         <li className={toolType === 2?'active':''}  onClick={()=>this.changeNav(2)}>
                             <a href="javascript:;">
                                 <img src={require('../../../../assets/images/tool4.png')} alt=""/>
                                 <span>患者描述</span>
                             </a>
                         </li>
-
+                        <li className={toolType === 3?'active':''} onClick={()=>this.changeNav(3)}>
+                            <a href="javascript:;">
+                                <img src={require('../../../../assets/images/tool6.png')} alt=""/>
+                                <span>发短信</span>
+                            </a>
+                        </li>
                         {/*<li>
                             <a href="javascript:;">
                                 <img src={require('../../../../assets/images/tool5.png')} alt=""/>

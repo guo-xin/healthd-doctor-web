@@ -24,7 +24,7 @@ class Callback extends Component {
     }
 
     toNextPage() {
-        let {dispatch, callbackUser, router} = this.props;
+        let {dispatch, callbackUser={}, router} = this.props;
 
         this.setVisible(false);
 
@@ -45,8 +45,7 @@ class Callback extends Component {
         }
 
         setTimeout(()=>{
-            let user = this.state.user || {};
-            dispatch(setIncomingUserId(user.userId, user));
+            dispatch(setIncomingUserId(callbackUser.userId, callbackUser));
         }, 200);
     }
 
@@ -110,40 +109,6 @@ class Callback extends Component {
                 }
             }
         }
-
-
-        if (nextProps.isVisible && nextProps.isVisible !== this.props.isVisible) {
-            let {userId} = nextProps.callbackUser;
-
-            if (userId) {
-                this.getUser(nextProps, userId);
-            }
-        }
-    }
-
-    getUser(props, id) {
-        this.setState({
-            user: {},
-            disabled: true
-        });
-
-        props.dispatch(getUserById(id)).then(
-            (action)=> {
-                let user = Object.assign({}, props.callbackUser, (action.response || {}).data);
-
-                props.dispatch(setCallbackUserId(user.userId, user));
-
-                this.setState({
-                    user: user,
-                    disabled: false
-                });
-            },
-            ()=> {
-                this.setState({
-                    disabled: false
-                });
-            }
-        );
     }
 
     //接听
@@ -213,7 +178,6 @@ class Callback extends Component {
         let user = callbackUser || {};
         let {disabled, tip} = this.state;
 
-
         return (
             <Modal
                 wrapClassName={styles.dialog + " vertical-center-modal"}
@@ -237,19 +201,18 @@ class Callback extends Component {
                 </div>
                 <div className={styles.detail}>
                     <div className="top">
-                        <span className="name">患者：{'--' || user.realName || '--'}</span>
-                        <span className="age">{'--' || global.getAge(user.birthday) || '--'}岁</span>
-                        <span className="serial">ID:{'--' || global.formatPatientCode(user.patientCode) || '--'}</span>
-                        <span className="gender" style={{display:'none'}}>
+                        <span className="name">患者：{user.realName || '--'}</span>
+                        <span className="age">{global.getAge(user.birthday) || '--岁'}</span>
+                        <span className="serial">ID:{global.formatPatientCode(user.patientCode) || '--'}</span>
+                        <span className="gender">
                              <img src={global.getGenderUrl(user.sex)} alt=""/>
                         </span>
                     </div>
                     <div className="middle clearfix">
                         <ul>
                             <li>问诊人：{user.userName || user.userMobilePhone || '--'}</li>
-                            <li>与问诊人关系：{'--' || global.getRelationText(user.relation) || '--'}</li>
-                            <li>就诊次数：{'--' || (user.caseCount || 0)}</li>
-                            <li>上次诊断：{'--' || user.diagnosisName || '--'}</li>
+                            <li>与问诊人关系：{global.getRelationText(user.relation) || '--'}</li>
+                            <li>上次诊断：{user.diagnosisName || '--'}</li>
                         </ul>
                     </div>
                 </div>

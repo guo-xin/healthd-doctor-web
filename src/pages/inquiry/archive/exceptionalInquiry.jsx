@@ -36,9 +36,6 @@ class ExceptionalInquiry extends React.Component {
     onCallBack(data, callType) {
 
         let item = Object.assign({}, data);
-        item.userMobilePhone = item.phoneNumber;
-        item.createdTime = item.startTime;
-        item.userName = item.userName || item.phoneNumber;
 
         if (item.userMobilePhone) {
             let {dispatch} = this.props;
@@ -107,7 +104,7 @@ class ExceptionalInquiry extends React.Component {
                             <div className="detail">
                                 <div className="top">
                                     <span className="name">患者：{item.realName || '--'}</span>
-                                    <span className="age">{global.getAge(item.birthday) || '--'}岁</span>
+                                    <span className="age">{global.getAge(item.birthday) || '--岁'}</span>
                                     <span
                                         className="serial">ID:{global.formatPatientCode(item.patientCode) || '--'}</span>
                                     <span className="gender">
