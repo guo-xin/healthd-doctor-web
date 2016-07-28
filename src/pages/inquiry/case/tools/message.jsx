@@ -3,7 +3,7 @@ import {Tabs, Button, Input, message} from 'antd';
 import styles from './message.less';
 import {connect} from 'react-redux';
 import * as global from 'util/global';
-import {getMessageByCaseId, sendMessageByDoctor} from 'redux/actions/tool';
+import {getMessageByCaseId, sendMessageByDoctor, sendMessageByRecordId} from 'redux/actions/tool';
 
 const TabPane = Tabs.TabPane;
 
@@ -47,17 +47,17 @@ class Message extends Component {
                 disableSendBtn: true
             });
             this._sendMsg(msg).then(
-                (action)=>{
+                (action)=> {
                     let result = (action.response || {}).result;
 
-                    if(result === 0){
+                    if (result === 0) {
                         this.setState({
                             msg: '',
                             disableSendBtn: false
                         });
 
                         message.success('发送成功');
-                    }else{
+                    } else {
                         this.setState({
                             disableSendBtn: false
                         });
@@ -65,7 +65,7 @@ class Message extends Component {
                         message.error('发送失败');
                     }
                 },
-                ()=>{
+                ()=> {
                     this.setState({
                         disableSendBtn: false
                     });
@@ -76,19 +76,60 @@ class Message extends Component {
     }
 
     onTabChange(key) {
-        if(key == 2){
+        if (key == 2) {
             this.getMessageList();
         }
     }
 
-    getMessageList(){
+    refresh() {
+        this.getMessageList();
+    }
+
+    retry(item) {
+        let {dispatch} = this.props;
+
+        if (item.statusCode == null || item.statusCode === '000000') {
+            return;
+        }
+
+        item.statusCode = null;
+
+        this.setState({
+            list: this.state.list.slice()
+        });
+
+        dispatch(sendMessageByRecordId({
+            id: item.id
+        })).then(
+            (action)=> {
+                let result = (action.response || {}).result;
+
+                if (result === 0) {
+                    this.getMessageList();
+                } else {
+                    item.statusCode = '100000';
+                    this.setState({
+                        list: this.state.list.slice()
+                    });
+                }
+            },
+            ()=> {
+                item.statusCode = '100000';
+                this.setState({
+                    list: this.state.list.slice()
+                });
+            }
+        );
+    }
+
+    getMessageList() {
         const {currentCase={}} = this.props;
-        if(currentCase.caseId){
+        if (currentCase.caseId) {
             this.props.dispatch(getMessageByCaseId(currentCase.caseId)).then(
-                (action)=>{
+                (action)=> {
                     let result = (action.response || {}).result;
 
-                    if(result === 0){
+                    if (result === 0) {
                         let data = (action.response || {}).data || [];
                         this.setState({
                             list: data
@@ -109,15 +150,24 @@ class Message extends Component {
         return global.getRelationText(relation);
     }
 
-    getFormattedList(list=[]){
-        if(list.length > 0){
+    getFormattedList(list = []) {
+        if (list.length > 0) {
             let date = new Date().valueOf();
-            let data = list.map((item, index)=>{
+            let data = list.map((item, index)=> {
+                let state;
+                if (item.statusCode === null) {
+                    state = <span className="state sending">发送中...<a href="javascript:void(0)" onClick={::this.refresh}>刷新</a></span>
+                } else if (item.statusCode === '000000') {
+                    state = <span className="state success">发送成功</span>
+                } else {
+                    state = <span className="state error">发送失败<a href="javascript:void(0)" onClick={()=>this.retry(item)}>重试</a></span>
+                }
 
                 return (
                     <li key={date + index}>
                         <span className="date">{global.formatDate(+item.startTime, 'yyyy-MM-dd HH:mm')}</span>
                         <span className="msg">{item.content}</span>
+                        {state}
                     </li>
                 )
             });
@@ -127,7 +177,7 @@ class Message extends Component {
                     {data}
                 </ul>
             );
-        }else{
+        } else {
             return null;
         }
     }
@@ -172,7 +222,7 @@ class Message extends Component {
                     </TabPane>
 
                     <TabPane tab="短信记录" key="2">
-                        <div  className={styles.listWrapper}>
+                        <div className={styles.listWrapper}>
                             {userInfo}
                             <div>
                                 {msgList}

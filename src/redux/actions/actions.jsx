@@ -122,6 +122,7 @@ export const AUTO_SAVE_CASE = "AUTO_SAVE_CASE"; //自动保存病历操作
 export const CLEAR_PATIENT_PICS = "CLEAR_PATIENT_PICS";
 
 export const SEND_MESSAGE_BY_DOCTOR = "SEND_MESSAGE_BY_DOCTOR"; //医生向用户发送短信
+export const SEND_MESSAGE_BY_RECORD_ID = "SEND_MESSAGE_BY_RECORD_ID"; //根据短信记录ID重新发送短信
 export const GET_MESSAGE_BY_CASE_ID = "GET_MESSAGE_BY_CASE_ID"; //根据病历ID查询相关短信
 /* ---------- 病历相关操作 end ---------- */
 

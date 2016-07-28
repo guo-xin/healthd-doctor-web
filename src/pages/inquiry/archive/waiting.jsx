@@ -90,7 +90,7 @@ class Waiting extends React.Component {
                             <span
                                 className={styles.footText}>上次问诊：{item.diagnosisName ? (item.createdTime && global.formatDate(item.createdTime, 'yyyy-MM-dd HH:mm') || '--') : '--'}</span>
                             <span
-                                className={styles.footTextOrange}>等待{global.formatTime(item.timeCount) || '--'}</span>
+                                className={styles.footTextOrange}>等待{global.formatTime((item.currentTime - item.createdTime) / 1000) || '--'}</span>
                         </div>
                     </div>
                 </Col>
