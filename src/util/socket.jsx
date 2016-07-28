@@ -5,7 +5,7 @@ import {autoSaveCase} from 'redux/actions/case';
 
 import {
     setDoctorQueueCount,
-    setDoctorMessageInfo,
+    getDoctorPictureMessage,
     changeDoctorState,
     getDoctorEndInquery,
     getDoctorAttendance
@@ -128,9 +128,8 @@ export const receiveMessages = ()=> {
         infoSource.addEvent("messageInfo/" + doctorId, function (event) {
             console.info('Received addEventListener event ' + event.type + ': ' + event.data);
             if (event.data) {
-                store.dispatch(setDoctorMessageInfo(JSON.parse(event.data)));
+                store.dispatch(getDoctorPictureMessage(doctorId));
             }
-
         });
 
         let SSECheck = setInterval(function () {

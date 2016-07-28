@@ -4,9 +4,6 @@ import fetch from 'isomorphic-fetch';
 //推送排队人数
 export const setDoctorQueueCount = actions.create(actions.SET_DOCTOR_QUEUE_COUNT, 'queue');
 
-//推送图片新消息通知
-export const setDoctorMessageInfo = actions.create(actions.SET_DOCTOR_MESSAGE_INFO, 'messageInfo');
-
 
 //首页图片消息通知
 export const getDoctorPictureMessage = (doctorId) => {

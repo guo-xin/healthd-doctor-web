@@ -51,7 +51,6 @@ export const GET_OCX_ACCOUNT = "GET_OCX_ACCOUNT"; //获取荣联账号
 
 /* ---------- 医生相关操作 start ---------- */
 export const SET_DOCTOR_QUEUE_COUNT = "SET_DOCTOR_QUEUE_COUNT";//推送医生排队人数
-export const SET_DOCTOR_MESSAGE_INFO = "SET_DOCTOR_MESSAGE_INFO";//推送图片消息通知
 
 export const GET_DOCTOR_PICTURE_MESSAGE = "GET_DOCTOR_PICTURE_MESSAGE";//图片消息通知
 export const GET_DOCTOR_RESET_PWD = "GET_DOCTOR_RESET_PWD";//医生忘记密码验证邮箱发送密码
@@ -112,7 +111,9 @@ export const DELETE_DIAGNOSIS_BY_ID = "DELETE_DIAGNOSIS_BY_ID"; //根据诊断ID
 export const UPLOAD_CASE_OPINIONS = "UPLOAD_CASE_OPINIONS";
 export const GET_CASE_OPINIONS = "GET_CASE_OPINIONS";
 
-export const GET_PATIENT_PICTURE = "GET_PATIENT_PICTURE"; //根据病历Id查询患者图片
+export const GET_PATIENT_PICTURE = "GET_PATIENT_PICTURE"; //根据患者Id查询患者全部图片
+export const GET_INQUERY_PICTURE = "GET_INQUERY_PICTURE"; //根据病历Id查询当前病历患者图片
+
 export const UPLOAD_CASE_TO_OSS = "UPLOAD_CASE_TO_OSS"; //保存病历后回调保存上传OSS
 
 export const APPEND_CASE = "APPEND_CASE"; //追加病历调用
