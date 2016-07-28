@@ -124,18 +124,7 @@ class Describe extends Component {
 
     render() {
         let {picture = [], pictureList=[], pictureForward=[], currentCase = {}} = this.props;
-
-        if (!currentCase.caseId) {
-            picture = [];
-        }
-
-        if (!currentCase.patientId) {
-            pictureList = [];
-        }
-
-        if (!currentCase.patientId && !currentCase.userId) {
-            pictureForward = [];
-        }
+        
 
         let time = new Date().getTime();
         let createdTime1, createdTime2;

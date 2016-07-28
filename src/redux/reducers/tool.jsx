@@ -9,18 +9,12 @@ const tools = (state = {
     let obj;
 
     switch (action.type) {
-        //将描述图片设为空
+        //将描述图片清空
         case actions.CLEAR_PATIENT_PICS:
             obj = Object.assign({}, state, {
-                picture: []
-            });
-
-            return obj;
-
-        //将当前病历图片设为空
-        case actions.GET_CURRENT_INQUIRY_PICTURE + "_REQUEST":
-            obj = Object.assign({}, state, {
-                picture: []
+                picture: [],
+                pictureList: [],
+                forwardPicture: []
             });
 
             return obj;
