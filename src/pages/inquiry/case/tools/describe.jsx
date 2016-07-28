@@ -5,8 +5,9 @@ import {connect} from 'react-redux';
 import * as global from 'util/global';
 import {
     getPatientAllPicture,
-    getCurrentInqueryPicture,
-    setInqueryPictureRead
+    getCurrentInquiryPicture,
+    setInquiryPictureRead,
+    getInquiryForwardPicture
 } from 'redux/actions/tool';
 
 const TabPane = Tabs.TabPane;
@@ -27,8 +28,12 @@ class Describe extends Component {
         const {dispatch, currentCase = {}} = this.props;
 
         if (currentCase.caseId) {
-            dispatch(getCurrentInqueryPicture(currentCase.caseId));
+            dispatch(getCurrentInquiryPicture(currentCase.caseId));
         }
+        if (currentCase.patientId && currentCase.userId) {
+            dispatch(getInquiryForwardPicture(currentCase.patientId, currentCase.userId));
+        }
+
     }
 
     //本地与所有图片的切换
@@ -52,6 +57,9 @@ class Describe extends Component {
     //点击图片
     bigPicuure(href, index) {
         //console.log(href, index);
+        if (this.state.currentTab) {
+            console.log(this.props.picture[index].id)
+        }
         this.setState({
             dialogShow: true,
             imgSrc: href,
@@ -115,7 +123,7 @@ class Describe extends Component {
     }
 
     render() {
-        let {picture = [], pictureList=[], message = [], currentCase = {}} = this.props;
+        let {picture = [], pictureList=[], pictureForward=[], currentCase = {}} = this.props;
 
         if (!currentCase.caseId) {
             picture = [];
@@ -124,6 +132,11 @@ class Describe extends Component {
         if (!currentCase.patientId) {
             pictureList = [];
         }
+
+        if (!currentCase.patientId && !currentCase.userId) {
+            pictureForward = [];
+        }
+
         let time = new Date().getTime();
         let createdTime1, createdTime2;
         let pictureList1 = picture.map((item, index)=> {
@@ -132,13 +145,6 @@ class Describe extends Component {
                 createdTime1 = global.formatDate(item.createdTime, 'yyyy-MM-dd');
                 let hourTime = global.formatDate(item.createdTime, 'HH:mm');
                 let date = (currentTime === createdTime1) ? "今日" : createdTime1;
-
-                let unread = false;
-                for (var i = 0; i < message.length; i++) {
-                    if (message[i].inquiryInfoId === item.inquiryInfoId) {
-                        unread = true;
-                    }
-                }
 
                 return (<div className={styles.part} key={index}>
                     <div className={styles.date}>{date}</div>
@@ -194,7 +200,63 @@ class Describe extends Component {
             }
         });
 
-        let createdTime3, createdTime4;
+        let forwardList = pictureForward.map((item, index)=> {
+            if (index === 0) {
+                let currentTime = global.formatDate(time, 'yyyy-MM-dd');
+                createdTime1 = global.formatDate(item.createdTime, 'yyyy-MM-dd');
+                let hourTime = global.formatDate(item.createdTime, 'HH:mm');
+                let date = (currentTime === createdTime1) ? "今日" : createdTime1;
+
+                return (<div className={styles.part} key={index}>
+                    <div className={styles.date}>{date}</div>
+                    <div className={styles.time}>{hourTime}</div>
+                    <div className={styles.description}>{item.description}</div>
+                    <div className={styles.item}>
+                        <div className={styles.pictureList}>
+                            {item.savePath && <img src={item.savePath+"@80h_80w_0e"} alt="" onClick={()=>this.bigPicuure(item.savePath,index)}/>}
+                        </div>
+                    </div>
+                </div>)
+
+            } else {
+                createdTime1 = global.formatDate(pictureForward[index].createdTime, 'yyyy-MM-dd-HH-mm');
+                createdTime2 = global.formatDate(pictureForward[index - 1].createdTime, 'yyyy-MM-dd-HH-mm');
+                let hourTime = global.formatDate(item.createdTime, 'HH:mm');
+
+                if (createdTime1 === createdTime2) {
+                    return (<div className={styles.item} key={index}>
+                        <div className={styles.pictureList}>
+                            {item.savePath && <img src={item.savePath+"@80h_80w_0e"} alt="" onClick={()=>this.bigPicuure(item.savePath,index)}/>}
+                        </div>
+                    </div>)
+                } else {
+                    if (global.formatDate(pictureForward[index].createdTime, 'yyyy-MM-dd') === global.formatDate(pictureForward[index - 1].createdTime, 'yyyy-MM-dd')) {
+                        return (<div className={styles.part} key={index}>
+                            <div className={styles.time}>{hourTime}</div>
+                            <div className={styles.description}>{item.description}</div>
+                            <div className={styles.item}>
+                                <div className={styles.pictureList}>
+                                    {item.savePath && <img src={item.savePath+"@80h_80w_0e"} alt="" onClick={()=>this.bigPicuure(item.savePath,index)}/>}
+                                </div>
+                            </div>
+                        </div>)
+                    } else {
+                        return (<div className={styles.part+" "+styles.partDay} key={index}>
+                            <div
+                                className={styles.date}>{global.formatDate(pictureForward[index].createdTime, 'yyyy-MM-dd')}</div>
+                            <div className={styles.time}>{hourTime}</div>
+                            <div className={styles.description}>{item.description}</div>
+                            <div className={styles.item}>
+                                <div className={styles.pictureList}>
+                                    {item.savePath && <img src={item.savePath+"@80h_80w_0e"} alt="" onClick={()=>this.bigPicuure(item.savePath,index)}/>}
+                                </div>
+                            </div>
+                        </div>)
+                    }
+                }
+            }
+        });
+
         let pictureList2 = pictureList.map((item, index)=> {
             if (index === 0) {
                 let currentTime = global.formatDate(time, 'yyyy-MM-dd');
@@ -263,7 +325,8 @@ class Describe extends Component {
                     <TabPane tab="本 次" key="1">
                         <div className={styles.panelBody}>
                             {pictureList1}
-                            {picture.length === 0 && <div>暂无图片</div>}
+                            {forwardList}
+                            {picture.length === 0 && pictureForward.length === 0 && <div>暂无图片</div>}
                         </div>
                         {this.state.dialogShow ? (<div className={styles.dialogModal} onClick={()=>this.dialogClick()}>
                             <div className={styles.dialogPicture} onClick={(e)=>this.pictureClick(e)}>
@@ -312,8 +375,8 @@ const mapStateToProps = (globalStore) => {
     return {
         picture: toolStore.picture,
         pictureList: toolStore.pictureList,
-        currentCase: caseStore.currentCase,
-        message: doctorStore.message
+        pictureForward: toolStore.forwardPicture,
+        currentCase: caseStore.currentCase
     };
 };
 

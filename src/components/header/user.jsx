@@ -152,6 +152,7 @@ export default class User extends Component {
             patientId: info.patientId,
             caseId: info.caseId,
             inquiryId: info.inquiryId,
+            userId: info.sender,
             state: 1
         }));
         router.push(`/inquire/case/detail`);
