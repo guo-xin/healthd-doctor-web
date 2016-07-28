@@ -1,6 +1,10 @@
 import * as actions from '../actions/actions';
 
-const tools = (state = {picture: []}, action) => {
+const tools = (state = {
+    result: {},
+    picture: [],
+    pictureList: []
+}, action) => {
     let obj;
 
     switch (action.type) {
@@ -12,8 +16,8 @@ const tools = (state = {picture: []}, action) => {
 
             return obj;
 
-        //查询将描述图片设为空
-        case actions.GET_INQUERY_PICTURE + "_REQUEST":
+        //将当前病历图片设为空
+        case actions.GET_CURRENT_INQUERY_PICTURE + "_REQUEST":
             obj = Object.assign({}, state, {
                 picture: []
             });
@@ -21,9 +25,25 @@ const tools = (state = {picture: []}, action) => {
             return obj;
 
         //根据病历ID查询当前病历图片
-        case actions.GET_INQUERY_PICTURE + "_SUCCESS":
+        case actions.GET_CURRENT_INQUERY_PICTURE + "_SUCCESS":
             obj = Object.assign({}, state, {
                 picture: action.response.data
+            });
+
+            return obj;
+
+        //根据患者ID查询当前患者所有图片
+        case actions.GET_PATIENT_ALL_PICTURE + "_SUCCESS":
+            obj = Object.assign({}, state, {
+                pictureList: action.response.data
+            });
+
+            return obj;
+
+        //将病历未读图片设置为已读
+        case actions.SET_INQUERY_PICTURE_READY + "_SUCCESS":
+            obj = Object.assign({}, state, {
+                result: action.response
             });
 
             return obj;

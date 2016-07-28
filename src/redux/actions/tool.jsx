@@ -22,10 +22,45 @@ export const getPatientPicture = (caseId) => {
     };
 };
 
+//将未读图片设置为已读
+export const setInqueryPictureRead = (pictureId) => {
+    let action = actions.SET_INQUERY_PICTURE_READY;
+    return {
+        // 要在之前和之后发送的 action types
+        types: [action + '_REQUEST', action + '_SUCCESS', action + '_FAILURE'],
+        // 检查缓存 (可选):
+        //shouldCallAPI: (state) => !state.users[userId],
+        // 进行取：https://test.d.healthdoc.cn/v2/message-info/is-read?id=1
+        callAPI: (token) => fetch(`${actions.WEB_API_URI}/message-info/is-read?id=${pictureId}`, {
+            method: 'GET',
+            headers: {
+                [actions.HEADER_AUTH_FIELD]: actions.HEADER_AUTH_PREFIX + token
+            }
+        })
+    };
+};
+
+//本次问诊的患者所有图片
+export const getPatientAllPicture = (patientId) => {
+    let action = actions.GET_PATIENT_ALL_PICTURE;
+    return {
+        // 要在之前和之后发送的 action types
+        types: [action + '_REQUEST', action + '_SUCCESS', action + '_FAILURE'],
+        // 检查缓存 (可选):
+        //shouldCallAPI: (state) => !state.users[userId],
+        // 进行取：https://test.d.healthdoc.cn/v2/inquiry-info-attachment/list?patientId=4
+        callAPI: (token) => fetch(`${actions.WEB_API_URI}/inquiry-info-attachment/list?patientId=${patientId}`, {
+            method: 'GET',
+            headers: {
+                [actions.HEADER_AUTH_FIELD]: actions.HEADER_AUTH_PREFIX + token
+            }
+        })
+    };
+};
 
 //本次问诊患者描述图片
 export const getCurrentInqueryPicture = (caseId) => {
-    let action = actions.GET_INQUERY_PICTURE;
+    let action = actions.GET_CURRENT_INQUERY_PICTURE;
     return {
         // 要在之前和之后发送的 action types
         types: [action + '_REQUEST', action + '_SUCCESS', action + '_FAILURE'],

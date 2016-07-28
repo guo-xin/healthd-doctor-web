@@ -31,6 +31,20 @@
     color: @grey;
     padding: 6px 0 0;
   }
+  .read {
+    color: #fff;
+    background: @red;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    display: inline-block;
+    text-align: center;
+    margin-left: @gapSm;
+  }
+
+  .description {
+    padding: 10px 0;
+  }
   .pictureList {
     img {
       width: 80px;
@@ -38,26 +52,13 @@
       cursor: pointer;
     }
   }
-}
 
-.panelHead {
-  composes: panel-head;
-  padding: 0;
-  border-top: 1px solid @borderColorBase;
-
-}
-
-.panelElement {
-  display: inline-block;
-  padding: 0 10px;
-  height: @panelHeadHeight - 2;
-  border-bottom: 2px solid @blue;
-}
-
-.panelTitle {
-  font-weight: normal;
-  color: @blue;
-  line-height: @panelHeadHeight;
+  :global {
+    .ant-tabs-nav .ant-tabs-tab-inner {
+      font-size: @fontSizeBase;
+      padding: 12px 20px;
+    }
+  }
 }
 
 .panelBody {
@@ -98,7 +99,7 @@
     font-size: 24px;
     cursor: pointer;
   }
-  i{
+  i {
     color: @grey;
   }
   i:hover {

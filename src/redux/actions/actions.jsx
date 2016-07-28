@@ -111,8 +111,9 @@ export const DELETE_DIAGNOSIS_BY_ID = "DELETE_DIAGNOSIS_BY_ID"; //根据诊断ID
 export const UPLOAD_CASE_OPINIONS = "UPLOAD_CASE_OPINIONS";
 export const GET_CASE_OPINIONS = "GET_CASE_OPINIONS";
 
-export const GET_PATIENT_PICTURE = "GET_PATIENT_PICTURE"; //根据患者Id查询患者全部图片
-export const GET_INQUERY_PICTURE = "GET_INQUERY_PICTURE"; //根据病历Id查询当前病历患者图片
+export const GET_PATIENT_ALL_PICTURE = "GET_PATIENT_ALL_PICTURE"; //根据患者Id查询患者全部图片
+export const GET_CURRENT_INQUERY_PICTURE = "GET_CURRENT_INQUERY_PICTURE"; //根据病历Id查询当前病历患者图片
+export const SET_INQUERY_PICTURE_READY = "SET_INQUERY_PICTURE_READY"; //将病历未读图片设置为已读
 
 export const UPLOAD_CASE_TO_OSS = "UPLOAD_CASE_TO_OSS"; //保存病历后回调保存上传OSS
 
