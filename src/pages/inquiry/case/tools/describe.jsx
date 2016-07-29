@@ -112,7 +112,7 @@ class Describe extends Component {
                     this.state.messageId = messageInfoId;
                     dispatch(getDoctorPictureMessage(doctorId));
                 });
-            }else if(this.state.messageId === messageInfoId && content[index].status === 0){
+            } else if (this.state.messageId === messageInfoId && content[index].status === 0) {
                 content[index].status = 1;
             }
         } else {
@@ -144,7 +144,7 @@ class Describe extends Component {
                     this.state.messageId = messageInfoId;
                     dispatch(getDoctorPictureMessage(doctorId));
                 });
-            }else if(this.state.messageId === messageInfoId && content[index].status === 0){
+            } else if (this.state.messageId === messageInfoId && content[index].status === 0) {
                 content[index].status = 1;
             }
         } else {
@@ -168,8 +168,13 @@ class Describe extends Component {
         let pictureList1 = picture.map((item, index)=> {
             let flag = false;
             if (this.state.messageId) {
-                if (item.status === 0 && this.state.messageId !== item.messageInfoId) {
-                    flag = true;
+                if (item.status === 0) {
+                    if(this.state.messageId !== item.messageInfoId){
+                        flag = true;
+                    }else{
+                        item.status = 1;
+                    }
+
                 }
             } else {
                 if (item.status === 0) {
@@ -187,7 +192,7 @@ class Describe extends Component {
                     <div className={styles.description}>{item.description}</div>
                     <div className={styles.item}>
                         <div className={styles.pictureList}>
-                            <img src={item.savePath+"@80h_80w_0e"} alt=""
+                            <img src={item.savePath?(item.savePath+"@80h_80w_0e"):""} alt=""
                                  onClick={()=>this.bigPicuure(item.savePath,index,item.messageInfoId,item.status)}/>
                         </div>
                     </div>
