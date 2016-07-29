@@ -85,6 +85,7 @@ class Call extends Component {
 
         if (user.patientId) {
             dispatch(setCurrentCase({
+                inquiryInfoId: user.inquiryInfoId,
                 userId: user.userId,
                 patientId: user.patientId,
                 caseId: null,

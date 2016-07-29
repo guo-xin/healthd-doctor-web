@@ -100,6 +100,7 @@ class Done extends React.Component {
     goToDetail(text, record, index) {
         let {router, dispatch} = this.props;
         dispatch(setCurrentCase({
+            inquiryInfoId: record.inquiryInfoId,
             userId: record.userId,
             patientId: record.patientId,
             caseId: record.id,

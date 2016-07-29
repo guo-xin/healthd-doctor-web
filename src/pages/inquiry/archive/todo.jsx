@@ -33,6 +33,7 @@ class Todo extends React.Component{
         let {router, dispatch} = this.props;
 
         dispatch(setCurrentCase({
+            inquiryInfoId: item.inquiryInfoId,
             userId: item.userId,
             patientId: item.patientId,
             caseId: item.id,
