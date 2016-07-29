@@ -171,6 +171,10 @@ class CallbackFromCase extends Component {
                     params.patientId = currentCase.patientId;
                 }
 
+                if(currentCase.inquiryInfoId){
+                    params.inquiryInfoId = currentCase.inquiryInfoId;
+                }
+
                 //回呼前创建会话ID
                 dispatch(addCallbackRecord(params)).then(
                     (action)=> {

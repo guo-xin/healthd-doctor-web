@@ -138,6 +138,10 @@ class Callback extends Component {
                 params.patientId = callbackUser.patientId;
             }
 
+            if(callbackUser.inquiryInfoId){
+                params.inquiryInfoId = callbackUser.inquiryInfoId;
+            }
+
             //回呼前创建会话ID
             dispatch(addCallRecord(params)).then(
                 (action)=> {

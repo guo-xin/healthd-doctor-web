@@ -16,12 +16,20 @@ import {
     getCaseById,
     setCurrentCase,
     changeDiagnosisTableData,
+    updateInquiryInfoByInquiryId,
     uploadCaseOpinions,
     uploadCaseToOss
 } from 'redux/actions/case';
 import {getPatientById} from 'redux/actions/patient';
 import {getDoctorInquiryCountByUserId} from 'redux/actions/doctor';
-import {unReadInquiry, queryService, reduceService, showCalcDialog, getCallRecords, setUserForVideoArea} from 'redux/actions/call';
+import {
+    unReadInquiry,
+    queryService,
+    reduceService,
+    showCalcDialog,
+    getCallRecords,
+    setUserForVideoArea
+} from 'redux/actions/call';
 
 const confirm = Modal.confirm;
 
@@ -75,8 +83,8 @@ class Detail extends React.Component {
         }
 
         if (nextProps.autoSaveCount != this.props.autoSaveCount) {
-            if(window.location.hash.indexOf('inquire/case/detail')!==-1){
-                if(!this.isSaving){
+            if (window.location.hash.indexOf('inquire/case/detail') !== -1) {
+                if (!this.isSaving) {
                     this.autoSave(this.refs.emr.getFieldsValue());
                 }
             }
@@ -98,7 +106,7 @@ class Detail extends React.Component {
         if (currentCase.patientId && currentCase.patientId !== null) {
             this.state.patientId = currentCase.patientId;
             dispatch(getPatientById(currentCase.patientId)).then(
-                (action)=>{
+                (action)=> {
                     let data = (action.response || {}).data || {};
 
                     dispatch(setUserForVideoArea({
@@ -107,8 +115,8 @@ class Detail extends React.Component {
                         headPic: data.userHead
                     }));
                 },
-                ()=>{
-                   dispatch(setUserForVideoArea({}));
+                ()=> {
+                    dispatch(setUserForVideoArea({}));
                 }
             );
         }
@@ -413,6 +421,7 @@ class Detail extends React.Component {
         this.diagnosis = this.formatDiagnosis(props);
         let values = formData || this.refs.emr.getFieldsValue();
         let params = this.getCaseData(props, values, 1);
+        let caseState = this.state.caseState;
 
         //新建调用postCase， 更新调用putCase
         return this.props.dispatch((this.state.caseState === -1 ? postCase : putCase)(params)).then(
@@ -425,7 +434,7 @@ class Detail extends React.Component {
                         this.state.caseData = data;
                     }
 
-                    if (this.state.caseState === -1 && data) {
+                    if (caseState === -1 && data) {
                         this.state.caseState = 1;
                         this.state.caseId = data.id;
                         this.state.patientId = data.patientId;
@@ -443,6 +452,17 @@ class Detail extends React.Component {
 
                     if (data) {
                         data.diagnosisList && this.initDiagnosisList(data.diagnosisList);
+                    }
+
+                    //创建病历时更新诊前资料信息
+                    if (caseState === -1) {
+                        let {currentCase={}}=props;
+                        if (props.inquiryId && currentCase.inquiryInfoId){
+                            props.dispatch(updateInquiryInfoByInquiryId({
+                                inquiryId: props.inquiryId,
+                                inquiryInfoId: currentCase.inquiryInfoId
+                            }));
+                        }
                     }
 
                     props.dispatch(getDoctorInquiryCountByUserId(props.doctorId));
@@ -634,7 +654,7 @@ class Detail extends React.Component {
         let pathname = (route || {}).pathname + '';
 
         //除了退出，跳转到其他路由时自动保存
-        if (pathname.indexOf('/login')===-1) {
+        if (pathname.indexOf('/login') === -1) {
             this.autoSave(this.refs.emr.getFieldsValue());
         }
     }
@@ -782,6 +802,15 @@ class Detail extends React.Component {
                                 inquiryId: props.inquiryId,
                                 state: 2
                             }));
+
+                            //创建病历时更新诊前资料信息
+                            let {currentCase={}}=props;
+                            if (props.inquiryId && currentCase.inquiryInfoId){
+                                props.dispatch(updateInquiryInfoByInquiryId({
+                                    inquiryId: props.inquiryId,
+                                    inquiryInfoId: currentCase.inquiryInfoId
+                                }));
+                            }
                         }
 
                         //未读问诊推送
@@ -799,7 +828,7 @@ class Detail extends React.Component {
                             data.diagnosisList && this.initDiagnosisList(data.diagnosisList);
 
                             //保存病历后回调保存上传OSS
-                            if(data.opinions){
+                            if (data.opinions) {
                                 props.dispatch(uploadCaseToOss({
                                     type: 1,
                                     url: data.opinions
