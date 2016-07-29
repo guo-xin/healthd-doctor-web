@@ -154,8 +154,7 @@ class Waiting extends React.Component {
         let list = this.props.list.map((data, index)=> {
             let item = data;
             let material = this.formatMaterial(item);
-            let rt = <div key={index} className={"item columnItem" + (item.id==selectedCardId?(' '+styles.active):'')}
-                          onMouseEnter={(e)=>this.onMouseEnter(e)}>
+            let rt = <div key={index} className={"item columnItem" + (item.id==selectedCardId?(' '+styles.active):'')}>
                 <div className={styles.card}>
                     <div className={styles.cardBody}>
                         <div className="pic">

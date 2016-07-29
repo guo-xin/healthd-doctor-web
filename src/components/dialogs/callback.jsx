@@ -35,6 +35,7 @@ class Callback extends Component {
 
         if(callbackUser.patientId){
             dispatch(setCurrentCase({
+                userId: callbackUser.userId,
                 patientId: callbackUser.patientId,
                 caseId: null,
                 state: -1

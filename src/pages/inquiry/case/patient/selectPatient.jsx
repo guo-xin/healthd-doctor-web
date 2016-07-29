@@ -121,6 +121,7 @@ class SelectPatient extends Component {
         let {dispatch, router}= this.props;
 
         dispatch(setCurrentCase({
+            userId: selectedPatient.userId,
             caseId: null,
             patientId: selectedPatient.id,
             state: -1 // -1：新建， 1：已存在
@@ -135,6 +136,7 @@ class SelectPatient extends Component {
         
         dispatch(setCurrentCase({
             caseId: item.id,
+            userId: selectedPatient.userId,
             patientId: selectedPatient.id,
             inquiryId: item.inquiryId,
             state: item.status // -1：新建， 1：已存在

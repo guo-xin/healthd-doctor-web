@@ -433,6 +433,7 @@ class Detail extends React.Component {
                         this.reduceService(0);
 
                         props.dispatch(setCurrentCase({
+                            userId: data.userId,
                             caseId: data.id,
                             patientId: data.patientId,
                             inquiryId: props.inquiryId,
@@ -775,6 +776,7 @@ class Detail extends React.Component {
                             this.state.patientId = data.patientId;
 
                             props.dispatch(setCurrentCase({
+                                userId: data.userId,
                                 caseId: data.id,
                                 patientId: data.patientId,
                                 inquiryId: props.inquiryId,

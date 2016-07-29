@@ -320,6 +320,7 @@ class EditPatient extends React.Component {
 
                 if (optState === -1) {
                     dispatch(setCurrentCase({
+                        userId: params.userId,
                         caseId: null,
                         patientId: id,
                         state: -1 // -1：新建， 1：已存在
