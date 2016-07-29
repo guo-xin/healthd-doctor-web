@@ -41,15 +41,15 @@ export const getPatientAllPicture = (patientId) => {
 };
 
 //本次问诊诊前图片
-export const getInquiryForwardPicture = (patientId,userId) => {
+export const getInquiryForwardPicture = (inquiryInfoId) => {
     let action = actions.GET_INQUIRY_FORWARD_PICTURE;
     return {
         // 要在之前和之后发送的 action types
         types: [action + '_REQUEST', action + '_SUCCESS', action + '_FAILURE'],
         // 检查缓存 (可选):
         //shouldCallAPI: (state) => !state.users[userId],
-        // 进行取：https://test.d.healthdoc.cn/v2/inquiry-info-attachment/current?patientId=4&userId=375
-        callAPI: (token) => fetch(`${actions.WEB_API_URI}/inquiry-info-attachment/current?patientId=${patientId}&userId=${userId}`, {
+        // 进行取：http://localhost:8080/healthd-api/v2/inquiry-info-attachment/query-one?inquiryInfoId=11
+        callAPI: (token) => fetch(`${actions.WEB_API_URI}/inquiry-info-attachment/query-one?inquiryInfoId=${inquiryInfoId}`, {
             method: 'GET',
             headers: {
                 [actions.HEADER_AUTH_FIELD]: actions.HEADER_AUTH_PREFIX + token

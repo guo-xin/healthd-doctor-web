@@ -32,8 +32,8 @@ class Describe extends Component {
         if (currentCase.caseId) {
             dispatch(getCurrentInquiryPicture(currentCase.caseId));
         }
-        if (currentCase.patientId && currentCase.userId) {
-            dispatch(getInquiryForwardPicture(currentCase.patientId, currentCase.userId));
+        if (currentCase.inquiryInfoId) {
+            dispatch(getInquiryForwardPicture(currentCase.inquiryInfoId));
         }
 
     }
@@ -112,6 +112,8 @@ class Describe extends Component {
                     this.state.messageId = messageInfoId;
                     dispatch(getDoctorPictureMessage(doctorId));
                 });
+            }else if(this.state.messageId === messageInfoId && content[index].status === 0){
+                content[index].status = 1;
             }
         } else {
             content = this.props.pictureList;
@@ -142,6 +144,8 @@ class Describe extends Component {
                     this.state.messageId = messageInfoId;
                     dispatch(getDoctorPictureMessage(doctorId));
                 });
+            }else if(this.state.messageId === messageInfoId && content[index].status === 0){
+                content[index].status = 1;
             }
         } else {
             content = this.props.pictureList;
