@@ -123,15 +123,21 @@ class Callback extends Component {
                 disabled: true
             });
 
-            //回呼前创建会话ID
-            dispatch(addCallRecord({
+            let params = {
                 inquiryCallType: 0,
                 phone: callbackUser.userMobilePhone,
                 userGpkgId: callbackUser.userGpkgId,
                 gpkgId: callbackUser.gpkgId,
                 callType: callType + 1,
                 operatorRoleCode: doctor.workingStatus === 4 ? 105 : 104
-            })).then(
+            };
+
+            if(callbackUser.patientId){
+                params.patientId = callbackUser.patientId;
+            }
+
+            //回呼前创建会话ID
+            dispatch(addCallRecord(params)).then(
                 (action)=> {
                     let result = (action.response || {}).result;
 

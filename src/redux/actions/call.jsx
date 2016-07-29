@@ -264,3 +264,26 @@ export const queryService = (inquiryId) => {
         payload: { inquiryId }
     };
 };
+
+
+//电话预约之后医生挂断和超时未接调用更新通话记录状态接口
+export const addRecordForTimeoutAndHangup = (params) => {
+    let action = actions.PHONE_TIMEOUT_AND_HANGUP;
+
+    return {
+        // 要在之前和之后发送的 action types
+        types: [action + '_REQUEST', action + '_SUCCESS', action + '_FAILURE'],
+        // 检查缓存 (可选):
+        //shouldCallAPI: (state) => !state.users[userId],
+        // 进行取：
+        callAPI: (token) => fetch(`${actions.WEB_API_URI}/ocx/communication-record/update`, {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json; charset=UTF-8',
+                [actions.HEADER_AUTH_FIELD]: actions.HEADER_AUTH_PREFIX + token
+            },
+            body: JSON.stringify(params)
+        })
+    };
+};

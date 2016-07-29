@@ -5,7 +5,7 @@ import {withRouter} from 'react-router';
 
 import {connect} from 'react-redux';
 import {getUserByMPTV} from 'redux/actions/user';
-import {showCallingDialog, setIncomingUserId, getInquiryRecord, addCallRecord} from 'redux/actions/call';
+import {showCallingDialog, setIncomingUserId, getInquiryRecord, addCallRecord, addRecordForTimeoutAndHangup} from 'redux/actions/call';
 import {setCurrentCase} from 'redux/actions/case';
 import Image from '../image/image.jsx';
 import * as global from 'util/global';
@@ -61,7 +61,7 @@ class Call extends Component {
 
             if (nextProps.callType === 0) {
                 this.st = setTimeout(()=> {
-                    this.hangUp(nextProps);
+                    this.hangUp(nextProps, true);
                 }, 60 * 1000);
             }
         }
@@ -169,13 +169,21 @@ class Call extends Component {
         }
     }
 
-    //挂断
-    hangUp(props) {
+    //挂断, isTimeout:是否超时挂断
+    hangUp(props, isTimeout) {
         clearTimeout(this.st);
 
         this.setVisible(false);
 
-        let {hangUp, callType, phone, incomingCallInfo} = props || this.props;
+        let {hangUp, callType, phone, incomingCallInfo, dispatch} = props || this.props;
+
+        //电话预约之后医生挂断和超时未接调用更新通话记录状态
+        if(callType===0 && !this.isClickAnswer && incomingCallInfo.recordId){
+            dispatch(addRecordForTimeoutAndHangup({
+                id: incomingCallInfo.recordId,
+                byeType: isTimeout ? -2 : -8
+            }));
+        }
 
         if (typeof hangUp === 'function') {
             hangUp(phone, callType, this.isClickAnswer, incomingCallInfo.workingStatus);

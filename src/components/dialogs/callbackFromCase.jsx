@@ -159,15 +159,20 @@ class CallbackFromCase extends Component {
             let {callback, dispatch, doctor={}} = this.props;
 
             if (typeof callback === 'function') {
-
-                //回呼前创建会话ID
-                dispatch(addCallbackRecord({
+                let params = {
                     inquiryCallType: 0,
                     phone: user.mobilePhone,
                     callType: callType + 1,
                     inquiryId: currentCase.inquiryId,
                     operatorRoleCode: doctor.workingStatus === 4 ? 105 : 104
-                })).then(
+                };
+
+                if(currentCase.patientId){
+                    params.patientId = currentCase.patientId;
+                }
+
+                //回呼前创建会话ID
+                dispatch(addCallbackRecord(params)).then(
                     (action)=> {
                         let result = (action.response || {}).result;
 
