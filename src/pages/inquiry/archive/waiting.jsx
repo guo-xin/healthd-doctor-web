@@ -8,6 +8,7 @@ import {withRouter} from 'react-router';
 import {getInquireQueue, getMaterialBeforeCase} from 'redux/actions/inquire';
 import {showCallbackDialog, setCallbackUserId} from 'redux/actions/call';
 import * as global from 'util/global';
+import PictureViewer from 'components/dialogs/pictureViewer';
 
 class Waiting extends React.Component {
     state = {
@@ -27,6 +28,16 @@ class Waiting extends React.Component {
             }
         );
     }
+
+    componentWillReceiveProps(nextProps) {
+        if (nextProps.isShowCallingDialog && nextProps.isShowCallingDialog !== this.props.isShowCallingDialog) {
+            let comp = this.refs.picViewer;
+            if (comp) {
+                comp.setVisible(false);
+            }
+        }
+    }
+
 
     onCallBack(data, callType) {
         let item = Object.assign({}, data);
@@ -50,7 +61,7 @@ class Waiting extends React.Component {
     toggleMaterial(item) {
         let selectedCardId = this.state.selectedCardId;
         if (item.id != selectedCardId) {
-            if (item.isLoading === undefined && item.userId && item.patientId) {
+            if (item.isLoading === undefined && item.inquiryInfoId) {
                 item.isLoading = true;
                 this.getMaterial(item);
             }
@@ -68,8 +79,7 @@ class Waiting extends React.Component {
 
     getMaterial(item) {
         this.props.dispatch(getMaterialBeforeCase({
-            userId: item.userId,
-            patientId: item.patientId
+            inquiryInfoId: item.inquiryInfoId
         })).then(
             (action)=> {
                 let data = (action.response || {}).data;
@@ -100,28 +110,37 @@ class Waiting extends React.Component {
         } else {
             let material = item.material;
             if (material) {
-                if (material.length > 0) {
-                    let des = material[0].description;
-                    let pics = material.map((item, index)=> {
-                        return <img key={index} src={item.savePath+"@80h_80w_0e"} alt=""/>
-                    });
+                let des = material.description;
+                let paths = material.savePath || [];
+                let pics = paths.map((item, index)=> {
+                    if (item) {
+                        return <img key={index} src={item+"@80h_80w_0e"} alt=""/>;
+                    } else {
+                        return null;
+                    }
+                });
 
-                    return (
-                        <div>
-                            <p>{des}</p>
-                            <div className="picList">
-                                {pics}
-                            </div>
-                        </div>
-                    );
-                }
+                return (
+                    <div>
+                        <p>{des}</p>
+                        {pics.length > 0 && <div className="picList" onClick={()=>this.checkPics(material.savePath)}>
+                            {pics}
+                        </div>}
+                    </div>
+                );
 
-                return <span className="loading">11111</span>
             } else {
                 return <span className="empty">暂无描述</span>
             }
         }
+    }
 
+    checkPics(list = []) {
+        let comp = this.refs.picViewer;
+
+        if (comp) {
+            comp.setData(list, true);
+        }
     }
 
     render() {
@@ -208,6 +227,8 @@ class Waiting extends React.Component {
                         {(!this.state.loading && list.length == 0) && <div className="noData">{global.noData}</div>}
                     </div>
                 </Spin>
+
+                <PictureViewer ref="picViewer"></PictureViewer>
             </div>
         );
     }
@@ -215,10 +236,11 @@ class Waiting extends React.Component {
 
 
 const mapStateToProps = (globalStore) => {
-    const {inquireStore}  = globalStore;
+    const {inquireStore, callStore}  = globalStore;
 
 
     return {
+        isShowCallingDialog: callStore.isShowCallingDialog,
         list: inquireStore.queue
     };
 };

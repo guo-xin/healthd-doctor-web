@@ -1,0 +1,59 @@
+@import "../../assets/style/index";
+
+.wrapper{
+  position: fixed;
+  width: 100%;
+  top: 0;
+  right: 0;
+  background: rgba(0, 0, 0, 0.75);
+  z-index: 1000;
+  bottom: 0;
+  overflow-y: auto;
+}
+
+.hidden{
+  display: none;
+}
+
+.picture {
+  height: 650px;
+  text-align: center;
+  background: #000;
+  width: 1100px;
+  margin: auto;
+  margin-top: 86px;
+  & > img {
+    height: 540px;
+    width: 540px;
+  }
+}
+
+.close {
+  height: 60px;
+  text-align: right;
+  span {
+    margin-right: @gapSm;
+    font-size: 24px;
+    cursor: pointer;
+  }
+  i {
+    color: @grey;
+  }
+  i:hover {
+    color: #D3D3D3;
+  }
+}
+
+.btnGroup {
+  margin: auto;
+  width: 540px;
+}
+
+.btn {
+  width: 270px;
+  display: inline-block;
+  cursor: pointer;
+  img {
+    padding-top: 15px;
+  }
+}

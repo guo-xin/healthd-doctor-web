@@ -38,11 +38,6 @@
     .ant-tabs-tabpane {
       height: 100%;
     }
-
-    .ant-input-wrapper {
-      display: block;
-      padding: 0 @gap;
-    }
   }
 }
 
@@ -72,10 +67,25 @@
   font-size: @fontSizeSm;
 }
 
+.msgContainer{
+  position: relative;
+  margin: 0 @gap;
+}
+
 .msgContent {
   resize: none;
   font-size: @fontSizeSm;
   min-height: 100px;
+}
+
+.wordTip{
+  position: absolute;
+  margin-top: -30px;
+  right: 10px;
+  span{
+    color:#999;
+    font-size: @fontSizeXs;
+  }
 }
 
 .wish {

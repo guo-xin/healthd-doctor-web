@@ -50,10 +50,10 @@ class Emr extends React.Component {
 
     getData(data = {}) {
         let formattedData = {
-            pc: data.illnessState,
-            hpc: this.getValue(data, 'historyPresentList').remark,
-            pmh: this.getValue(data, 'historyPastList').description,
-            allergies: this.getValue(data, 'historyPastList').allergies,
+            pc: data.illnessState || undefined,
+            hpc: this.getValue(data, 'historyPresentList').remark || undefined,
+            pmh: this.getValue(data, 'historyPastList').description || undefined,
+            allergies: this.getValue(data, 'historyPastList').allergies || undefined,
             hasDrugAllergyHistory: this.getValue(data, 'historyPastList').status === 1 ? true : false,
             physicalExamination: this.getValue(data, 'physicalExaminationList').userProfile,
             temperature: this.getValue(data, 'physicalExaminationList').temperature,
@@ -61,7 +61,7 @@ class Emr extends React.Component {
             highPressure: this.getValue(data, 'physicalExaminationList').highPressure,
             breath: this.getValue(data, 'physicalExaminationList').breath,
             pulse: this.getValue(data, 'physicalExaminationList').pulse,
-            auxiliaryExamination: this.getValue(data, 'auxiliaryExaminationsList').resultDesc,
+            auxiliaryExamination: this.getValue(data, 'auxiliaryExaminationsList').resultDesc || undefined,
             opinions: data.opinions
         };
 
@@ -141,9 +141,8 @@ class Emr extends React.Component {
 
         let {
             pc='--', hpc='--', pmh='--', allergies='--', temperature='--',
-            pulse='--', breath='--', lowPressure='--', highPressure='--', physicalExamination='--', auxiliaryExamination='--'
+            pulse='--', breath='--', lowPressure='--', highPressure='--', physicalExamination='--', auxiliaryExamination='--', hasDrugAllergyHistory
         } = this.getData(caseData);
-
 
         return (
             <div className={styles.wrapper}>
@@ -206,7 +205,7 @@ class Emr extends React.Component {
                                             onBlur={()=>this.onBlur('allergies')}/>
                                     </FormItem>
                                 </span>
-                                ) : (getFieldValue('hasDrugAllergyHistory') ?
+                                ) : (hasDrugAllergyHistory ?
                                     <span>{allergies}</span> : <span>--</span>)}
                             </div>
                         </FormItem>

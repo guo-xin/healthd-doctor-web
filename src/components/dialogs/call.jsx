@@ -195,6 +195,7 @@ class Call extends Component {
 
         //回呼前创建会话ID
         dispatch(addCallRecord({
+            inquiryInfoId: incomingCallInfo.inquiryInfoId,
             userGpkgId: incomingCallInfo.userGpkgId,
             gpkgId: incomingCallInfo.gpkgId,
             inquiryCallType: 1,

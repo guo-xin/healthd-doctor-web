@@ -21,7 +21,7 @@ class Message extends Component {
     onChange(e) {
         let val = e.target.value;
 
-        val = val.substring(0, 60);
+        val = val.substring(0, 80);
 
         this.setState({
             msg: val
@@ -209,7 +209,11 @@ class Message extends Component {
                             短信内容：[我有医生]尊敬的用户，{doctor.name}医生向您发来一条消息
                         </p>
 
-                        <Input className={styles.msgContent} type="textarea" value={msg} onChange={::this.onChange}/>
+                        <div className={styles.msgContainer}>
+                            <Input className={styles.msgContent} type="textarea" value={msg} onChange={::this.onChange}/>
+                            <div className={styles.wordTip}><span>{80-(msg?msg.length:0)}</span><span>/80</span></div>
+                        </div>
+
 
                         <p className={styles.wish}>
                             祝您/您的家人早日康复
