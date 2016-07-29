@@ -32,8 +32,8 @@ class Describe extends Component {
         if (currentCase.caseId) {
             dispatch(getCurrentInquiryPicture(currentCase.caseId));
         }
-        if (currentCase.inquiryInfoId) {
-            dispatch(getInquiryForwardPicture(currentCase.inquiryInfoId));
+        if (currentCase.inquiryId) {
+            dispatch(getInquiryForwardPicture(currentCase.inquiryId));
         }
 
     }
