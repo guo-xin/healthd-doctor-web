@@ -61,6 +61,7 @@ class Describe extends Component {
         //console.log(href, index);
         if (this.state.currentTab) {
             if (status === 0) {
+                this.props.picture[index].status = 1;
                 const {dispatch, doctorId={}} = this.props;
                 dispatch(setInquiryPictureRead(messageInfoId)).then(()=> {
                     this.state.messageId = messageInfoId;
@@ -105,6 +106,7 @@ class Describe extends Component {
             }
             let messageInfoId = content[index].messageInfoId;
             if (this.state.messageId !== messageInfoId && content[index].status === 0) {
+                content[index].status = 1;
                 const {dispatch, doctorId={}} = this.props;
                 dispatch(setInquiryPictureRead(messageInfoId)).then(()=> {
                     this.state.messageId = messageInfoId;
@@ -134,6 +136,7 @@ class Describe extends Component {
             }
             let messageInfoId = content[index].messageInfoId;
             if (this.state.messageId !== messageInfoId && content[index].status === 0) {
+                content[index].status = 1;
                 const {dispatch, doctorId={}} = this.props;
                 dispatch(setInquiryPictureRead(messageInfoId)).then(()=> {
                     this.state.messageId = messageInfoId;
@@ -155,12 +158,11 @@ class Describe extends Component {
     render() {
         let {picture = [], pictureList=[], pictureForward=[], currentCase = {}} = this.props;
 
-
         let time = new Date().getTime();
-        let createdTime,currentMessage,forwardMessage;
+        let createdTime, currentMessage, forwardMessage;
 
         let pictureList1 = picture.map((item, index)=> {
-            let flag =false;
+            let flag = false;
             if (this.state.messageId) {
                 if (item.status === 0 && this.state.messageId !== item.messageInfoId) {
                     flag = true;
@@ -177,7 +179,7 @@ class Describe extends Component {
                 let date = (currentTime === createdTime) ? "今日" : createdTime;
                 return (<div className={styles.part} key={index}>
                     <div className={styles.date}>{date}</div>
-                    <div className={styles.time}>{hourTime}{flag? (<span className={styles.read}>新</span>) : ""}</div>
+                    <div className={styles.time}>{hourTime}{flag ? (<span className={styles.read}>新</span>) : ""}</div>
                     <div className={styles.description}>{item.description}</div>
                     <div className={styles.item}>
                         <div className={styles.pictureList}>
@@ -189,7 +191,7 @@ class Describe extends Component {
 
             } else {
                 currentMessage = picture[index].inquiryInfoId;
-                forwardMessage = picture[index-1].inquiryInfoId;
+                forwardMessage = picture[index - 1].inquiryInfoId;
                 let hourTime = global.formatDate(item.createdTime, 'HH:mm');
 
                 if (currentMessage === forwardMessage) {
@@ -202,7 +204,8 @@ class Describe extends Component {
                 } else {
                     if (global.formatDate(picture[index].createdTime, 'yyyy-MM-dd') === global.formatDate(picture[index - 1].createdTime, 'yyyy-MM-dd')) {
                         return (<div className={styles.part} key={index}>
-                            <div className={styles.time}>{hourTime}{flag? (<span className={styles.read}>新</span>) : ""}</div>
+                            <div className={styles.time}>{hourTime}{flag ? (
+                                <span className={styles.read}>新</span>) : ""}</div>
                             <div className={styles.description}>{item.description}</div>
                             <div className={styles.item}>
                                 <div className={styles.pictureList}>
@@ -213,8 +216,10 @@ class Describe extends Component {
                         </div>)
                     } else {
                         return (<div className={styles.part+" "+styles.partDay} key={index}>
-                            <div className={styles.date}>{global.formatDate(picture[index].createdTime, 'yyyy-MM-dd')}</div>
-                            <div className={styles.time}>{hourTime}{flag? (<span className={styles.read}>新</span>) : ""}</div>
+                            <div
+                                className={styles.date}>{global.formatDate(picture[index].createdTime, 'yyyy-MM-dd')}</div>
+                            <div className={styles.time}>{hourTime}{flag ? (
+                                <span className={styles.read}>新</span>) : ""}</div>
                             <div className={styles.description}>{item.description}</div>
                             <div className={styles.item}>
                                 <div className={styles.pictureList}>
@@ -249,13 +254,14 @@ class Describe extends Component {
 
             } else {
                 currentMessage = pictureForward[index].inquiryInfoId;
-                forwardMessage = pictureForward[index-1].inquiryInfoId;
+                forwardMessage = pictureForward[index - 1].inquiryInfoId;
                 let hourTime = global.formatDate(item.createdTime, 'HH:mm');
 
                 if (currentMessage === forwardMessage) {
                     return (<div className={styles.item} key={index}>
                         <div className={styles.pictureList}>
-                            {item.savePath && <img src={item.savePath+"@80h_80w_0e"} alt="" onClick={()=>this.bigPicuure(item.savePath,index)}/>}
+                            {item.savePath && <img src={item.savePath+"@80h_80w_0e"} alt=""
+                                                   onClick={()=>this.bigPicuure(item.savePath,index)}/>}
                         </div>
                     </div>)
                 } else {
@@ -278,7 +284,8 @@ class Describe extends Component {
                             <div className={styles.description}>{item.description}</div>
                             <div className={styles.item}>
                                 <div className={styles.pictureList}>
-                                    {item.savePath && <img src={item.savePath+"@80h_80w_0e"} alt="" onClick={()=>this.bigPicuure(item.savePath,index)}/>}
+                                    {item.savePath && <img src={item.savePath+"@80h_80w_0e"} alt=""
+                                                           onClick={()=>this.bigPicuure(item.savePath,index)}/>}
                                 </div>
                             </div>
                         </div>)
@@ -308,7 +315,7 @@ class Describe extends Component {
 
             } else {
                 currentMessage = pictureList[index].inquiryInfoId;
-                forwardMessage = pictureList[index-1].inquiryInfoId;
+                forwardMessage = pictureList[index - 1].inquiryInfoId;
                 let hourTime = global.formatDate(item.createdTime, 'HH:mm');
 
                 if (currentMessage === forwardMessage) {
