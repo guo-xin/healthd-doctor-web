@@ -253,3 +253,24 @@ export const appendCase = (params) => {
     };
 };
 
+//根据问诊资料ID 更新问诊ID
+export const updateInquiryInfoByInquiryId = (params) => {
+    let action = actions.UPDATE_INQUIRYINFO_BY_INQUIRYID;
+
+    return {
+        // 要在之前和之后发送的 action types
+        types: [action + '_REQUEST', action + '_SUCCESS', action + '_FAILURE'],
+        // 检查缓存 (可选):
+        //shouldCallAPI: (state) => !state.users[userId],
+        // 进行取：
+        callAPI: (token) => fetch(`${actions.WEB_API_URI}/inquiry-info-attachment/update?inquiryInfoId=${params.inquiryInfoId}&inquiryId=${params.inquiryId}`,{
+            method: 'GET',
+            headers: {
+                [actions.HEADER_AUTH_FIELD]: actions.HEADER_AUTH_PREFIX + token
+            }
+        }),
+        // 在 actions 的开始和结束注入的参数
+        payload: params
+    };
+};
+
