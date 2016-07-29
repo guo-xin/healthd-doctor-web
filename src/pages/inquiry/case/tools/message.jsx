@@ -178,7 +178,7 @@ class Message extends Component {
                 </ul>
             );
         } else {
-            return null;
+            return <div className={styles.empty}>暂无数据</div>;
         }
     }
 
