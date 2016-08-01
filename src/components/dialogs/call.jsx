@@ -128,7 +128,7 @@ class Call extends Component {
 
         let patientId = user.patientId || incomingCallInfo.patientId;
         let inquiryInfoId = user.inquiryInfoId || incomingCallInfo.inquiryInfoId;
-        let inquiryId = user.patientId || incomingCallInfo.inquiryId;
+        let inquiryId = user.inquiryId || incomingCallInfo.inquiryId;
 
         if (patientId) {
             dispatch(setCurrentCase({
