@@ -10,12 +10,26 @@ const TabPane = Tabs.TabPane;
 class Message extends Component {
     state = {
         msg: "",
+        tabIndex: 1,
         disableSendBtn: false,
         list: []
     };
 
     componentDidMount() {
 
+    }
+
+    componentWillReceiveProps(nextProps) {
+        if (nextProps.currentCase && this.props.currentCase && nextProps.currentCase.caseId != this.props.currentCase.caseId) {
+            this.setState({
+                msg: '',
+                list: []
+            });
+
+            if(this.state.tabIndex == 2){
+                this.getMessageList(nextProps);
+            }
+        }
     }
 
     onChange(e) {
@@ -78,6 +92,7 @@ class Message extends Component {
     }
 
     onTabChange(key) {
+        this.state.tabIndex = key;
         if (key == 2) {
             this.getMessageList();
         }
@@ -124,8 +139,8 @@ class Message extends Component {
         );
     }
 
-    getMessageList() {
-        const {currentCase={}} = this.props;
+    getMessageList(props) {
+        const {currentCase={}} = props || this.props;
         if (currentCase.caseId) {
             this.props.dispatch(getMessageByCaseId(currentCase.caseId)).then(
                 (action)=> {
