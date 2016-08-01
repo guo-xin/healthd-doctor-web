@@ -97,6 +97,13 @@ class Detail extends React.Component {
             if (nextProps.currentCase.caseId != this.props.currentCase.caseId) {
                 this.initState();
                 this.refs.emr.resetFields();
+                
+                if(!nextProps.currentCase.caseId){
+                    this.refs.emr.setFieldsValue({
+                        pc: nextProps.currentCase.description || ''
+                    });
+                }
+                
                 this.resetData(nextProps);
             }
         }

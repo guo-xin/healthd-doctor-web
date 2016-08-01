@@ -5,8 +5,15 @@ import {withRouter} from 'react-router';
 
 import {connect} from 'react-redux';
 import {getUserByMPTV} from 'redux/actions/user';
-import {showCallingDialog, setIncomingUserId, getInquiryRecord, addCallRecord, addRecordForTimeoutAndHangup} from 'redux/actions/call';
+import {
+    showCallingDialog,
+    setIncomingUserId,
+    getInquiryRecord,
+    addCallRecord,
+    addRecordForTimeoutAndHangup
+} from 'redux/actions/call';
 import {setCurrentCase} from 'redux/actions/case';
+import {getMaterialBeforeCase} from 'redux/actions/inquire';
 import Image from '../image/image.jsx';
 import * as global from 'util/global';
 
@@ -31,33 +38,7 @@ class Call extends Component {
 
         if (nextIsVisible === true && nextIsVisible != isVisible) {
             this.state.user = {};
-            if (nextProps.phone) {
-                this.state.disabled = true;
-                dispatch(getUserByMPTV({
-                    mobilephone: nextProps.phone,
-                    callType: nextProps.callType + 1,
-                    voipId: nextProps.account.voipId,
-                    patientId: nextProps.patientId
-                })).then(
-                    (action)=> {
-                        let user = (action.response || {}).data || {};
-                        let result = (action.response || {}).result;
-
-                        if (result === 0) {
-                            this.setState({
-                                disabled: false,
-                                user: user
-                            });
-                        } else {
-                            message.info('由于网络异常用户信息获取失败，请挂断');
-                        }
-
-                    },
-                    ()=> {
-                        message.info('由于网络异常用户信息获取失败，请挂断');
-                    }
-                );
-            }
+            this.getUser(nextProps);
 
             if (nextProps.callType === 0) {
                 this.st = setTimeout(()=> {
@@ -77,18 +58,77 @@ class Call extends Component {
         }
     }
 
+    getUser(props) {
+        if (props.phone) {
+            this.state.disabled = true;
+            props.dispatch(getUserByMPTV({
+                mobilephone: props.phone,
+                callType: props.callType + 1,
+                voipId: props.account.voipId,
+                patientId: props.patientId
+            })).then(
+                (action)=> {
+                    let user = (action.response || {}).data || {};
+                    let result = (action.response || {}).result;
+
+                    if (result === 0) {
+                        this.getPatientDesc(props, user);
+
+                    } else {
+                        message.info('由于网络异常用户信息获取失败，请挂断');
+                    }
+
+                },
+                ()=> {
+                    message.info('由于网络异常用户信息获取失败，请挂断');
+                }
+            );
+        }
+    }
+
+    getPatientDesc(props, user) {
+        if (user.inquiryInfoId && user.patientId) {
+            props.dispatch(getMaterialBeforeCase({
+                inquiryInfoId: user.inquiryInfoId
+            })).then(
+                (action)=> {
+                    let data = (action.response || {}).data || {};
+                    let description = data.description;
+
+                    this.setState({
+                        user: user,
+                        description: description,
+                        disabled: false
+                    });
+                },
+                ()=> {
+                    this.setState({
+                        user: user,
+                        disabled: false
+                    });
+                }
+            );
+        } else {
+            this.setState({
+                user: user,
+                disabled: false
+            });
+        }
+    }
+
     toSelectPatientPage(props) {
-        let {dispatch, router} = props;
-        let {user} = this.state;
+        let {dispatch, incomingCallInfo, router} = props;
+        let {user, description} = this.state;
 
         this.setVisible(false);
 
         if (user.patientId) {
             dispatch(setCurrentCase({
-                inquiryInfoId: user.inquiryInfoId,
-                inquiryId: user.inquiryId,
+                description: description,
+                inquiryInfoId: user.inquiryInfoId || incomingCallInfo.inquiryInfoId,
+                inquiryId: user.inquiryId || incomingCallInfo.inquiryId,
                 userId: user.userId,
-                patientId: user.patientId,
+                patientId: user.patientId || incomingCallInfo.patientId,
                 caseId: null,
                 state: -1
             }));
@@ -181,7 +221,7 @@ class Call extends Component {
         let {hangUp, callType, phone, incomingCallInfo, dispatch} = props || this.props;
 
         //电话预约之后医生挂断和超时未接调用更新通话记录状态
-        if(callType===0 && !this.isClickAnswer && incomingCallInfo.recordId){
+        if (callType === 0 && !this.isClickAnswer && incomingCallInfo.recordId) {
             dispatch(addRecordForTimeoutAndHangup({
                 id: incomingCallInfo.recordId,
                 byeType: isTimeout ? -2 : -8
@@ -217,8 +257,10 @@ class Call extends Component {
         })).then(
             (action)=> {
                 let result = (action.response || {}).result;
+                let data = (action.response || {}).data || {};
 
                 if (result === 0) {
+                    this.state.user.inquiryId = data.inquiryId;
                     dispatch(setIncomingUserId(user.userId, user));
 
                     if (typeof callbackFromCall === 'function') {
