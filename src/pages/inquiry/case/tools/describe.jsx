@@ -97,7 +97,7 @@ class Describe extends Component {
         //console.log(href, index);
         if (this.state.currentTab) {
             if (status === 0) {
-                this.props.picture[index].status = 1;
+                this.state.picture[index].status = 1;
                 const {dispatch, doctorId={}} = this.props;
                 dispatch(setInquiryPictureRead(messageInfoId)).then(()=> {
                     this.state.messageId = messageInfoId;
@@ -136,7 +136,7 @@ class Describe extends Component {
         let index = this.state.currentIndex - 1;
         let content;
         if (this.state.currentTab) {
-            content = this.props.picture;
+            content = this.state.picture;
             if (index < 0) {
                 index = content.length - 1;
             }
@@ -152,7 +152,7 @@ class Describe extends Component {
                 content[index].status = 1;
             }
         } else {
-            content = this.props.pictureList;
+            content = this.state.pictureList;
             if (index < 0) {
                 index = content.length - 1;
             }
@@ -168,7 +168,7 @@ class Describe extends Component {
         let index = this.state.currentIndex + 1;
         let content;
         if (this.state.currentTab) {
-            content = this.props.picture;
+            content = this.state.picture;
             if (index === content.length) {
                 index = 0;
             }
@@ -184,7 +184,7 @@ class Describe extends Component {
                 content[index].status = 1;
             }
         } else {
-            content = this.props.pictureList;
+            content = this.state.pictureList;
             if (index === content.length) {
                 index = 0;
             }
@@ -461,7 +461,6 @@ class Describe extends Component {
 
 const mapStateToProps = (globalStore) => {
     const {authStore, caseStore}  = globalStore;
-
     return {
         doctorId: authStore.id,
         currentCase: caseStore.currentCase
