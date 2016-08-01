@@ -29,12 +29,13 @@ class PictureViewer extends Component {
         event.stopPropagation();
     }
 
-    setData(list=[], isVisible){
+    setData(list=[], isVisible, index){
         if(list.length>0){
+            index = index || 0;
             this.setState({
                 isVisible: !!isVisible,
-                index: 0,
-                url: list[0],
+                index: index,
+                url: list[index],
                 list: list
             });
         }

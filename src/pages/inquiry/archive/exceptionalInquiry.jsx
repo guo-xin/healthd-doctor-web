@@ -115,7 +115,7 @@ class ExceptionalInquiry extends React.Component {
                 let paths = material.savePath || [];
                 let pics = paths.map((item, index)=> {
                     if (item) {
-                        return <img key={index} src={item+"@80h_80w_0e"} alt=""/>;
+                        return <img key={index} src={item+"@80h_80w_0e"} alt=""  onClick={()=>this.checkPics(material.savePath, index)}/>;
                     } else {
                         return null;
                     }
@@ -124,7 +124,7 @@ class ExceptionalInquiry extends React.Component {
                 return (
                     <div>
                         <p>{des}</p>
-                        {pics.length > 0 && <div className="picList" onClick={()=>this.checkPics(material.savePath)}>
+                        {pics.length > 0 && <div className="picList">
                             {pics}
                         </div>}
                     </div>
@@ -136,11 +136,11 @@ class ExceptionalInquiry extends React.Component {
         }
     }
 
-    checkPics(list=[]){
+    checkPics(list=[], index){
         let comp = this.refs.picViewer;
         
         if(comp){
-            comp.setData(list, true);
+            comp.setData(list, true, index);
         }
     }
 
