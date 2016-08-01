@@ -165,205 +165,212 @@ class Describe extends Component {
         let time = new Date().getTime();
         let createdTime, currentMessage, forwardMessage;
 
-        let pictureList1 = picture.map((item, index)=> {
-            let flag = false;
-            if (this.state.messageId) {
-                if (item.status === 0) {
-                    if(this.state.messageId !== item.messageInfoId){
+        let pictureList1, forwardList, pictureList2;
+
+        if (Array.isArray(picture) && picture.length > 0) {
+            pictureList1 = picture.map((item, index)=> {
+                let flag = false;
+                if (this.state.messageId) {
+                    if (item.status === 0) {
+                        if (this.state.messageId !== item.messageInfoId) {
+                            flag = true;
+                        } else {
+                            item.status = 1;
+                        }
+                    }
+                } else {
+                    if (item.status === 0) {
                         flag = true;
-                    }else{
-                        item.status = 1;
                     }
-
                 }
-            } else {
-                if (item.status === 0) {
-                    flag = true;
-                }
-            }
-            if (index === 0) {
-                let currentTime = global.formatDate(time, 'yyyy-MM-dd');
-                createdTime = global.formatDate(item.createdTime, 'yyyy-MM-dd');
-                let hourTime = global.formatDate(item.createdTime, 'HH:mm');
-                let date = (currentTime === createdTime) ? "今日" : createdTime;
-                return (<div className={styles.part} key={index}>
-                    <div className={styles.date}>{date}</div>
-                    <div className={styles.time}>{hourTime}{flag ? (<span className={styles.read}>新</span>) : ""}</div>
-                    <div className={styles.description}>{item.description}</div>
-                    <div className={styles.item}>
-                        <div className={styles.pictureList}>
-                            <img src={item.savePath?(item.savePath+"@80h_80w_0e"):""} alt=""
-                                 onClick={()=>this.bigPicuure(item.savePath,index,item.messageInfoId,item.status)}/>
-                        </div>
-                    </div>
-                </div>)
-
-            } else {
-                currentMessage = picture[index].inquiryInfoId;
-                forwardMessage = picture[index - 1].inquiryInfoId;
-                let hourTime = global.formatDate(item.createdTime, 'HH:mm');
-
-                if (currentMessage === forwardMessage) {
-                    return (<div className={styles.item} key={index}>
-                        <div className={styles.pictureList}>
-                            <img src={item.savePath+"@80h_80w_0e"} alt=""
-                                 onClick={()=>this.bigPicuure(item.savePath,index,item.messageInfoId,item.status)}/>
+                if (index === 0) {
+                    let currentTime = global.formatDate(time, 'yyyy-MM-dd');
+                    createdTime = global.formatDate(item.createdTime, 'yyyy-MM-dd');
+                    let hourTime = global.formatDate(item.createdTime, 'HH:mm');
+                    let date = (currentTime === createdTime) ? "今日" : createdTime;
+                    return (<div className={styles.part} key={index}>
+                        <div className={styles.date}>{date}</div>
+                        <div className={styles.time}>{hourTime}{flag ? (
+                            <span className={styles.read}>新</span>) : ""}</div>
+                        <div className={styles.description}>{item.description}</div>
+                        <div className={styles.item}>
+                            <div className={styles.pictureList}>
+                                {item.savePath && <img src={item.savePath+"@80h_80w_0e"} alt=""
+                                                       onClick={()=>this.bigPicuure(item.savePath,index,item.messageInfoId,item.status)}/>}
+                            </div>
                         </div>
                     </div>)
+
                 } else {
-                    if (global.formatDate(picture[index].createdTime, 'yyyy-MM-dd') === global.formatDate(picture[index - 1].createdTime, 'yyyy-MM-dd')) {
-                        return (<div className={styles.part} key={index}>
-                            <div className={styles.time}>{hourTime}{flag ? (
-                                <span className={styles.read}>新</span>) : ""}</div>
-                            <div className={styles.description}>{item.description}</div>
-                            <div className={styles.item}>
-                                <div className={styles.pictureList}>
-                                    <img src={item.savePath+"@80h_80w_0e"} alt=""
-                                         onClick={()=>this.bigPicuure(item.savePath,index,item.messageInfoId,item.status)}/>
-                                </div>
+                    currentMessage = picture[index].inquiryInfoId;
+                    forwardMessage = picture[index - 1].inquiryInfoId;
+                    let hourTime = global.formatDate(item.createdTime, 'HH:mm');
+
+                    if (currentMessage === forwardMessage) {
+                        return (<div className={styles.item} key={index}>
+                            <div className={styles.pictureList}>
+                                <img src={item.savePath+"@80h_80w_0e"} alt=""
+                                     onClick={()=>this.bigPicuure(item.savePath,index,item.messageInfoId,item.status)}/>
                             </div>
                         </div>)
                     } else {
-                        return (<div className={styles.part+" "+styles.partDay} key={index}>
-                            <div
-                                className={styles.date}>{global.formatDate(picture[index].createdTime, 'yyyy-MM-dd')}</div>
-                            <div className={styles.time}>{hourTime}{flag ? (
-                                <span className={styles.read}>新</span>) : ""}</div>
-                            <div className={styles.description}>{item.description}</div>
-                            <div className={styles.item}>
-                                <div className={styles.pictureList}>
-                                    <img src={item.savePath+"@80h_80w_0e"} alt=""
-                                         onClick={()=>this.bigPicuure(item.savePath,index,item.messageInfoId,item.status)}/>
+                        if (global.formatDate(picture[index].createdTime, 'yyyy-MM-dd') === global.formatDate(picture[index - 1].createdTime, 'yyyy-MM-dd')) {
+                            return (<div className={styles.part} key={index}>
+                                <div className={styles.time}>{hourTime}{flag ? (
+                                    <span className={styles.read}>新</span>) : ""}</div>
+                                <div className={styles.description}>{item.description}</div>
+                                <div className={styles.item}>
+                                    <div className={styles.pictureList}>
+                                        <img src={item.savePath+"@80h_80w_0e"} alt=""
+                                             onClick={()=>this.bigPicuure(item.savePath,index,item.messageInfoId,item.status)}/>
+                                    </div>
                                 </div>
-                            </div>
-                        </div>)
+                            </div>)
+                        } else {
+                            return (<div className={styles.part+" "+styles.partDay} key={index}>
+                                <div
+                                    className={styles.date}>{global.formatDate(picture[index].createdTime, 'yyyy-MM-dd')}</div>
+                                <div className={styles.time}>{hourTime}{flag ? (
+                                    <span className={styles.read}>新</span>) : ""}</div>
+                                <div className={styles.description}>{item.description}</div>
+                                <div className={styles.item}>
+                                    <div className={styles.pictureList}>
+                                        <img src={item.savePath+"@80h_80w_0e"} alt=""
+                                             onClick={()=>this.bigPicuure(item.savePath,index,item.messageInfoId,item.status)}/>
+                                    </div>
+                                </div>
+                            </div>)
+                        }
                     }
                 }
-            }
-        });
+            });
+        }
 
-        let forwardList = pictureForward.map((item, index)=> {
-            if (index === 0) {
-                let currentTime = global.formatDate(time, 'yyyy-MM-dd');
-                createdTime = global.formatDate(item.createdTime, 'yyyy-MM-dd');
-                let hourTime = global.formatDate(item.createdTime, 'HH:mm');
-                let date = (currentTime === createdTime) ? "今日" : createdTime;
+        if (Array.isArray(pictureForward) && pictureForward.length > 0) {
+            forwardList = pictureForward.map((item, index)=> {
+                if (index === 0) {
+                    let currentTime = global.formatDate(time, 'yyyy-MM-dd');
+                    createdTime = global.formatDate(item.createdTime, 'yyyy-MM-dd');
+                    let hourTime = global.formatDate(item.createdTime, 'HH:mm');
+                    let date = (currentTime === createdTime) ? "今日" : createdTime;
 
-                return (<div className={styles.part} key={index}>
-                    <div className={styles.date}>{date}</div>
-                    <div className={styles.time}>{hourTime}</div>
-                    <div className={styles.description}>{item.description}</div>
-                    <div className={styles.item}>
-                        <div className={styles.pictureList}>
-                            {item.savePath && <img src={item.savePath+"@80h_80w_0e"} alt=""
-                                                   onClick={()=>this.bigPicuure(item.savePath,index)}/>}
-                        </div>
-                    </div>
-                </div>)
-
-            } else {
-                currentMessage = pictureForward[index].inquiryInfoId;
-                forwardMessage = pictureForward[index - 1].inquiryInfoId;
-                let hourTime = global.formatDate(item.createdTime, 'HH:mm');
-
-                if (currentMessage === forwardMessage) {
-                    return (<div className={styles.item} key={index}>
-                        <div className={styles.pictureList}>
-                            {item.savePath && <img src={item.savePath+"@80h_80w_0e"} alt=""
-                                                   onClick={()=>this.bigPicuure(item.savePath,index)}/>}
+                    return (<div className={styles.part} key={index}>
+                        <div className={styles.date}>{date}</div>
+                        <div className={styles.time}>{hourTime}</div>
+                        <div className={styles.description}>{item.description}</div>
+                        <div className={styles.item}>
+                            <div className={styles.pictureList}>
+                                {item.savePath && <img src={item.savePath+"@80h_80w_0e"} alt=""
+                                                       onClick={()=>this.bigPicuure(item.savePath,index)}/>}
+                            </div>
                         </div>
                     </div>)
+
                 } else {
-                    if (global.formatDate(pictureForward[index].createdTime, 'yyyy-MM-dd') === global.formatDate(pictureForward[index - 1].createdTime, 'yyyy-MM-dd')) {
-                        return (<div className={styles.part} key={index}>
-                            <div className={styles.time}>{hourTime}</div>
-                            <div className={styles.description}>{item.description}</div>
-                            <div className={styles.item}>
-                                <div className={styles.pictureList}>
-                                    {item.savePath && <img src={item.savePath+"@80h_80w_0e"} alt=""
-                                                           onClick={()=>this.bigPicuure(item.savePath,index)}/>}
-                                </div>
+                    currentMessage = pictureForward[index].inquiryInfoId;
+                    forwardMessage = pictureForward[index - 1].inquiryInfoId;
+                    let hourTime = global.formatDate(item.createdTime, 'HH:mm');
+
+                    if (currentMessage === forwardMessage) {
+                        return (<div className={styles.item} key={index}>
+                            <div className={styles.pictureList}>
+                                {item.savePath && <img src={item.savePath+"@80h_80w_0e"} alt=""
+                                                       onClick={()=>this.bigPicuure(item.savePath,index)}/>}
                             </div>
                         </div>)
                     } else {
-                        return (<div className={styles.part+" "+styles.partDay} key={index}>
-                            <div
-                                className={styles.date}>{global.formatDate(pictureForward[index].createdTime, 'yyyy-MM-dd')}</div>
-                            <div className={styles.time}>{hourTime}</div>
-                            <div className={styles.description}>{item.description}</div>
-                            <div className={styles.item}>
-                                <div className={styles.pictureList}>
-                                    {item.savePath && <img src={item.savePath+"@80h_80w_0e"} alt=""
-                                                           onClick={()=>this.bigPicuure(item.savePath,index)}/>}
+                        if (global.formatDate(pictureForward[index].createdTime, 'yyyy-MM-dd') === global.formatDate(pictureForward[index - 1].createdTime, 'yyyy-MM-dd')) {
+                            return (<div className={styles.part} key={index}>
+                                <div className={styles.time}>{hourTime}</div>
+                                <div className={styles.description}>{item.description}</div>
+                                <div className={styles.item}>
+                                    <div className={styles.pictureList}>
+                                        {item.savePath && <img src={item.savePath+"@80h_80w_0e"} alt=""
+                                                               onClick={()=>this.bigPicuure(item.savePath,index)}/>}
+                                    </div>
                                 </div>
-                            </div>
-                        </div>)
+                            </div>)
+                        } else {
+                            return (<div className={styles.part+" "+styles.partDay} key={index}>
+                                <div
+                                    className={styles.date}>{global.formatDate(pictureForward[index].createdTime, 'yyyy-MM-dd')}</div>
+                                <div className={styles.time}>{hourTime}</div>
+                                <div className={styles.description}>{item.description}</div>
+                                <div className={styles.item}>
+                                    <div className={styles.pictureList}>
+                                        {item.savePath && <img src={item.savePath+"@80h_80w_0e"} alt=""
+                                                               onClick={()=>this.bigPicuure(item.savePath,index)}/>}
+                                    </div>
+                                </div>
+                            </div>)
+                        }
                     }
                 }
-            }
-        });
+            });
+        }
 
-        let pictureList2 = pictureList.map((item, index)=> {
-            if (index === 0) {
-                let currentTime = global.formatDate(time, 'yyyy-MM-dd');
-                createdTime = global.formatDate(item.createdTime, 'yyyy-MM-dd');
-                let hourTime = global.formatDate(item.createdTime, 'HH:mm');
-                let date = (currentTime === createdTime) ? "今日" : createdTime;
+        if (Array.isArray(pictureList) && pictureList.length > 0) {
+            pictureList2 = pictureList.map((item, index)=> {
+                if (index === 0) {
+                    let currentTime = global.formatDate(time, 'yyyy-MM-dd');
+                    createdTime = global.formatDate(item.createdTime, 'yyyy-MM-dd');
+                    let hourTime = global.formatDate(item.createdTime, 'HH:mm');
+                    let date = (currentTime === createdTime) ? "今日" : createdTime;
 
-                return (<div className={styles.part} key={index}>
-                    <div className={styles.date}>{date}</div>
-                    <div className={styles.time}>{hourTime}</div>
-                    <div className={styles.description}>{item.description}</div>
-                    <div className={styles.item}>
-                        <div className={styles.pictureList}>
-                            <img src={item.savePath+"@80h_80w_0e"} alt=""
-                                 onClick={()=>this.bigPicuure(item.savePath,index)}/>
-                        </div>
-                    </div>
-                </div>)
-
-            } else {
-                currentMessage = pictureList[index].inquiryInfoId;
-                forwardMessage = pictureList[index - 1].inquiryInfoId;
-                let hourTime = global.formatDate(item.createdTime, 'HH:mm');
-
-                if (currentMessage === forwardMessage) {
-                    return (<div className={styles.item} key={index}>
-                        <div className={styles.pictureList}>
-                            <img src={item.savePath+"@80h_80w_0e"} alt=""
-                                 onClick={()=>this.bigPicuure(item.savePath,index)}/>
+                    return (<div className={styles.part} key={index}>
+                        <div className={styles.date}>{date}</div>
+                        <div className={styles.time}>{hourTime}</div>
+                        <div className={styles.description}>{item.description}</div>
+                        <div className={styles.item}>
+                            <div className={styles.pictureList}>
+                                {item.savePath && <img src={item.savePath+"@80h_80w_0e"} alt=""
+                                                       onClick={()=>this.bigPicuure(item.savePath,index)}/>}
+                            </div>
                         </div>
                     </div>)
+
                 } else {
-                    if (global.formatDate(pictureList[index].createdTime, 'yyyy-MM-dd') === global.formatDate(pictureList[index - 1].createdTime, 'yyyy-MM-dd')) {
-                        return (<div className={styles.part} key={index}>
-                            <div className={styles.time}>{hourTime}</div>
-                            <div className={styles.description}>{item.description}</div>
-                            <div className={styles.item}>
-                                <div className={styles.pictureList}>
-                                    <img src={item.savePath+"@80h_80w_0e"} alt=""
-                                         onClick={()=>this.bigPicuure(item.savePath,index)}/>
-                                </div>
+                    currentMessage = pictureList[index].inquiryInfoId;
+                    forwardMessage = pictureList[index - 1].inquiryInfoId;
+                    let hourTime = global.formatDate(item.createdTime, 'HH:mm');
+
+                    if (currentMessage === forwardMessage) {
+                        return (<div className={styles.item} key={index}>
+                            <div className={styles.pictureList}>
+                                {item.savePath && <img src={item.savePath+"@80h_80w_0e"} alt=""
+                                                       onClick={()=>this.bigPicuure(item.savePath,index)}/>}
                             </div>
                         </div>)
                     } else {
-                        return (<div className={styles.part+" "+styles.partDay} key={index}>
-                            <div
-                                className={styles.date}>{global.formatDate(pictureList[index].createdTime, 'yyyy-MM-dd')}</div>
-                            <div className={styles.time}>{hourTime}</div>
-                            <div className={styles.description}>{item.description}</div>
-                            <div className={styles.item}>
-                                <div className={styles.pictureList}>
-                                    <img src={item.savePath+"@80h_80w_0e"} alt=""
-                                         onClick={()=>this.bigPicuure(item.savePath,index)}/>
+                        if (global.formatDate(pictureList[index].createdTime, 'yyyy-MM-dd') === global.formatDate(pictureList[index - 1].createdTime, 'yyyy-MM-dd')) {
+                            return (<div className={styles.part} key={index}>
+                                <div className={styles.time}>{hourTime}</div>
+                                <div className={styles.description}>{item.description}</div>
+                                <div className={styles.item}>
+                                    <div className={styles.pictureList}>
+                                        {item.savePath && <img src={item.savePath+"@80h_80w_0e"} alt=""
+                                                               onClick={()=>this.bigPicuure(item.savePath,index)}/>}
+                                    </div>
                                 </div>
-                            </div>
-                        </div>)
+                            </div>)
+                        } else {
+                            return (<div className={styles.part+" "+styles.partDay} key={index}>
+                                <div
+                                    className={styles.date}>{global.formatDate(pictureList[index].createdTime, 'yyyy-MM-dd')}</div>
+                                <div className={styles.time}>{hourTime}</div>
+                                <div className={styles.description}>{item.description}</div>
+                                <div className={styles.item}>
+                                    <div className={styles.pictureList}>
+                                        {item.savePath && <img src={item.savePath+"@80h_80w_0e"} alt=""
+                                                               onClick={()=>this.bigPicuure(item.savePath,index)}/>}
+                                    </div>
+                                </div>
+                            </div>)
+                        }
                     }
                 }
-            }
-        });
-
+            });
+        }
 
         return (
             <div className={styles.wrapper}>
@@ -420,9 +427,9 @@ const mapStateToProps = (globalStore) => {
     const {authStore, caseStore, toolStore, doctorStore}  = globalStore;
     return {
         doctorId: authStore.id,
-        picture: toolStore.picture,
-        pictureList: toolStore.pictureList,
-        pictureForward: toolStore.forwardPicture,
+        picture: toolStore.picture || undefined,
+        pictureList: toolStore.pictureList || undefined,
+        pictureForward: toolStore.forwardPicture || undefined,
         currentCase: caseStore.currentCase
     };
 };
