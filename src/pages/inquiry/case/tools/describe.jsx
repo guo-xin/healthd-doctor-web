@@ -52,7 +52,8 @@ class Describe extends Component {
     //页面重新渲染
     componentWillReceiveProps(nextProps) {
         if (nextProps.toolType === 2) {
-            if (nextProps.currentCase && this.props.currentCase && nextProps.currentCase.caseId != this.props.currentCase.caseId) {
+            if (nextProps.currentCase && this.props.currentCase && (nextProps.currentCase.caseId != this.props.currentCase.caseId
+                || nextProps.currentCase.inquiryId != this.props.currentCase.inquiryId)) {
 
                 this.setState({
                     picture: [],
