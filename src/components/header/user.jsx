@@ -56,7 +56,7 @@ export default class User extends Component {
 
     state = {
         changeState: false,
-        menuName: '在线'
+        menuName: '离线'
     };
 
     logout() {
@@ -163,13 +163,14 @@ export default class User extends Component {
         let menuList;
         if (Array.isArray(message) && message.length > 0) {
             menuList = message.map((item, index)=> {
-                let content = JSON.parse(item.content);
+                let content = JSON.parse(item.content) || {};
                 return (<Menu.Item key={index} content={content}>患者 {content.realName} 上传{content.count}张新图片 <a
                     className={styles.check}>查看</a></Menu.Item>);
             });
             return (<Menu onClick={::this.onSettingClick} className={styles.informMenu}>
                 {menuList}
             </Menu>);
+
         } else {
             return (<Menu className={styles.informMenu}>
                 <Menu.Item key='2' className={styles.informationNull}>暂无新消息</Menu.Item>

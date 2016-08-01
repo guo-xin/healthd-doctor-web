@@ -14,7 +14,7 @@ export const getDoctorPictureMessage = (doctorId) => {
         // 检查缓存 (可选):
         //shouldCallAPI: (state) => !state.users[userId],
         // 进行取：https://test.d.healthdoc.cn/v2/messageInfo/list?sender=90&receiver=56
-        callAPI: (token) => fetch(`${actions.WEB_API_URI}/message-info/list?receiver=${doctorId}`, {
+        callAPI: (token) => fetch(`${actions.WEB_API_URI}/message-info/list?receiver=${doctorId}&type=2`, {
             method: 'GET',
             headers: {
                 [actions.HEADER_AUTH_FIELD]: actions.HEADER_AUTH_PREFIX + token
