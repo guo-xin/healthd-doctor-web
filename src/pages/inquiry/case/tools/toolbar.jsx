@@ -86,8 +86,8 @@ export default class Toolbar extends Component {
                 {
                     showTool && (<div className={styles.toolBody}>
                         {/*{toolType === 1 && <Template/>}*/}
-                        {toolType === 2 && <Describe/>}
-                        {toolType === 3 && <Message/>}
+                        {toolType === 2 && <Describe toolType={toolType}/>}
+                        {toolType === 3 && <Message  toolType={toolType}/>}
                     </div>)
                 }
             </div>

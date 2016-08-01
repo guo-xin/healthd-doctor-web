@@ -16,18 +16,19 @@ class Message extends Component {
     };
 
     componentDidMount() {
-
     }
 
     componentWillReceiveProps(nextProps) {
-        if (nextProps.currentCase && this.props.currentCase && nextProps.currentCase.caseId != this.props.currentCase.caseId) {
-            this.setState({
-                msg: '',
-                list: []
-            });
+        if(nextProps.toolType === 3){
+            if (nextProps.currentCase && this.props.currentCase && nextProps.currentCase.caseId != this.props.currentCase.caseId) {
+                this.setState({
+                    msg: '',
+                    list: []
+                });
 
-            if(this.state.tabIndex == 2){
-                this.getMessageList(nextProps);
+                if(this.state.tabIndex == 2){
+                    this.getMessageList(nextProps);
+                }
             }
         }
     }
