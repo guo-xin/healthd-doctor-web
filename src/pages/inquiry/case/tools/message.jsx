@@ -20,7 +20,9 @@ class Message extends Component {
 
     componentWillReceiveProps(nextProps) {
         if(nextProps.toolType === 3){
-            if (nextProps.currentCase && this.props.currentCase && nextProps.currentCase.caseId != this.props.currentCase.caseId) {
+            if (nextProps.currentCase && this.props.currentCase
+                && (nextProps.currentCase.caseId != this.props.currentCase.caseId || 
+                nextProps.currentCase.patientId != this.props.currentCase.patientId)) {
                 this.setState({
                     msg: '',
                     list: []

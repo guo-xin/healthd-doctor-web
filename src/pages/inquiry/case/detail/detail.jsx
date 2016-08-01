@@ -59,14 +59,14 @@ class Detail extends React.Component {
 
     opinionsUrl = '';
 
-    locationHash = '';
 
     constructor(props) {
         super(props);
+        this.locationHash = window.location.hash;
         this.initState();
     }
 
-    initState(){
+    initState() {
         this.state = {
             caseId: null,
             patientId: null,
@@ -95,17 +95,19 @@ class Detail extends React.Component {
             }
         }
 
-        if(this.locationHash!==window.location.hash){
-            if (window.location.hash.indexOf('inquire/case/detail') !== -1) {
-                if (nextProps.currentCase.caseId != this.props.currentCase.caseId) {
+        //病历或者病人变更后重置数据
+        if (this.locationHash.indexOf('inquire/case/detail') !== -1) {
+            if (nextProps.currentCase.caseId != this.props.currentCase.caseId ||
+                nextProps.currentCase.patientId != this.props.currentCase.patientId) {
+                if (this.locationHash !== window.location.hash) {
+                    this.locationHash = window.location.hash;
+
                     this.initState();
                     this.refs.emr.resetFields();
                     this.resetData(nextProps);
                 }
             }
         }
-
-        this.locationHash = window.location.hash;
     }
 
     componentWillMount() {
@@ -121,7 +123,7 @@ class Detail extends React.Component {
         this.resetData();
     }
 
-    resetData(props){
+    resetData(props) {
         let {dispatch, currentCase={}} = props || this.props;
 
         if (currentCase.patientId && currentCase.patientId !== null) {
@@ -159,17 +161,16 @@ class Detail extends React.Component {
                     this.setOperationsState();
                 }
             );
-
-            if (currentCase.inquiryId) {
-                dispatch(getCallRecords(currentCase.inquiryId));
-            }
-
         } else {
             this.state.isEditable = currentCase.state == -1 ? true : false;
             this.setOperationsState();
         }
 
-        if(!currentCase.caseId){
+        if (currentCase.inquiryId) {
+            dispatch(getCallRecords(currentCase.inquiryId));
+        }
+
+        if (!currentCase.caseId) {
             this.refs.emr.setFieldsValue({
                 pc: currentCase.description || ''
             });
@@ -408,7 +409,16 @@ class Detail extends React.Component {
     }
 
     //挂断
-    hangUp(nextProps) {
+    hangUp(props) {
+        let {currentCase={}} = props;
+
+        if (currentCase.inquiryId) {
+            setTimeout(()=> {
+                if (window.location.hash.indexOf('inquire/case/detail') !== -1) {
+                    props.dispatch(getCallRecords(currentCase.inquiryId));
+                }
+            }, 2000);
+        }
     }
 
     //扣次

@@ -140,6 +140,7 @@ class Call extends Component {
                 caseId: null,
                 state: -1
             }));
+
             router.push(`/inquire/case/detail`);
         } else {
             router.push(`/inquire/case/selectPatient`);
