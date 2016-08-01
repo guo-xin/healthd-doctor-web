@@ -4,9 +4,9 @@ import {Modal, Button, message} from 'antd';
 import {withRouter} from 'react-router';
 
 import {connect} from 'react-redux';
-import {getUserById} from 'redux/actions/user';
 import {showCallbackDialog, setIncomingUserId, setCallbackUserId, addCallRecord} from 'redux/actions/call';
-import {setCurrentCase} from 'redux/actions/case'
+import {setCurrentCase} from 'redux/actions/case';
+import {getMaterialBeforeCase} from 'redux/actions/inquire';
 
 import Image from '../image/image.jsx';
 import * as global from 'util/global';
@@ -16,6 +16,7 @@ class Callback extends Component {
         isVisible: false,
         disabled: false,
         user: {},
+        description: '',
         tip: '您是否需要回呼患者'
     };
 
@@ -28,25 +29,22 @@ class Callback extends Component {
 
         this.setVisible(false);
 
-        /*dispatch(getUserById(callbackUser.userId)).then((action)=> {
-            let user = (action.response || {}).data || {};
-            dispatch(setIncomingUserId(user.userId, user));
-        });*/
-
-        if(callbackUser.patientId){
+        if (callbackUser.patientId) {
             dispatch(setCurrentCase({
+                description: this.state.description,
                 inquiryInfoId: callbackUser.inquiryInfoId,
+                inquiryId: callbackUser.inquiryId,
                 userId: callbackUser.userId,
                 patientId: callbackUser.patientId,
                 caseId: null,
                 state: -1
             }));
             router.push(`/inquire/case/detail`);
-        }else{
+        } else {
             router.push(`/inquire/case/selectPatient`);
         }
 
-        setTimeout(()=>{
+        setTimeout(()=> {
             dispatch(setIncomingUserId(callbackUser.userId, callbackUser));
         }, 200);
     }
@@ -111,6 +109,39 @@ class Callback extends Component {
                 }
             }
         }
+
+        if (nextProps.isVisible && nextProps.isVisible != this.props.isVisible) {
+            this.state.description = '';
+            this.getPatientDesc(nextProps);
+        }
+    }
+
+    getPatientDesc(props) {
+        let {dispatch, callbackUser} = props;
+
+        if (callbackUser.inquiryInfoId && callbackUser.patientId) {
+            this.setState({
+                disabled: true
+            });
+            dispatch(getMaterialBeforeCase({
+                inquiryInfoId: callbackUser.inquiryInfoId
+            })).then(
+                (action)=> {
+                    let data = (action.response || {}).data || {};
+                    let description = data.description;
+
+                    this.setState({
+                        description: description,
+                        disabled: false
+                    });
+                },
+                ()=> {
+                    this.setState({
+                        disabled: false
+                    });
+                }
+            );
+        }
     }
 
     //接听
@@ -134,11 +165,11 @@ class Callback extends Component {
                 operatorRoleCode: doctor.workingStatus === 4 ? 105 : 104
             };
 
-            if(callbackUser.patientId){
+            if (callbackUser.patientId) {
                 params.patientId = callbackUser.patientId;
             }
 
-            if(callbackUser.inquiryInfoId){
+            if (callbackUser.inquiryInfoId) {
                 params.inquiryInfoId = callbackUser.inquiryInfoId;
             }
 

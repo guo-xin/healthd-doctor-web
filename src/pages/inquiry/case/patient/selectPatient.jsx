@@ -5,6 +5,7 @@ import styles from './selectPatient.less';
 
 import {connect} from 'react-redux';
 import Image from 'components/image/image.jsx';
+import {getUserById} from 'redux/actions/user';
 import {getPatientsByUserId, setCurrentPatient} from 'redux/actions/patient';
 import {getCasesByPatientId, setCurrentCase, appendCase} from 'redux/actions/case';
 import * as global from 'util/global';
@@ -16,6 +17,7 @@ class SelectPatient extends Component {
         super(props);
 
         this.state = {
+            user: {},
             showTimeline: false,
             selectedPatient: {},
             loadingPatient: false,
@@ -29,6 +31,7 @@ class SelectPatient extends Component {
         if (callState === 0) {
             if (userId && userId !== -1) {
                 this.getPatientsList(userId);
+                this.getUser(this.props);
             }
         }
     }
@@ -40,7 +43,26 @@ class SelectPatient extends Component {
         let count = nextProps.count;
 
         if (count !== this.props.count && nextCallState !== -1) {
+            this.state.user = {};
+            this.getUser(nextProps);
             this.getPatientsList(nextUserId);
+        }
+    }
+
+    getUser(props) {
+        if (props.userId) {
+            props.dispatch(getUserById(props.userId)).then(
+                (action)=> {
+                    let data = (action.response || {}).data;
+                    let incomingUser = props.user || {};
+                    this.setState({
+                        user: Object.assign({}, data, {
+                            userId: incomingUser.userId,
+                            userName: incomingUser.userName
+                        })
+                    });
+                }
+            );
         }
     }
 
@@ -133,7 +155,7 @@ class SelectPatient extends Component {
     appendCase(item) {
         let {selectedPatient} = this.state;
         let {inquiryCallType, dispatch, router, callType} = this.props;
-        
+
         dispatch(setCurrentCase({
             caseId: item.id,
             userId: selectedPatient.userId,
@@ -180,8 +202,8 @@ class SelectPatient extends Component {
 
     render() {
         let cases = [];
-        const {user, patientList, relatedCases, doctorId} = this.props;
-        const {showTimeline, selectedPatient} = this.state;
+        const {patientList, relatedCases, doctorId} = this.props;
+        const {user, showTimeline, selectedPatient} = this.state;
 
         if (Array.isArray(relatedCases[selectedPatient.id])) {
             cases = relatedCases[selectedPatient.id];
