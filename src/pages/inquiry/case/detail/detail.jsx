@@ -97,15 +97,12 @@ class Detail extends React.Component {
 
         //病历或者病人变更后重置数据
         if (this.locationHash.indexOf('inquire/case/detail') !== -1) {
-            if (nextProps.currentCase.caseId != this.props.currentCase.caseId ||
-                nextProps.currentCase.patientId != this.props.currentCase.patientId) {
-                if (this.locationHash !== window.location.hash) {
-                    this.locationHash = window.location.hash;
+            if (this.locationHash !== window.location.hash) {
+                this.locationHash = window.location.hash;
 
-                    this.initState();
-                    this.refs.emr.resetFields();
-                    this.resetData(nextProps);
-                }
+                this.initState();
+                this.refs.emr.resetFields();
+                this.resetData(nextProps);
             }
         }
     }

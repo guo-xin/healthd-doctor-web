@@ -1,9 +1,6 @@
 import * as actions from './actions';
 import fetch from 'isomorphic-fetch';
 
-export const clearPatientPics = actions.create(actions.CLEAR_PATIENT_PICS);
-
-
 //将未读图片设置为已读
 export const setInquiryPictureRead = (messageInfoId) => {
     let action = actions.SET_INQUIRY_PICTURE_READY;
@@ -31,7 +28,7 @@ export const getPatientAllPicture = (patientId) => {
         // 检查缓存 (可选):
         //shouldCallAPI: (state) => !state.users[userId],
         // 进行取：https://test.d.healthdoc.cn/v2/inquiry-info-attachment/list?patientId=4
-        callAPI: (token) => fetch(`${actions.WEB_API_URI}/inquiry-info-attachment/list?patientId=${patientId}`, {
+        callAPI: (token) => fetch(`${actions.WEB_API_URI}/inquiry-info-attachment/list?patientId=${patientId}&size=20`, {
             method: 'GET',
             headers: {
                 [actions.HEADER_AUTH_FIELD]: actions.HEADER_AUTH_PREFIX + token

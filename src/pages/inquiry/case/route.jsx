@@ -4,7 +4,6 @@ import EditPatient from './patient/editPatient';
 import Detail from './detail/detail';
 import * as store from 'redux/store';
 import {toggleVideo} from 'redux/actions/case';
-import {clearPatientPics} from 'redux/actions/tool';
 
 module.exports = {
     path: 'case',
@@ -18,9 +17,7 @@ module.exports = {
     },
     childRoutes: [
         {
-            path: 'detail', component: Detail, onLeave: ()=> {
-            store.dispatch(clearPatientPics());
-            }
+            path: 'detail', component: Detail, onLeave: ()=> {}
         },
         {
             path: 'selectPatient', component: SelectPatient, onEnter: (nextState, replace)=> {

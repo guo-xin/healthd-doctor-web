@@ -1,48 +1,11 @@
 import * as actions from '../actions/actions';
 
 const tools = (state = {
-    result: {},
-    picture: [],
-    pictureList: [],
-    forwardPicture: []
+    result: {}
 }, action) => {
     let obj;
 
     switch (action.type) {
-        //将描述图片清空
-        case actions.CLEAR_PATIENT_PICS:
-            obj = Object.assign({}, state, {
-                picture: [],
-                pictureList: [],
-                forwardPicture: []
-            });
-
-            return obj;
-
-        //根据病历ID查询当前病历图片
-        case actions.GET_CURRENT_INQUIRY_PICTURE + "_SUCCESS":
-            obj = Object.assign({}, state, {
-                picture: action.response.data
-            });
-
-            return obj;
-
-        //根据病历ID查询当前病历诊前图片
-        case actions.GET_INQUIRY_FORWARD_PICTURE + "_SUCCESS":
-            obj = Object.assign({}, state, {
-                forwardPicture: action.response.data
-            });
-
-            return obj;
-
-        //根据患者ID查询当前患者所有图片
-        case actions.GET_PATIENT_ALL_PICTURE + "_SUCCESS":
-            obj = Object.assign({}, state, {
-                pictureList: action.response.data
-            });
-
-            return obj;
-
         //将病历未读图片设置为已读
         case actions.SET_INQUIRY_PICTURE_READY + "_SUCCESS":
             obj = Object.assign({}, state, {

@@ -19,23 +19,54 @@ class Describe extends Component {
         imgSrc: "",
         currentIndex: "",
         currentTab: true,
-        messageId: ''
+        messageId: '',
+        picture: [],
+        pictureList: [],
+        pictureForward: []
     };
 
     componentDidMount() {
         this.getDoctorList();
     }
 
-    getDoctorList() {
-        const {dispatch, currentCase = {}} = this.props;
+    getDoctorList(props) {
+        const {dispatch, currentCase = {}} = props || this.props;
 
         if (currentCase.caseId) {
-            dispatch(getCurrentInquiryPicture(currentCase.caseId));
+            dispatch(getCurrentInquiryPicture(currentCase.caseId)).then((action)=> {
+                this.setState({
+                    picture: action.response.data || []
+                })
+            });
         }
         if (currentCase.inquiryId) {
-            dispatch(getInquiryForwardPicture(currentCase.inquiryId));
+            dispatch(getInquiryForwardPicture(currentCase.inquiryId)).then((action)=> {
+                this.setState({
+                    pictureForward: action.response.data || []
+                })
+            });
         }
 
+    }
+
+    //页面重新渲染
+    componentWillReceiveProps(nextProps) {
+        if (nextProps.toolType === 2) {
+            if (nextProps.currentCase && this.props.currentCase && nextProps.currentCase.caseId != this.props.currentCase.caseId) {
+
+                this.setState({
+                    picture: [],
+                    pictureList: [],
+                    pictureForward: []
+                });
+
+                if (this.state.currentTab) {
+                    this.getDoctorList(nextProps);
+                } else {
+                    this.getPictureList2(nextProps);
+                }
+            }
+        }
     }
 
     //本次图片与所有图片的切换
@@ -44,15 +75,20 @@ class Describe extends Component {
             this.state.currentTab = false;
             this.getPictureList2();
         } else {
+            this.getDoctorList();
             this.state.currentTab = true;
         }
     }
 
     //获取患者全部图片列表
-    getPictureList2() {
-        const {currentCase={}} = this.props;
+    getPictureList2(nextProps) {
+        const {currentCase={}} = nextProps || this.props;
         if (currentCase.patientId) {
-            this.props.dispatch(getPatientAllPicture(currentCase.patientId));
+            this.props.dispatch(getPatientAllPicture(currentCase.patientId)).then((action)=> {
+                this.setState({
+                    pictureList: action.response.data || []
+                })
+            });
         }
     }
 
@@ -160,7 +196,7 @@ class Describe extends Component {
     }
 
     render() {
-        let {picture = [], pictureList=[], pictureForward=[], currentCase = {}} = this.props;
+        let {picture = [], pictureList=[], pictureForward=[]} = this.state;
 
         let time = new Date().getTime();
         let createdTime, currentMessage, forwardMessage;
@@ -424,12 +460,10 @@ class Describe extends Component {
 }
 
 const mapStateToProps = (globalStore) => {
-    const {authStore, caseStore, toolStore, doctorStore}  = globalStore;
+    const {authStore, caseStore}  = globalStore;
+
     return {
         doctorId: authStore.id,
-        picture: toolStore.picture || undefined,
-        pictureList: toolStore.pictureList || undefined,
-        pictureForward: toolStore.forwardPicture || undefined,
         currentCase: caseStore.currentCase
     };
 };

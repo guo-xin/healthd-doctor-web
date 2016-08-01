@@ -88,7 +88,7 @@ const cases = (state = {
 
             cookie.save('c', state.currentCase);
 
-            return state;
+            return Object.assign({},state);
         
         //根据病历ID查询病历
         case actions.GET_CASE_BY_ID + "_SUCCESS":
