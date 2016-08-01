@@ -87,9 +87,13 @@ class Call extends Component {
     }
 
     getPatientDesc(props, user) {
-        if (user.inquiryInfoId && user.patientId) {
+        let {incomingCallInfo={}} = props;
+        let inquiryInfoId = user.inquiryInfoId || incomingCallInfo.inquiryInfoId;
+        let patientId = user.patientId || incomingCallInfo.patientId;
+
+        if (inquiryInfoId && patientId) {
             props.dispatch(getMaterialBeforeCase({
-                inquiryInfoId: user.inquiryInfoId
+                inquiryInfoId: inquiryInfoId
             })).then(
                 (action)=> {
                     let data = (action.response || {}).data || {};
@@ -122,13 +126,17 @@ class Call extends Component {
 
         this.setVisible(false);
 
-        if (user.patientId) {
+        let patientId = user.patientId || incomingCallInfo.patientId;
+        let inquiryInfoId = user.inquiryInfoId || incomingCallInfo.inquiryInfoId;
+        let inquiryId = user.patientId || incomingCallInfo.inquiryId;
+
+        if (patientId) {
             dispatch(setCurrentCase({
                 description: description,
-                inquiryInfoId: user.inquiryInfoId || incomingCallInfo.inquiryInfoId,
-                inquiryId: user.inquiryId || incomingCallInfo.inquiryId,
+                inquiryInfoId: inquiryInfoId,
+                inquiryId: inquiryId,
                 userId: user.userId,
-                patientId: user.patientId || incomingCallInfo.patientId,
+                patientId: patientId,
                 caseId: null,
                 state: -1
             }));

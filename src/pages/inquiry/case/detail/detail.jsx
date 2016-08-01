@@ -59,6 +59,8 @@ class Detail extends React.Component {
 
     opinionsUrl = '';
 
+    locationHash = '';
+
     constructor(props) {
         super(props);
         this.initState();
@@ -93,20 +95,17 @@ class Detail extends React.Component {
             }
         }
 
-        if (window.location.hash.indexOf('inquire/case/detail') !== -1) {
-            if (nextProps.currentCase.caseId != this.props.currentCase.caseId) {
-                this.initState();
-                this.refs.emr.resetFields();
-                
-                if(!nextProps.currentCase.caseId){
-                    this.refs.emr.setFieldsValue({
-                        pc: nextProps.currentCase.description || ''
-                    });
+        if(this.locationHash!==window.location.hash){
+            if (window.location.hash.indexOf('inquire/case/detail') !== -1) {
+                if (nextProps.currentCase.caseId != this.props.currentCase.caseId) {
+                    this.initState();
+                    this.refs.emr.resetFields();
+                    this.resetData(nextProps);
                 }
-                
-                this.resetData(nextProps);
             }
         }
+
+        this.locationHash = window.location.hash;
     }
 
     componentWillMount() {
@@ -168,6 +167,12 @@ class Detail extends React.Component {
         } else {
             this.state.isEditable = currentCase.state == -1 ? true : false;
             this.setOperationsState();
+        }
+
+        if(!currentCase.caseId){
+            this.refs.emr.setFieldsValue({
+                pc: currentCase.description || ''
+            });
         }
     }
 
