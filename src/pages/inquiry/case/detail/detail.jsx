@@ -52,15 +52,6 @@ function pad(num, n) {
 }
 
 class Detail extends React.Component {
-    state = {
-        caseId: null,
-        patientId: null,
-        caseData: {},
-        caseState: -1,
-        isEditable: false,
-        operationsState: {}
-    };
-
     diagnosis = {
         data: [],
         isHasDiagnosis: false
@@ -70,6 +61,18 @@ class Detail extends React.Component {
 
     constructor(props) {
         super(props);
+        this.initState();
+    }
+
+    initState(){
+        this.state = {
+            caseId: null,
+            patientId: null,
+            caseData: {},
+            caseState: -1,
+            isEditable: false,
+            operationsState: {}
+        };
     }
 
     componentWillReceiveProps(nextProps) {
@@ -89,6 +92,14 @@ class Detail extends React.Component {
                 }
             }
         }
+
+        if (window.location.hash.indexOf('inquire/case/detail') !== -1) {
+            if (nextProps.currentCase.caseId != this.props.currentCase.caseId) {
+                this.initState();
+                this.refs.emr.resetFields();
+                this.resetData(nextProps);
+            }
+        }
     }
 
     componentWillMount() {
@@ -101,7 +112,11 @@ class Detail extends React.Component {
     }
 
     componentDidMount() {
-        let {dispatch, currentCase={}} = this.props;
+        this.resetData();
+    }
+
+    resetData(props){
+        let {dispatch, currentCase={}} = props || this.props;
 
         if (currentCase.patientId && currentCase.patientId !== null) {
             this.state.patientId = currentCase.patientId;
@@ -435,6 +450,7 @@ class Detail extends React.Component {
                     }
 
                     if (caseState === -1 && data) {
+                        let {currentCase={}}=props;
                         this.state.caseState = 1;
                         this.state.caseId = data.id;
                         this.state.patientId = data.patientId;
@@ -442,6 +458,7 @@ class Detail extends React.Component {
                         this.reduceService(0);
 
                         props.dispatch(setCurrentCase({
+                            inquiryInfoId: currentCase.inquiryInfoId,
                             userId: data.userId,
                             caseId: data.id,
                             patientId: data.patientId,
@@ -457,7 +474,7 @@ class Detail extends React.Component {
                     //创建病历时更新诊前资料信息
                     if (caseState === -1) {
                         let {currentCase={}}=props;
-                        if (props.inquiryId && currentCase.inquiryInfoId){
+                        if (props.inquiryId && currentCase.inquiryInfoId) {
                             props.dispatch(updateInquiryInfoByInquiryId({
                                 inquiryId: props.inquiryId,
                                 inquiryInfoId: currentCase.inquiryInfoId
@@ -791,11 +808,14 @@ class Detail extends React.Component {
                         }
 
                         if (caseState === -1) {
+                            let {currentCase={}}=props;
+
                             this.state.caseData.inquiryId = this.props.inquiryId;
                             this.state.caseId = data.id;
                             this.state.patientId = data.patientId;
 
                             props.dispatch(setCurrentCase({
+                                inquiryInfoId: currentCase.inquiryInfoId,
                                 userId: data.userId,
                                 caseId: data.id,
                                 patientId: data.patientId,
@@ -804,8 +824,8 @@ class Detail extends React.Component {
                             }));
 
                             //创建病历时更新诊前资料信息
-                            let {currentCase={}}=props;
-                            if (props.inquiryId && currentCase.inquiryInfoId){
+
+                            if (props.inquiryId && currentCase.inquiryInfoId) {
                                 props.dispatch(updateInquiryInfoByInquiryId({
                                     inquiryId: props.inquiryId,
                                     inquiryInfoId: currentCase.inquiryInfoId

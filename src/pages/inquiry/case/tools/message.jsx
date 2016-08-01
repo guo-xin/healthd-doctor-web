@@ -42,7 +42,9 @@ class Message extends Component {
     //点击确定发送消息
     sendMsg() {
         let msg = this.state.msg;
-        if (msg) {
+        let {currentCase} = this.props;
+
+        if (msg && currentCase.caseId) {
             this.setState({
                 disableSendBtn: true
             });
@@ -160,7 +162,8 @@ class Message extends Component {
                 } else if (item.statusCode === '000000') {
                     state = <span className="state success">发送成功</span>
                 } else {
-                    state = <span className="state error">发送失败<a href="javascript:void(0)" onClick={()=>this.retry(item)}>重试</a></span>
+                    state = <span className="state error">发送失败<a href="javascript:void(0)"
+                                                                 onClick={()=>this.retry(item)}>重试</a></span>
                 }
 
                 return (
@@ -210,8 +213,10 @@ class Message extends Component {
                         </p>
 
                         <div className={styles.msgContainer}>
-                            <Input className={styles.msgContent} type="textarea" value={msg} onChange={::this.onChange}/>
-                            <div className={styles.wordTip}><span>{80-(msg?msg.length:0)}</span><span>/80</span></div>
+                            <Input className={styles.msgContent} type="textarea" value={msg}
+                                   onChange={::this.onChange}/>
+                            <div className={styles.wordTip}><span>{80 - (msg ? msg.length : 0)}</span><span>/80</span>
+                            </div>
                         </div>
 
 
@@ -220,7 +225,8 @@ class Message extends Component {
                         </p>
 
                         <div className={styles.actions}>
-                            <Button type="primary" onClick={::this.sendMsg}>发送</Button>
+                            <Button type="primary" onClick={::this.sendMsg}
+                                    disabled={currentCase.caseId?false:true}>发送</Button>
                         </div>
 
                     </TabPane>
