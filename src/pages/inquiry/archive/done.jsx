@@ -14,6 +14,7 @@ class Done extends React.Component {
         {
             title: 'ID',
             dataIndex: 'patientId',
+            width: '8%',
             render: (text, record, index)=> {
                 return global.formatPatientCode(record.patientCode) || '--';
             }
@@ -21,6 +22,7 @@ class Done extends React.Component {
         {
             title: '姓名',
             dataIndex: 'realName',
+            width: '8%',
             render: (text, record, index)=> {
                 //return <a href="javascript:;" onClick={()=>this.goToDetail(text,record, index)}>{text}</a>;
                 return text;
@@ -29,6 +31,7 @@ class Done extends React.Component {
         {
             title: '性别',
             dataIndex: 'sex',
+            width: '8%',
             render(text) {
                 return global.getGenderText(text);
             }
@@ -36,6 +39,7 @@ class Done extends React.Component {
         {
             title: '年龄',
             dataIndex: 'age',
+            width: '8%',
             render(text, record, index) {
                 return global.getAge(record.birthday, record.createdTime);
             }
@@ -43,6 +47,7 @@ class Done extends React.Component {
         {
             title: '就诊次数',
             dataIndex: 'caseCount',
+            width: '8%',
             render(text) {
                 if (text) {
                     return '第' + text + '次';
@@ -54,11 +59,13 @@ class Done extends React.Component {
         },
         {
             title: '诊断',
-            dataIndex: 'diagnosisName'
+            dataIndex: 'diagnosisName',
+            width: '14%'
         },
         {
             title: '与用户关系',
             dataIndex: 'relation',
+            width: '8%',
             render(text) {
                 return global.getRelationText(text);
             }
@@ -66,6 +73,7 @@ class Done extends React.Component {
         {
             title: '问诊时长',
             dataIndex: 'timeCount',
+            width: '10%',
             render(text, record) {
                 return global.formatTime((record.endTime - record.startTime) / 1000) || '--';
             }
@@ -73,6 +81,7 @@ class Done extends React.Component {
         {
             title: '问诊时间',
             dataIndex: 'createdTime',
+            width: '10%',
             render(text) {
                 return global.formatDate(text, 'yyyy-MM-dd HH:mm');
             }
@@ -80,6 +89,7 @@ class Done extends React.Component {
         {
             title: '归档时间',
             dataIndex: 'updateTime',
+            width: '10%',
             render(text) {
                 return global.formatDate(text, 'yyyy-MM-dd HH:mm');
             }
@@ -87,6 +97,7 @@ class Done extends React.Component {
         {
             title: '操作',
             dataIndex: 'operations',
+            width: '6%',
             render: (text, record, index)=> {
                 return <a href="javascript:;" onClick={()=>this.goToDetail(text,record, index)}>查看</a>;
             }
