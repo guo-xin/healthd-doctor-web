@@ -263,11 +263,16 @@ export const updateInquiryInfoByInquiryId = (params) => {
         // 检查缓存 (可选):
         //shouldCallAPI: (state) => !state.users[userId],
         // 进行取：
-        callAPI: (token) => fetch(`${actions.WEB_API_URI}/inquiry-info-attachment/update?inquiryInfoId=${params.inquiryInfoId}&inquiryId=${params.inquiryId}`,{
-            method: 'GET',
+        callAPI: (token) => fetch(`${actions.WEB_API_URI}/inquiry-info/${params.inquiryInfoId}`,{
+            method: 'POST',
             headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json; charset=UTF-8',
                 [actions.HEADER_AUTH_FIELD]: actions.HEADER_AUTH_PREFIX + token
-            }
+            },
+            body: JSON.stringify({
+                inquiryId: params.inquiryId
+            })
         }),
         // 在 actions 的开始和结束注入的参数
         payload: params
