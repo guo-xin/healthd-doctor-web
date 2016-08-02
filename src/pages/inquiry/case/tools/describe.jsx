@@ -19,6 +19,7 @@ class Describe extends Component {
         imgSrc: "",
         currentIndex: "",
         currentTab: true,
+        forward: false,
         messageId: '',
         picture: [],
         pictureList: [],
@@ -105,6 +106,11 @@ class Describe extends Component {
                     dispatch(getDoctorPictureMessage(doctorId));
                 });
             }
+            if (messageInfoId === 'forward') {
+                this.state.forward = true;
+            } else {
+                this.state.forward = false;
+            }
         }
         this.setState({
             dialogShow: true,
@@ -137,7 +143,12 @@ class Describe extends Component {
         let index = this.state.currentIndex - 1;
         let content;
         if (this.state.currentTab) {
-            content = this.state.picture;
+            if (!this.state.forward) {
+                content = this.state.picture;
+            } else {
+                content = this.state.pictureForward;
+            }
+
             if (index < 0) {
                 index = content.length - 1;
             }
@@ -174,7 +185,11 @@ class Describe extends Component {
         let index = this.state.currentIndex + 1;
         let content;
         if (this.state.currentTab) {
-            content = this.state.picture;
+            if (!this.state.forward) {
+                content = this.state.picture;
+            } else {
+                content = this.state.pictureForward;
+            }
 
             if (index === content.length) {
                 index = 0;
@@ -309,7 +324,7 @@ class Describe extends Component {
                         <div className={styles.item}>
                             <div className={styles.pictureList}>
                                 {item.savePath && <img src={item.savePath+"@80h_80w_0e"} alt=""
-                                                       onClick={()=>this.bigPicuure(item.savePath,index)}/>}
+                                                       onClick={()=>this.bigPicuure(item.savePath,index,'forward')}/>}
                             </div>
                         </div>
                     </div>)
@@ -323,7 +338,7 @@ class Describe extends Component {
                         return (<div className={styles.item} key={index}>
                             <div className={styles.pictureList}>
                                 {item.savePath && <img src={item.savePath+"@80h_80w_0e"} alt=""
-                                                       onClick={()=>this.bigPicuure(item.savePath,index)}/>}
+                                                       onClick={()=>this.bigPicuure(item.savePath,index,'forward')}/>}
                             </div>
                         </div>)
                     } else {
@@ -334,7 +349,7 @@ class Describe extends Component {
                                 <div className={styles.item}>
                                     <div className={styles.pictureList}>
                                         {item.savePath && <img src={item.savePath+"@80h_80w_0e"} alt=""
-                                                               onClick={()=>this.bigPicuure(item.savePath,index)}/>}
+                                                               onClick={()=>this.bigPicuure(item.savePath,index,'forward')}/>}
                                     </div>
                                 </div>
                             </div>)
@@ -347,7 +362,7 @@ class Describe extends Component {
                                 <div className={styles.item}>
                                     <div className={styles.pictureList}>
                                         {item.savePath && <img src={item.savePath+"@80h_80w_0e"} alt=""
-                                                               onClick={()=>this.bigPicuure(item.savePath,index)}/>}
+                                                               onClick={()=>this.bigPicuure(item.savePath,index,'forward')}/>}
                                     </div>
                                 </div>
                             </div>)
@@ -473,6 +488,7 @@ class Describe extends Component {
 
 const mapStateToProps = (globalStore) => {
     const {authStore, caseStore}  = globalStore;
+    
     return {
         doctorId: authStore.id,
         currentCase: caseStore.currentCase
