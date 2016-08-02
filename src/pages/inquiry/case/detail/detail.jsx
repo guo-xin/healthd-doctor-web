@@ -808,7 +808,7 @@ class Detail extends React.Component {
             let params = this.getCaseData(props, values, 2);
 
             //新建调用postCase， 更新调用putCase
-            props.dispatch((this.state.caseState === -1 ? postCase : putCase)(params)).then(
+            props.dispatch((caseState === -1 ? postCase : putCase)(params)).then(
                 (action)=> {
                     this.isSaving = false;
                     hide();
