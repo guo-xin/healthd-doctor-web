@@ -158,10 +158,15 @@ class Describe extends Component {
                 index = content.length - 1;
             }
         }
-        this.setState({
-            imgSrc: content[index].savePath,
-            currentIndex: index
-        })
+        if (content[index].savePath) {
+            this.setState({
+                imgSrc: content[index].savePath,
+                currentIndex: index
+            })
+        } else {
+            this.state.currentIndex = index;
+            this.previous();
+        }
     }
 
     //下一张
@@ -170,6 +175,7 @@ class Describe extends Component {
         let content;
         if (this.state.currentTab) {
             content = this.state.picture;
+
             if (index === content.length) {
                 index = 0;
             }
@@ -190,10 +196,15 @@ class Describe extends Component {
                 index = 0;
             }
         }
-        this.setState({
-            imgSrc: content[index].savePath,
-            currentIndex: index
-        })
+        if (content[index].savePath) {
+            this.setState({
+                imgSrc: content[index].savePath,
+                currentIndex: index
+            })
+        } else {
+            this.state.currentIndex = index;
+            this.last();
+        }
     }
 
     render() {
