@@ -135,6 +135,9 @@ class Login extends Component {
 
     signIn(values){
         this.setState({disabled: true});
+        this.props.dispatch({
+            type: 'RESET'
+        });
         this.props.dispatch(signIn(values)).then(
             (action)=> {
                 let result = (action.response || {}).result;

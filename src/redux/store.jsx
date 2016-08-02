@@ -1,4 +1,5 @@
-import {createStore, applyMiddleware} from 'redux';
+import {compose, createStore, applyMiddleware} from 'redux';
+import reduxReset from 'redux-reset';
 import thunkMiddleware from 'redux-thunk'
 import reducers from './reducers';
 import {setCurrentCase} from './actions/case';
@@ -62,10 +63,18 @@ function callAsyncActionsMiddleware({dispatch, getState}) {
     };
 }
 
-let store = createStore(
+
+const enHanceCreateStore = compose(
+    applyMiddleware(callAsyncActionsMiddleware, thunkMiddleware),
+    reduxReset()  // Will use 'RESET' as default action.type to trigger reset
+)(createStore);
+
+const store = enHanceCreateStore(reducers);
+
+/*let store = createStore(
     reducers,
     applyMiddleware(callAsyncActionsMiddleware, thunkMiddleware)
-);
+);*/
 
 store.dispatch(setCurrentCase(cookie.load('c')));
 store.dispatch(setCurrentPatient(cookie.load('p')));
