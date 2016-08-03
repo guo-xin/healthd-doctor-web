@@ -273,13 +273,13 @@ class CallbackFromCase extends Component {
                     </div>
                     <div className="middle clearfix">
                         <ul>
-                            <li>问诊人：{user.userName || patient.userName || '--'}</li>
+                            <li>问诊人：{user.userName || user.mobilePhone || patient.userName || patient.userMobilePhone || '--'}</li>
                             <li>与问诊人关系：{global.getRelationText(patient.relation) || '--'}</li>
                             <li style={{width:"100%"}}>本次诊断：{diagnosisName || '--'}</li>
                         </ul>
                     </div>
                 </div>
-
+                
                 <div className={styles.callTips}>{tip}</div>
             </Modal>
         );

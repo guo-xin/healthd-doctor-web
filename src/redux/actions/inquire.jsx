@@ -89,7 +89,7 @@ export const getMaterialBeforeCase = (params) => {
         // 检查缓存 (可选):
         //shouldCallAPI: (state) => !state.users[userId],
         // 进行取：
-        callAPI: (token) => fetch(`${actions.WEB_API_URI}/inquiry/query/beforecase-pic?inquiryInfoId=${params.inquiryInfoId}`,{
+        callAPI: (token) => fetch(`${actions.WEB_API_URI}/inquiry-info/pre-inquiry?inquiryInfoId=${params.inquiryInfoId}`,{
             method: 'GET',
             headers: {
                 [actions.HEADER_AUTH_FIELD]: actions.HEADER_AUTH_PREFIX + token

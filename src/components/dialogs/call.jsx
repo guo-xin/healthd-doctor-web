@@ -337,7 +337,7 @@ class Call extends Component {
                     </div>
                     <div className="middle clearfix">
                         <ul>
-                            <li>问诊人：{user.userName || '--'}</li>
+                            <li>问诊人：{user.userName || user.userMobilePhone || '--'}</li>
                             <li>与问诊人关系：{global.getRelationText(user.relation) || '--'}</li>
                             <li style={{width:"100%"}}>上次诊断：{user.diagnosisName || '--'}</li>
                         </ul>

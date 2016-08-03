@@ -174,7 +174,7 @@ class Waiting extends React.Component {
                             </div>
                             <div className="middle clearfix">
                                 <ul>
-                                    <li className="patientName">问诊人：{data.userName || '--'}</li>
+                                    <li className="patientName">问诊人：{data.userName || item.userMobilePhone || '--'}</li>
                                     <li>与问诊人关系：{global.getRelationText(item.relation) || '--'}</li>
                                     <li className="lastInquery" style={{width:"100%"}}>
                                         上次诊断：{item.diagnosisName || '--'}</li>
