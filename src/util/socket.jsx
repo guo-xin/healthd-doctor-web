@@ -8,13 +8,15 @@ import {
     getDoctorPictureMessage,
     changeDoctorState,
     getDoctorEndInquery,
+    setDoctorClose,
     getDoctorAttendance
 } from 'redux/actions/doctor';
 
 class Events {
-    constructor(name, url) {
+    constructor(name, url, events=[]) {
         this.name = name;
         this.url = url;
+        this.events = events;
         this.createSource();
     }
 
@@ -35,9 +37,28 @@ class Events {
                 self.onError.call(self, event);
             };
 
+            this.addEvents();
+
             console.log(this.name + '-' + 'start listening events from server');
         } else {
             console.log('SSE not supported by browser.');
+        }
+    }
+
+    addEvents(){
+        let events = this.events || [];
+        let source = this.source;
+        let item;
+
+        if(events.length>0){
+            for(let i=0; i<events.length; i++){
+                item = events[i] || {};
+
+                if(item.event && typeof item.fn == 'function'){
+                    source.addEventListener(item.event, item.fn, false);
+                }
+
+            }
         }
     }
 
@@ -51,6 +72,9 @@ class Events {
 
     onError(event) {
         console.info(this.name + '-' + 'Received error event voicecall');
+        if(!this.isClose){
+            this.close();
+        }
     }
 
     addEvent(event, fn) {
@@ -59,89 +83,83 @@ class Events {
         }
     }
 
-    close() {
+    close(isClose) {
+        this.isClose = isClose;
         if (this.source) {
-            this.source.close();
-            this.source = null;
+            console.info(this.name + '-' + "event source closed,");
+
+            if(this.isClose){
+                this.source.close();
+                this.source = null;
+            }else{
+                let doctorId = store.getState().authStore.id;
+                store.dispatch(setDoctorClose(this.name, doctorId)).then(()=> {
+                    this.source.close();
+                    this.createSource();
+                });
+            }
         }
     }
 }
 
 
-let phoneSource, queueSource,infoSource;
+let phoneSource, queueSource, infoSource;
 
 export const receiveMessages = ()=> {
     let doctorId = store.getState().authStore.id;
 
     //电话推送
     function seMessage() {
-        phoneSource = new Events('phone', "v2/message/events/" + doctorId);
-        phoneSource.addEvent("voicecall/" + doctorId, function (event) {
-            console.info('Received addEventListener event ' + event.type + ': ' + event.data);
-            if (event.data) {
-                let preWorkingStatus = store.getState().doctorStore.data.workingStatus;
+        phoneSource = new Events('message', "v2/message/events/" + doctorId, [
+            {
+                event: "voicecall/" + doctorId,
+                fn: function (event) {
+                    console.info('Received addEventListener event ' + event.type + ': ' + event.data);
+                    if (event.data) {
+                        let preWorkingStatus = store.getState().doctorStore.data.workingStatus;
 
-                store.dispatch(changeDoctorState({
-                    workingStatus: 1
-                }));
-                store.dispatch(showCallingDialog(true, 0, Object.assign({workingStatus: preWorkingStatus}, JSON.parse(event.data))));
+                        store.dispatch(changeDoctorState({
+                            workingStatus: 1
+                        }));
+                        store.dispatch(showCallingDialog(true, 0, Object.assign({workingStatus: preWorkingStatus}, JSON.parse(event.data))));
+                    }
+
+                }
             }
-
-        });
-
-        let SSECheck = setInterval(function () {
-            if (phoneSource.source && phoneSource.source.readyState == 2) {
-                clearInterval(SSECheck);
-                phoneSource.close();
-                seMessage();
-                console.log('event phoneSource restart');
-            }
-
-        }, 1000);
+        ]);
     }
 
     //排队推送
     function seQueueMessage() {
-        queueSource = new Events('queue', "v2/queue-message/events/" + doctorId);
-        queueSource.addEvent("queue/" + doctorId, function (event) {
-            console.info('Received addEventListener event ' + event.type + ': ' + event.data);
-            if (event.data) {
-                store.dispatch(setDoctorQueueCount(JSON.parse(event.data)));
+        queueSource = new Events('queue-message', "v2/queue-message/events/" + doctorId, [
+            {
+                event: "queue/" + doctorId,
+                fn: function (event) {
+                    console.info('Received addEventListener event ' + event.type + ': ' + event.data);
+                    if (event.data) {
+                        store.dispatch(setDoctorQueueCount(JSON.parse(event.data)));
+                    }
+
+                }
             }
-
-        });
-
-        let SSECheck = setInterval(function () {
-            if (queueSource.source && queueSource.source.readyState == 2) {
-                clearInterval(SSECheck);
-                queueSource.close();
-                seQueueMessage();
-                console.log('event queueSource restart');
-            }
-
-        }, 1000);
+        ]);
     }
 
     //图片新消息推送
     function seMessageInfo() {
-        infoSource = new Events('messageInfo', "v2/message-info-push/events/" + doctorId);
-        infoSource.addEvent("messageInfo/" + doctorId, function (event) {
-            console.info('Received addEventListener event ' + event.type + ': ' + event.data);
-            if (event.data) {
-                store.dispatch(getDoctorPictureMessage(doctorId));
+        infoSource = new Events('message-info-push', "v2/message-info-push/events/" + doctorId, [
+            {
+                event: "messageInfo/" + doctorId,
+                fn: function (event) {
+                    console.info('Received addEventListener event ' + event.type + ': ' + event.data);
+                    if (event.data) {
+                        store.dispatch(getDoctorPictureMessage(doctorId));
+                    }
+                }
             }
-        });
-
-        let SSECheck = setInterval(function () {
-            if (infoSource.source && infoSource.source.readyState == 2) {
-                clearInterval(SSECheck);
-                infoSource.close();
-                seMessageInfo();
-                console.log('event infoSource restart');
-            }
-
-        }, 1000);
+        ]);
     }
+
 
     seMessage();
     seQueueMessage();
@@ -151,16 +169,16 @@ export const receiveMessages = ()=> {
 //关闭se消息推送
 export const seClose = ()=> {
     if (phoneSource && phoneSource.close) {
-        phoneSource.close();
+        phoneSource.close(true);
         console.log('event phoneSource closed');
     }
     if (queueSource && queueSource.close) {
-        queueSource.close();
+        queueSource.close(true);
         console.log('event queueSource closed');
     }
 
     if (infoSource && infoSource.close) {
-        infoSource.close();
+        infoSource.close(true);
         console.log('event infoSource closed');
     }
 };

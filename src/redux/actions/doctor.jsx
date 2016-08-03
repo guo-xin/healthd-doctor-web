@@ -4,6 +4,26 @@ import fetch from 'isomorphic-fetch';
 //推送排队人数
 export const setDoctorQueueCount = actions.create(actions.SET_DOCTOR_QUEUE_COUNT, 'queue');
 
+//关闭消息推送
+export const setDoctorClose = (type,doctorId) => {
+    let action = actions.SET_DOCTOR_CLOSE;
+    return {
+        // 要在之前和之后发送的 action types
+        types: [action + '_REQUEST', action + '_SUCCESS', action + '_FAILURE'],
+        // 检查缓存 (可选):
+        //shouldCallAPI: (state) => !state.users[userId],
+        // 进行取：
+        callAPI: (token) => fetch(`${actions.WEB_API_URI}/${type}/close/${doctorId}`, {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json; charset=UTF-8',
+                [actions.HEADER_AUTH_FIELD]: actions.HEADER_AUTH_PREFIX + token
+            },
+            body: JSON.stringify(doctorId)
+        })
+    };
+};
 
 //首页图片消息通知
 export const getDoctorPictureMessage = (doctorId) => {

@@ -13,6 +13,12 @@ const doctor = (state = {
 
     let obj;
     switch (action.type) {
+        case actions.SET_DOCTOR_CLOSE + "_SUCCESS":
+            obj = Object.assign({}, state, {
+                result: action.response.result
+            },);
+            return obj;
+
         case actions.GET_DOCTOR_RESET_PWD + "_SUCCESS":
             obj = Object.assign({}, state, {
                 response: action.response.result

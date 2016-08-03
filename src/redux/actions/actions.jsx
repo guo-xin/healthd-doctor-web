@@ -52,6 +52,8 @@ export const GET_OCX_ACCOUNT = "GET_OCX_ACCOUNT"; //获取荣联账号
 /* ---------- 医生相关操作 start ---------- */
 export const SET_DOCTOR_QUEUE_COUNT = "SET_DOCTOR_QUEUE_COUNT";//推送医生排队人数
 
+export const SET_DOCTOR_CLOSE = "SET_DOCTOR_CLOSE";//关闭消息推送
+
 export const GET_DOCTOR_PICTURE_MESSAGE = "GET_DOCTOR_PICTURE_MESSAGE";//图片消息通知
 export const GET_DOCTOR_RESET_PWD = "GET_DOCTOR_RESET_PWD";//医生忘记密码验证邮箱发送密码
 export const DOCTOR_START_INQUERY = "DOCTOR_START_INQUERY";//医生开始出诊
