@@ -40,8 +40,9 @@ class Describe extends Component {
                 })
             });
         }
-        if (currentCase.inquiryId) {
-            dispatch(getInquiryForwardPicture(currentCase.inquiryId)).then((action)=> {
+
+        if (currentCase.inquiryInfoId) {
+            dispatch(getInquiryForwardPicture(currentCase.inquiryInfoId)).then((action)=> {
                 this.setState({
                     pictureForward: action.response.data || []
                 })
@@ -488,7 +489,7 @@ class Describe extends Component {
 
 const mapStateToProps = (globalStore) => {
     const {authStore, caseStore}  = globalStore;
-    
+
     return {
         doctorId: authStore.id,
         currentCase: caseStore.currentCase
