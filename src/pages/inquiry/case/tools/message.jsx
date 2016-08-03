@@ -239,7 +239,7 @@ class Message extends Component {
 
 
                         <p className={styles.wish}>
-                            祝您/您的家人早日康复
+                            祝您早日康复
                         </p>
 
                         <div className={styles.actions}>
