@@ -103,21 +103,23 @@
   top: 0;
   right: 0;
   background: rgba(0, 0, 0, 0.75);
+  text-align: center;
   z-index: 1000;
   bottom: 0;
   overflow-y: auto;
 }
 
 .dialogPicture {
+  display: inline-block;
   height: 650px;
   text-align: center;
   background: #000;
-  width: 1100px;
+  min-width: 1100px;
   margin: auto;
   margin-top: 86px;
   & > img {
     height: 540px;
-    width: 540px;
+    margin: 0 30px;
   }
 }
 
@@ -125,6 +127,7 @@
   height: 60px;
   text-align: right;
   span {
+    margin-right: @gapSm;
     font-size: 24px;
     cursor: pointer;
   }

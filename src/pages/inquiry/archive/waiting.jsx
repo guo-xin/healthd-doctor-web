@@ -112,23 +112,27 @@ class Waiting extends React.Component {
             if (material) {
                 let des = material.description;
                 let paths = material.savePath || [];
-                let pics = paths.map((item, index)=> {
-                    if (item) {
-                        return <img key={index} src={item+"@80h_80w_0e"} alt=""  onClick={()=>this.checkPics(material.savePath, index)}/>;
-                    } else {
-                        return null;
-                    }
-                });
 
-                return (
-                    <div>
-                        <p>{des}</p>
-                        {pics.length > 0 && <div className="picList">
-                            {pics}
-                        </div>}
-                    </div>
-                );
+                if(des){
+                    let pics = paths.map((item, index)=> {
+                        if (item) {
+                            return <img key={index} src={item+"@80h_80w_0e"} alt=""  onClick={()=>this.checkPics(material.savePath, index)}/>;
+                        } else {
+                            return null;
+                        }
+                    });
 
+                    return (
+                        <div>
+                            <p>{des}</p>
+                            {pics.length > 0 && <div className="picList">
+                                {pics}
+                            </div>}
+                        </div>
+                    );
+                }else{
+                    return <span className="empty">暂无描述</span>
+                }
             } else {
                 return <span className="empty">暂无描述</span>
             }
