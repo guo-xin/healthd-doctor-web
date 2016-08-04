@@ -101,7 +101,7 @@ class Describe extends Component {
             let {dispatch, doctorId} = this.props;
             let item = this.state.allList[msgIndex];
 
-            if (item.inquiryType!==1 && item.status === 0) {
+            if (item.inquiryType !== 1 && item.status === 0) {
                 item.status = 1;
                 dispatch(setInquiryPictureRead(item.messageInfoId)).then(()=> {
                     dispatch(getDoctorPictureMessage(doctorId));
@@ -148,11 +148,11 @@ class Describe extends Component {
 
         let item = list[index];
 
-        if(currentTab){
+        if (currentTab) {
             let {dispatch, doctorId} = this.props;
             let msg = this.state.allList[item.msgIndex];
 
-            if (msg.inquiryType!==1 && msg.status === 0) {
+            if (msg.inquiryType !== 1 && msg.status === 0) {
                 msg.status = 1;
                 dispatch(setInquiryPictureRead(msg.messageInfoId)).then(()=> {
                     dispatch(getDoctorPictureMessage(doctorId));
@@ -179,11 +179,11 @@ class Describe extends Component {
 
         let item = list[index];
 
-        if(currentTab){
+        if (currentTab) {
             let {dispatch, doctorId} = this.props;
             let msg = this.state.allList[item.msgIndex];
 
-            if (msg.inquiryType!==1 && msg.status === 0) {
+            if (msg.inquiryType !== 1 && msg.status === 0) {
                 msg.status = 1;
                 dispatch(setInquiryPictureRead(msg.messageInfoId)).then(()=> {
                     dispatch(getDoctorPictureMessage(doctorId));
@@ -210,7 +210,7 @@ class Describe extends Component {
                         msgIndex: msgIndex
                     });
 
-                    let imgIndex = viewList.length-1;
+                    let imgIndex = viewList.length - 1;
 
                     return (
                         <img key={index} src={item.savePath+"@80h_80w_0e"} alt=""
@@ -250,12 +250,12 @@ class Describe extends Component {
                 let flag = false;
                 let isSameDay = false;
 
-                if (item.inquiryType!==1 && item.status === 0) {
+                if (item.inquiryType !== 1 && item.status === 0) {
                     flag = true;
                 }
 
-                createdTime = global.formatDate(item.createdTime, 'yyyy-MM-dd');
-                let hourTime = global.formatDate(item.createdTime, 'HH:mm');
+                createdTime = global.formatDate(item.updateTime, 'yyyy-MM-dd');
+                let hourTime = global.formatDate(item.updateTime, 'HH:mm');
 
                 if (createdTime === preTime) {
                     isSameDay = true;
