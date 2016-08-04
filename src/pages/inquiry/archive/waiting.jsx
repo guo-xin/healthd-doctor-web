@@ -172,7 +172,7 @@ class Waiting extends React.Component {
                                 <span className="age">{global.getAge(item.birthday) || '--岁'}</span>
                                     <span
                                         className="serial">ID:{global.formatPatientCode(item.patientCode) || '--'}</span>
-                                    <span className="gender" style={{display:'none'}}>
+                                    <span className="gender">
                                         <img src={global.getGenderUrl(item.sex)} alt=""/>
                                     </span>
                             </div>
