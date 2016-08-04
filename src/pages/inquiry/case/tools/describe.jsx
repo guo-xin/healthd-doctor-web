@@ -5,9 +5,8 @@ import {connect} from 'react-redux';
 import * as global from 'util/global';
 import {
     getPatientAllPicture,
-    getCurrentInquiryPicture,
     setInquiryPictureRead,
-    getInquiryForwardPicture
+    getInquiryAllPicture
 } from 'redux/actions/tool';
 import {getDoctorPictureMessage} from 'redux/actions/doctor';
 
@@ -19,11 +18,10 @@ class Describe extends Component {
         imgSrc: "",
         currentIndex: "",
         currentTab: true,
-        forward: false,
-        messageId: '',
-        picture: [],
         pictureList: [],
-        pictureForward: []
+        allList: [],
+        pictureViewList: [],
+        currentViewList: []
     };
 
     componentDidMount() {
@@ -33,34 +31,36 @@ class Describe extends Component {
     getDoctorList(props) {
         const {dispatch, currentCase = {}} = props || this.props;
 
-        if (currentCase.caseId) {
-            dispatch(getCurrentInquiryPicture(currentCase.caseId)).then((action)=> {
+        if (currentCase.caseId || currentCase.inquiryInfoId) {
+            dispatch(getInquiryAllPicture(currentCase.caseId, currentCase.inquiryInfoId)).then((action)=> {
+                let currentList = action.response.data || {};
+                let list = [];
+
+                if (currentList.historyCaseList && currentList.historyCaseList.length > 0) {
+                    list = list.concat(currentList.historyCaseList.slice());
+                }
+
+                if (currentList.preList && currentList.preList.length > 0) {
+                    list = list.concat(currentList.preList.slice());
+                }
+
+
                 this.setState({
-                    picture: action.response.data || []
+                    allList: list
                 })
             });
         }
-
-        if (currentCase.inquiryInfoId) {
-            dispatch(getInquiryForwardPicture(currentCase.inquiryInfoId)).then((action)=> {
-                this.setState({
-                    pictureForward: action.response.data || []
-                })
-            });
-        }
-
     }
 
     //页面重新渲染
     componentWillReceiveProps(nextProps) {
         if (nextProps.toolType === 2) {
             if (nextProps.currentCase && this.props.currentCase && (nextProps.currentCase.caseId != this.props.currentCase.caseId
-                || nextProps.currentCase.inquiryId != this.props.currentCase.inquiryId)) {
+                || nextProps.currentCase.inquiryInfoId != this.props.currentCase.inquiryInfoId)) {
 
                 this.setState({
-                    picture: [],
                     pictureList: [],
-                    pictureForward: []
+                    allList: []
                 });
 
                 if (this.state.currentTab) {
@@ -96,23 +96,20 @@ class Describe extends Component {
     }
 
     //点击图片
-    bigPicuure(href, index, messageInfoId, status) {
-        //console.log(href, index);
+    bigPicture(href, index, msgIndex) {
         if (this.state.currentTab) {
-            if (status === 0) {
-                this.state.picture[index].status = 1;
-                const {dispatch, doctorId={}} = this.props;
-                dispatch(setInquiryPictureRead(messageInfoId)).then(()=> {
-                    this.state.messageId = messageInfoId;
+            let {dispatch, doctorId} = this.props;
+            let item = this.state.allList[msgIndex];
+
+            if (item.status === 0) {
+                item.status = 1;
+                dispatch(setInquiryPictureRead(item.messageInfoId)).then(()=> {
                     dispatch(getDoctorPictureMessage(doctorId));
                 });
             }
-            if (messageInfoId === 'forward') {
-                this.state.forward = true;
-            } else {
-                this.state.forward = false;
-            }
+
         }
+
         this.setState({
             dialogShow: true,
             imgSrc: href,
@@ -141,300 +138,155 @@ class Describe extends Component {
 
     //上一张
     previous() {
+        let {pictureViewList=[], currentViewList=[], currentTab} = this.state;
+        let list = currentTab ? currentViewList : pictureViewList;
         let index = this.state.currentIndex - 1;
-        let content;
-        if (this.state.currentTab) {
-            if (!this.state.forward) {
-                content = this.state.picture;
-            } else {
-                content = this.state.pictureForward;
-            }
 
-            if (index < 0) {
-                index = content.length - 1;
-            }
-            let messageInfoId = content[index].messageInfoId;
-            if (this.state.messageId !== messageInfoId && content[index].status === 0) {
-                content[index].status = 1;
-                const {dispatch, doctorId={}} = this.props;
-                dispatch(setInquiryPictureRead(messageInfoId)).then(()=> {
-                    this.state.messageId = messageInfoId;
+        if (index < 0) {
+            index = list.length - 1;
+        }
+
+        let item = list[index];
+
+        if(currentTab){
+            let {dispatch, doctorId} = this.props;
+            let msg = this.state.allList[item.msgIndex];
+
+            if (msg.status === 0) {
+                msg.status = 1;
+                dispatch(setInquiryPictureRead(msg.messageInfoId)).then(()=> {
                     dispatch(getDoctorPictureMessage(doctorId));
                 });
-            } else if (this.state.messageId === messageInfoId && content[index].status === 0) {
-                content[index].status = 1;
-            }
-        } else {
-            content = this.state.pictureList;
-            if (index < 0) {
-                index = content.length - 1;
             }
         }
-        if (content[index].savePath) {
-            this.setState({
-                imgSrc: content[index].savePath,
-                currentIndex: index
-            })
-        } else {
-            this.state.currentIndex = index;
-            this.previous();
-        }
+
+        this.setState({
+            imgSrc: item.url,
+            currentIndex: index
+        });
     }
 
     //下一张
     last() {
+        let {pictureViewList=[], currentViewList=[], currentTab} = this.state;
+        let list = currentTab ? currentViewList : pictureViewList;
         let index = this.state.currentIndex + 1;
-        let content;
-        if (this.state.currentTab) {
-            if (!this.state.forward) {
-                content = this.state.picture;
-            } else {
-                content = this.state.pictureForward;
-            }
 
-            if (index === content.length) {
-                index = 0;
-            }
-            let messageInfoId = content[index].messageInfoId;
-            if (this.state.messageId !== messageInfoId && content[index].status === 0) {
-                content[index].status = 1;
-                const {dispatch, doctorId={}} = this.props;
-                dispatch(setInquiryPictureRead(messageInfoId)).then(()=> {
-                    this.state.messageId = messageInfoId;
+
+        if (index > list.length - 1) {
+            index = 0;
+        }
+
+        let item = list[index];
+
+        if(currentTab){
+            let {dispatch, doctorId} = this.props;
+            let msg = this.state.allList[item.msgIndex];
+
+            if (msg.status === 0) {
+                msg.status = 1;
+                dispatch(setInquiryPictureRead(msg.messageInfoId)).then(()=> {
                     dispatch(getDoctorPictureMessage(doctorId));
                 });
-            } else if (this.state.messageId === messageInfoId && content[index].status === 0) {
-                content[index].status = 1;
-            }
-        } else {
-            content = this.state.pictureList;
-            if (index === content.length) {
-                index = 0;
             }
         }
-        if (content[index].savePath) {
-            this.setState({
-                imgSrc: content[index].savePath,
-                currentIndex: index
-            })
-        } else {
-            this.state.currentIndex = index;
-            this.last();
+
+        this.setState({
+            imgSrc: item.url,
+            currentIndex: index
+        });
+    }
+
+    //图片列表
+    imgList(data, msgIndex, tab) {
+        let list = data.attachments;
+        let viewList = tab === 0 ? this.state.currentViewList : this.state.pictureViewList;
+
+        if (list && list.length > 0) {
+            let imgList = list.map((item, index)=> {
+                if (item.savePath) {
+                    viewList.push({
+                        url: item.savePath,
+                        msgIndex: msgIndex
+                    });
+
+                    let imgIndex = viewList.length-1;
+
+                    return (
+                        <img key={index} src={item.savePath+"@80h_80w_0e"} alt=""
+                             onClick={()=>this.bigPicture(item.savePath, imgIndex, msgIndex)}/>)
+                } else {
+                    return null;
+                }
+
+            });
+
+            return <div className={styles.pictureList}>{imgList}</div>
+        }
+        else {
+            return null;
         }
     }
 
-    render() {
-        let {picture = [], pictureList=[], pictureForward=[]} = this.state;
-
+    formatMessage(list = [], tab) {
+        let pictureList;
+        let createdTime;
         let time = new Date().getTime();
-        let createdTime, currentMessage, forwardMessage;
+        let preTime;
+        let currentTime = global.formatDate(time, 'yyyy-MM-dd');
 
-        let pictureList1, forwardList, pictureList2;
+        if (tab == 0) {
+            this.state.currentViewList = [];
+        }
 
-        if (Array.isArray(picture) && picture.length > 0) {
-            pictureList1 = picture.map((item, index)=> {
+        if (tab == 1) {
+            this.state.pictureViewList = [];
+        }
+
+        if (Array.isArray(list) && list.length > 0) {
+            pictureList = list.map((item, index)=> {
+
+
                 let flag = false;
-                if (this.state.messageId) {
-                    if (item.status === 0) {
-                        if (this.state.messageId !== item.messageInfoId) {
-                            flag = true;
-                        } else {
-                            item.status = 1;
-                        }
-                    }
-                } else {
-                    if (item.status === 0) {
-                        flag = true;
-                    }
+                let isSameDay = false;
+
+                if (item.status === 0) {
+                    flag = true;
                 }
-                if (index === 0) {
-                    let currentTime = global.formatDate(time, 'yyyy-MM-dd');
-                    createdTime = global.formatDate(item.createdTime, 'yyyy-MM-dd');
-                    let hourTime = global.formatDate(item.createdTime, 'HH:mm');
-                    let date = (currentTime === createdTime) ? "今日" : createdTime;
-                    return (<div className={styles.part} key={index}>
-                        <div className={styles.date}>{date}</div>
+
+                createdTime = global.formatDate(item.createdTime, 'yyyy-MM-dd');
+                let hourTime = global.formatDate(item.createdTime, 'HH:mm');
+
+                if (createdTime === preTime) {
+                    isSameDay = true;
+                }
+
+                preTime = createdTime;
+
+                let date = (index == 0 && currentTime === createdTime) ? "今日" : createdTime;
+                let formattedList = this.imgList(item, index, tab);
+
+                return (
+                    <div className={styles.part} key={index}>
+                        {!isSameDay && <div className={styles.date}>{date}</div>}
                         <div className={styles.time}>{hourTime}{flag ? (
                             <span className={styles.read}>新</span>) : ""}</div>
                         <div className={styles.description}>{item.description}</div>
-                        <div className={styles.item}>
-                            <div className={styles.pictureList}>
-                                {item.savePath && <img src={item.savePath+"@80h_80w_0e"} alt=""
-                                                       onClick={()=>this.bigPicuure(item.savePath,index,item.messageInfoId,item.status)}/>}
-                            </div>
-                        </div>
-                    </div>)
+                        {formattedList}
+                    </div>
+                );
 
-                } else {
-                    currentMessage = picture[index].inquiryInfoId;
-                    forwardMessage = picture[index - 1].inquiryInfoId;
-                    let hourTime = global.formatDate(item.createdTime, 'HH:mm');
-
-                    if (currentMessage === forwardMessage) {
-                        return (<div className={styles.item} key={index}>
-                            <div className={styles.pictureList}>
-                                <img src={item.savePath+"@80h_80w_0e"} alt=""
-                                     onClick={()=>this.bigPicuure(item.savePath,index,item.messageInfoId,item.status)}/>
-                            </div>
-                        </div>)
-                    } else {
-                        if (global.formatDate(picture[index].createdTime, 'yyyy-MM-dd') === global.formatDate(picture[index - 1].createdTime, 'yyyy-MM-dd')) {
-                            return (<div className={styles.part} key={index}>
-                                <div className={styles.time}>{hourTime}{flag ? (
-                                    <span className={styles.read}>新</span>) : ""}</div>
-                                <div className={styles.description}>{item.description}</div>
-                                <div className={styles.item}>
-                                    <div className={styles.pictureList}>
-                                        <img src={item.savePath+"@80h_80w_0e"} alt=""
-                                             onClick={()=>this.bigPicuure(item.savePath,index,item.messageInfoId,item.status)}/>
-                                    </div>
-                                </div>
-                            </div>)
-                        } else {
-                            return (<div className={styles.part+" "+styles.partDay} key={index}>
-                                <div
-                                    className={styles.date}>{global.formatDate(picture[index].createdTime, 'yyyy-MM-dd')}</div>
-                                <div className={styles.time}>{hourTime}{flag ? (
-                                    <span className={styles.read}>新</span>) : ""}</div>
-                                <div className={styles.description}>{item.description}</div>
-                                <div className={styles.item}>
-                                    <div className={styles.pictureList}>
-                                        <img src={item.savePath+"@80h_80w_0e"} alt=""
-                                             onClick={()=>this.bigPicuure(item.savePath,index,item.messageInfoId,item.status)}/>
-                                    </div>
-                                </div>
-                            </div>)
-                        }
-                    }
-                }
             });
         }
 
-        if (Array.isArray(pictureForward) && pictureForward.length > 0) {
-            forwardList = pictureForward.map((item, index)=> {
-                if (index === 0) {
-                    let currentTime = global.formatDate(time, 'yyyy-MM-dd');
-                    createdTime = global.formatDate(item.createdTime, 'yyyy-MM-dd');
-                    let hourTime = global.formatDate(item.createdTime, 'HH:mm');
-                    let date = (currentTime === createdTime) ? "今日" : createdTime;
+        return pictureList;
+    }
 
-                    return (<div className={styles.part} key={index}>
-                        <div className={styles.date}>{date}</div>
-                        <div className={styles.time}>{hourTime}</div>
-                        <div className={styles.description}>{item.description}</div>
-                        <div className={styles.item}>
-                            <div className={styles.pictureList}>
-                                {item.savePath && <img src={item.savePath+"@80h_80w_0e"} alt=""
-                                                       onClick={()=>this.bigPicuure(item.savePath,index,'forward')}/>}
-                            </div>
-                        </div>
-                    </div>)
+    render() {
+        let {allList = {}, pictureList=[]} = this.state;
 
-                } else {
-                    currentMessage = pictureForward[index].inquiryInfoId;
-                    forwardMessage = pictureForward[index - 1].inquiryInfoId;
-                    let hourTime = global.formatDate(item.createdTime, 'HH:mm');
-
-                    if (currentMessage === forwardMessage) {
-                        return (<div className={styles.item} key={index}>
-                            <div className={styles.pictureList}>
-                                {item.savePath && <img src={item.savePath+"@80h_80w_0e"} alt=""
-                                                       onClick={()=>this.bigPicuure(item.savePath,index,'forward')}/>}
-                            </div>
-                        </div>)
-                    } else {
-                        if (global.formatDate(pictureForward[index].createdTime, 'yyyy-MM-dd') === global.formatDate(pictureForward[index - 1].createdTime, 'yyyy-MM-dd')) {
-                            return (<div className={styles.part} key={index}>
-                                <div className={styles.time}>{hourTime}</div>
-                                <div className={styles.description}>{item.description}</div>
-                                <div className={styles.item}>
-                                    <div className={styles.pictureList}>
-                                        {item.savePath && <img src={item.savePath+"@80h_80w_0e"} alt=""
-                                                               onClick={()=>this.bigPicuure(item.savePath,index,'forward')}/>}
-                                    </div>
-                                </div>
-                            </div>)
-                        } else {
-                            return (<div className={styles.part+" "+styles.partDay} key={index}>
-                                <div
-                                    className={styles.date}>{global.formatDate(pictureForward[index].createdTime, 'yyyy-MM-dd')}</div>
-                                <div className={styles.time}>{hourTime}</div>
-                                <div className={styles.description}>{item.description}</div>
-                                <div className={styles.item}>
-                                    <div className={styles.pictureList}>
-                                        {item.savePath && <img src={item.savePath+"@80h_80w_0e"} alt=""
-                                                               onClick={()=>this.bigPicuure(item.savePath,index,'forward')}/>}
-                                    </div>
-                                </div>
-                            </div>)
-                        }
-                    }
-                }
-            });
-        }
-
-        if (Array.isArray(pictureList) && pictureList.length > 0) {
-            pictureList2 = pictureList.map((item, index)=> {
-                if (index === 0) {
-                    let currentTime = global.formatDate(time, 'yyyy-MM-dd');
-                    createdTime = global.formatDate(item.createdTime, 'yyyy-MM-dd');
-                    let hourTime = global.formatDate(item.createdTime, 'HH:mm');
-                    let date = (currentTime === createdTime) ? "今日" : createdTime;
-
-                    return (<div className={styles.part} key={index}>
-                        <div className={styles.date}>{date}</div>
-                        <div className={styles.time}>{hourTime}</div>
-                        <div className={styles.description}>{item.description}</div>
-                        <div className={styles.item}>
-                            <div className={styles.pictureList}>
-                                {item.savePath && <img src={item.savePath+"@80h_80w_0e"} alt=""
-                                                       onClick={()=>this.bigPicuure(item.savePath,index)}/>}
-                            </div>
-                        </div>
-                    </div>)
-
-                } else {
-                    currentMessage = pictureList[index].inquiryInfoId;
-                    forwardMessage = pictureList[index - 1].inquiryInfoId;
-                    let hourTime = global.formatDate(item.createdTime, 'HH:mm');
-
-                    if (currentMessage === forwardMessage) {
-                        return (<div className={styles.item} key={index}>
-                            <div className={styles.pictureList}>
-                                {item.savePath && <img src={item.savePath+"@80h_80w_0e"} alt=""
-                                                       onClick={()=>this.bigPicuure(item.savePath,index)}/>}
-                            </div>
-                        </div>)
-                    } else {
-                        if (global.formatDate(pictureList[index].createdTime, 'yyyy-MM-dd') === global.formatDate(pictureList[index - 1].createdTime, 'yyyy-MM-dd')) {
-                            return (<div className={styles.part} key={index}>
-                                <div className={styles.time}>{hourTime}</div>
-                                <div className={styles.description}>{item.description}</div>
-                                <div className={styles.item}>
-                                    <div className={styles.pictureList}>
-                                        {item.savePath && <img src={item.savePath+"@80h_80w_0e"} alt=""
-                                                               onClick={()=>this.bigPicuure(item.savePath,index)}/>}
-                                    </div>
-                                </div>
-                            </div>)
-                        } else {
-                            return (<div className={styles.part+" "+styles.partDay} key={index}>
-                                <div
-                                    className={styles.date}>{global.formatDate(pictureList[index].createdTime, 'yyyy-MM-dd')}</div>
-                                <div className={styles.time}>{hourTime}</div>
-                                <div className={styles.description}>{item.description}</div>
-                                <div className={styles.item}>
-                                    <div className={styles.pictureList}>
-                                        {item.savePath && <img src={item.savePath+"@80h_80w_0e"} alt=""
-                                                               onClick={()=>this.bigPicuure(item.savePath,index)}/>}
-                                    </div>
-                                </div>
-                            </div>)
-                        }
-                    }
-                }
-            });
-        }
+        let pictureList1 = this.formatMessage(allList, 0);
+        let pictureList2 = this.formatMessage(pictureList, 1);
 
         return (
             <div className={styles.wrapper}>
@@ -442,8 +294,7 @@ class Describe extends Component {
                     <TabPane tab="本 次" key="1">
                         <div className={styles.panelBody}>
                             {pictureList1}
-                            {forwardList}
-                            {picture.length === 0 && pictureForward.length === 0 && <div>暂无图片</div>}
+                            {allList.length === 0 && <div>暂无图片</div>}
                         </div>
                         {this.state.dialogShow ? (<div className={styles.dialogModal} onClick={()=>this.dialogClick()}>
                             <div className={styles.dialogPicture} onClick={(e)=>this.pictureClick(e)}>

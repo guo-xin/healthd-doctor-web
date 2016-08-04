@@ -19,7 +19,7 @@ export const setInquiryPictureRead = (messageInfoId) => {
     };
 };
 
-//本次问诊的患者所有图片
+//患者所有图片
 export const getPatientAllPicture = (patientId) => {
     let action = actions.GET_PATIENT_ALL_PICTURE;
     return {
@@ -37,35 +37,27 @@ export const getPatientAllPicture = (patientId) => {
     };
 };
 
-//本次问诊诊前图片
-export const getInquiryForwardPicture = (inquiryInfoId) => {
-    let action = actions.GET_INQUIRY_FORWARD_PICTURE;
-    return {
-        // 要在之前和之后发送的 action types
-        types: [action + '_REQUEST', action + '_SUCCESS', action + '_FAILURE'],
-        // 检查缓存 (可选):
-        //shouldCallAPI: (state) => !state.users[userId],
-        // 进行取：http://localhost:8080/healthd-api/v2/inquiry-info-attachment/query-one?inquiryId=1673&inquiryType=1
-        //http://localhost:8080/healthd-api/v2/inquiry-info-attachment/query-one?inquiryInfoId=10&quiryType=1&inquiryId=1673
-        callAPI: (token) => fetch(`${actions.WEB_API_URI}/inquiry-info-attachment/query-one?inquiryInfoId=${inquiryInfoId}`, {
-            method: 'GET',
-            headers: {
-                [actions.HEADER_AUTH_FIELD]: actions.HEADER_AUTH_PREFIX + token
-            }
-        })
-    };
-};
 
-//本次问诊患者描述图片
-export const getCurrentInquiryPicture = (caseId) => {
-    let action = actions.GET_CURRENT_INQUIRY_PICTURE;
+//本次问诊所有图片
+export const getInquiryAllPicture = (caseId, inquiryInfoId) => {
+    let action = actions.GET_INQUIRY_ALL_PICTURE;
+    let params = [];
+
+    if (caseId) {
+        params.push('historyCaseId=' + caseId);
+    }
+
+    if (inquiryInfoId) {
+        params.push('inquiryInfoId=' + inquiryInfoId);
+    }
+
     return {
         // 要在之前和之后发送的 action types
         types: [action + '_REQUEST', action + '_SUCCESS', action + '_FAILURE'],
         // 检查缓存 (可选):
         //shouldCallAPI: (state) => !state.users[userId],
-        // 进行取：https://test.d.healthdoc.cn/v2/inquiry-info-attachment/list-history-case?historyCaseId=443
-        callAPI: (token) => fetch(`${actions.WEB_API_URI}/inquiry-info-attachment/list-history-case?historyCaseId=${caseId}`, {
+        // 进行取：http://localhost:8080/healthd-api/v2/inquiry-info-attachment/list-history-case-pre?historyCaseId=1678&inquiryInfoId=10
+        callAPI: (token) => fetch(`${actions.WEB_API_URI}/inquiry-info-attachment/list-history-case-pre?` + params.join('&'), {
             method: 'GET',
             headers: {
                 [actions.HEADER_AUTH_FIELD]: actions.HEADER_AUTH_PREFIX + token

@@ -4,7 +4,7 @@ import fetch from 'isomorphic-fetch';
 //推送排队人数
 export const setDoctorQueueCount = actions.create(actions.SET_DOCTOR_QUEUE_COUNT, 'queue');
 
-//关闭消息推送
+//结束出诊的正常关闭消息推送
 export const setDoctorClose = (type,doctorId) => {
     let action = actions.SET_DOCTOR_CLOSE;
     return {
