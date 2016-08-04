@@ -125,7 +125,7 @@ export default class User extends Component {
             let {data} = this.props;
             if (data && (data.workingStatus || data.workingStatus === 0)) {
                 this.state.menuName = this.status[data.workingStatus];
-                if (data.workingStatus === 9) {
+                if (data.workingStatus === 9 || data.workingStatus === 1) {
                     return (<Menu onClick={this.onMenuChange}>
                         <Menu.Item key="5" name="退出"><Icon type="logout"/>退出</Menu.Item>
                     </Menu>);
