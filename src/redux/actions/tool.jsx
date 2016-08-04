@@ -45,10 +45,10 @@ export const getInquiryAllPicture = (caseId, inquiryInfoId) => {
 
     if (caseId) {
         params.push('historyCaseId=' + caseId);
-    }
-
-    if (inquiryInfoId) {
-        params.push('inquiryInfoId=' + inquiryInfoId);
+    }else{
+        if (inquiryInfoId) {
+            params.push('inquiryInfoId=' + inquiryInfoId);
+        }
     }
 
     return {

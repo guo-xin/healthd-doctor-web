@@ -100,9 +100,14 @@ class Detail extends React.Component {
             if (this.locationHash !== window.location.hash) {
                 this.locationHash = window.location.hash;
 
-                this.initState();
-                this.refs.emr.resetFields();
-                this.resetData(nextProps);
+                let preCase = this.props.currentCase || {};
+                let curCase = nextProps.currentCase || {};
+
+                if (!(curCase.caseId && curCase.caseId === preCase.caseId)) {
+                    this.initState();
+                    this.refs.emr.resetFields();
+                    this.resetData(nextProps);
+                }
             }
         }
     }
