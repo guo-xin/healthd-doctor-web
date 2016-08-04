@@ -13,7 +13,7 @@ import {
 } from 'redux/actions/doctor';
 
 class Events {
-    constructor(name, url, events=[]) {
+    constructor(name, url, events = []) {
         this.name = name;
         this.url = url;
         this.events = events;
@@ -45,16 +45,16 @@ class Events {
         }
     }
 
-    addEvents(){
+    addEvents() {
         let events = this.events || [];
         let source = this.source;
         let item;
 
-        if(events.length>0){
-            for(let i=0; i<events.length; i++){
+        if (events.length > 0) {
+            for (let i = 0; i < events.length; i++) {
                 item = events[i] || {};
 
-                if(item.event && typeof item.fn == 'function'){
+                if (item.event && typeof item.fn == 'function') {
                     source.addEventListener(item.event, item.fn, false);
                 }
 
@@ -72,7 +72,7 @@ class Events {
 
     onError(event) {
         console.info(this.name + '-' + 'Received error event voicecall');
-        if(!this.isClose){
+        if (!this.isClose) {
             this.close();
         }
     }
@@ -88,10 +88,10 @@ class Events {
         if (this.source) {
             console.info(this.name + '-' + "event source closed,");
 
-            if(this.isClose){
+            if (this.isClose) {
                 this.source.close();
-                this.source = null;
-            }else{
+                //this.source = null;
+            } else {
                 let doctorId = store.getState().authStore.id;
                 store.dispatch(setDoctorClose(this.name, doctorId)).then(()=> {
                     this.source.close();
