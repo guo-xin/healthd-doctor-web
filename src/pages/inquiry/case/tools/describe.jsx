@@ -101,7 +101,7 @@ class Describe extends Component {
             let {dispatch, doctorId} = this.props;
             let item = this.state.allList[msgIndex];
 
-            if (item.status === 0) {
+            if (item.inquiryType!==1 && item.status === 0) {
                 item.status = 1;
                 dispatch(setInquiryPictureRead(item.messageInfoId)).then(()=> {
                     dispatch(getDoctorPictureMessage(doctorId));
@@ -152,7 +152,7 @@ class Describe extends Component {
             let {dispatch, doctorId} = this.props;
             let msg = this.state.allList[item.msgIndex];
 
-            if (msg.status === 0) {
+            if (msg.inquiryType!==1 && msg.status === 0) {
                 msg.status = 1;
                 dispatch(setInquiryPictureRead(msg.messageInfoId)).then(()=> {
                     dispatch(getDoctorPictureMessage(doctorId));
@@ -183,7 +183,7 @@ class Describe extends Component {
             let {dispatch, doctorId} = this.props;
             let msg = this.state.allList[item.msgIndex];
 
-            if (msg.status === 0) {
+            if (msg.inquiryType!==1 && msg.status === 0) {
                 msg.status = 1;
                 dispatch(setInquiryPictureRead(msg.messageInfoId)).then(()=> {
                     dispatch(getDoctorPictureMessage(doctorId));
@@ -250,7 +250,7 @@ class Describe extends Component {
                 let flag = false;
                 let isSameDay = false;
 
-                if (item.status === 0) {
+                if (item.inquiryType!==1 && item.status === 0) {
                     flag = true;
                 }
 
