@@ -89,14 +89,18 @@ class Events {
             console.info(this.name + '-' + "event source closed,");
 
             if (this.isClose) {
-                this.source.close();
+                if (this.source.readyState !== EventSource.CLOSED){
+                    this.source.close();
+                }
                 //this.source = null;
             } else {
-                let doctorId = store.getState().authStore.id;
-                store.dispatch(setDoctorClose(this.name, doctorId)).then(()=> {
-                    this.source.close();
-                    this.createSource();
-                });
+                if (this.source.readyState !== EventSource.CLOSED) {
+                    let doctorId = store.getState().authStore.id;
+                    store.dispatch(setDoctorClose(this.name, doctorId)).then(()=> {
+                        this.source.close();
+                    });
+                }
+                this.createSource();
             }
         }
     }
