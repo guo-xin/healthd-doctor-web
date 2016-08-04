@@ -322,7 +322,7 @@ class Call extends Component {
                 }>
                 <div className={styles.pic}>
                     <span>
-                        <Image src={user.headPic || global.defaultHead} defaultImg={global.defaultHead}>
+                        <Image src={user.head || global.defaultHead} defaultImg={global.defaultHead}>
                         </Image>
                     </span>
                 </div>
