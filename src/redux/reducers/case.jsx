@@ -66,20 +66,29 @@ const cases = (state = {
             data = action.data;
 
             if(data){
+                let flag = false;
+
+                if(!(data.caseId && data.caseId === state.currentCase.caseId)){
+                    flag = true;
+                }
+
                 state.currentCase = Object.assign({}, state.currentCase, data);
-                state.diagnosis =  Object.assign({},{
-                    count: 0,
-                    expandedRowKeys: ['0'],
-                    data: [{
-                        key: '0',
-                        diagnosisCode: '',
-                        diagnosisDesc: '',
-                        diagnosisName: '',
-                        isFirst: 0,
-                        sequenceNumber: 0,
-                        status: 0
-                    }]
-                });
+
+                if(flag){
+                    state.diagnosis =  Object.assign({},{
+                        count: 0,
+                        expandedRowKeys: ['0'],
+                        data: [{
+                            key: '0',
+                            diagnosisCode: '',
+                            diagnosisDesc: '',
+                            diagnosisName: '',
+                            isFirst: 0,
+                            sequenceNumber: 0,
+                            status: 0
+                        }]
+                    });
+                }
 
                 if(data.inquiryId!==state.currentCase.inquiryId){
                     state.callRecords = [];
