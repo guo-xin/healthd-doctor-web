@@ -59,67 +59,74 @@ export default class User extends Component {
         menuName: '离线'
     };
 
+    //退出操作
     logout() {
-        const {dispatch, data = {}, doctorId = {}, queue = {}, scheduletList = {}, router} = this.props;
-        let dateInfo = global.getDateRange();
-        let content = "";
-        let time = '';
-
-        dispatch(autoSaveCase());
-
-        if (data.workingStatus && data.workingStatus === 9) {
-            confirm({
-                title: '你确认要退出“我有医生”出诊系统吗？',
-                content: content,
-                onOk: ()=> {
-                    router.replace(`/login`);
-                    dispatch(signOut(this.props.data.email)).then(()=> {
-                    });
-                },
-                onCancel: ()=> {
-                }
-            });
+        if (this.props.callState !== -1) {
+            return;
         } else {
-            dispatch(getDoctorQueueCountByUserId(doctorId));
+            const {dispatch, data = {}, doctorId = {}, queue = {}, scheduletList = {}, router} = this.props;
+            let dateInfo = global.getDateRange();
+            let content = "";
+            let time = '';
 
-            scheduletList.slice(0, 7).map((obj, index)=> {
-                if (index === dateInfo.weekday - 1) {
-                    obj.schedulingList.map((item)=> {
-                        if (Date.parse(dateInfo.date) > item.startTime && Date.parse(dateInfo.date) < item.endTime) {
-                            time = global.formatTime((item.endTime - Date.parse(dateInfo.date)) / 1000);
-                        }
-                    })
+            dispatch(autoSaveCase());
+
+            if (data.workingStatus && data.workingStatus === 9) {
+                confirm({
+                    title: '你确认要退出“我有医生”出诊系统吗？',
+                    content: content,
+                    onOk: ()=> {
+                        router.replace(`/login`);
+                        dispatch(signOut(this.props.data.email)).then(()=> {
+                        });
+                    },
+                    onCancel: ()=> {
+                    }
+                });
+            } else {
+                dispatch(getDoctorQueueCountByUserId(doctorId));
+
+                scheduletList.slice(0, 7).map((obj, index)=> {
+                    if (index === dateInfo.weekday - 1) {
+                        obj.schedulingList.map((item)=> {
+                            if (Date.parse(dateInfo.date) > item.startTime && Date.parse(dateInfo.date) < item.endTime) {
+                                time = global.formatTime((item.endTime - Date.parse(dateInfo.date)) / 1000);
+                            }
+                        })
+                    }
+                });
+                if (!(queue.queueCount === 0) && time === '') {
+                    content = "当前还有 " + queue.queueCount + " 位病人正在排队！";
+                } else if (queue.queueCount === 0 && !(time === '')) {
+                    content = "距离出诊结束还有 " + time;
+                } else if (!(queue.queueCount === 0) && !(time === '')) {
+                    content = "还有 " + queue.queueCount + " 位病人正在排队！" + "且距离出诊结束还有 " + time;
                 }
-            });
-            if (!(queue.queueCount === 0) && time === '') {
-                content = "当前还有 " + queue.queueCount + " 位病人正在排队！";
-            } else if (queue.queueCount === 0 && !(time === '')) {
-                content = "距离出诊结束还有 " + time;
-            } else if (!(queue.queueCount === 0) && !(time === '')) {
-                content = "还有 " + queue.queueCount + " 位病人正在排队！" + "且距离出诊结束还有 " + time;
+
+
+                confirm({
+                    title: '确认要结束出诊吗？',
+                    content: content,
+                    onOk: ()=> {
+                        const {dispatch, doctorId} = this.props;
+
+                        dispatch(getDoctorEndInquery());
+                        socket.seClose();
+                        setTimeout(()=> {
+                            router.replace(`/login`);
+                            dispatch(signOut(this.props.data.email));
+                        }, 200);
+
+                    },
+                    onCancel: ()=> {
+                    }
+                });
             }
 
-
-            confirm({
-                title: '确认要结束出诊吗？',
-                content: content,
-                onOk: ()=> {
-                    const {dispatch, doctorId} = this.props;
-
-                    dispatch(getDoctorEndInquery());
-                    socket.seClose();
-                    setTimeout(()=> {
-                        router.replace(`/login`);
-                        dispatch(signOut(this.props.data.email));
-                    }, 200);
-
-                },
-                onCancel: ()=> {
-                }
-            });
         }
     }
 
+    //医生状态下拉列表
     getMenu() {
         if (this.props) {
             let {data} = this.props;
@@ -145,19 +152,25 @@ export default class User extends Component {
         return [];
     }
 
+    //点击图片列表
     onSettingClick(menu) {
-        let info = menu.key;
-        const {dispatch, router, message=[]} = this.props;
-        dispatch(setCurrentCase({
-            patientId: message[info].patientId,
-            caseId: message[info].historyCaseId,
-            inquiryId: message[info].inquiryId,
-            inquiryInfoId: message[info].inquiryInfoId,
-            state: 1
-        }));
-        router.push(`/inquire/case/detail`);
+        if (this.props.callState !== -1) {
+            return;
+        } else {
+            let info = menu.key;
+            const {dispatch, router, message=[]} = this.props;
+            dispatch(setCurrentCase({
+                patientId: message[info].patientId,
+                caseId: message[info].historyCaseId,
+                inquiryId: message[info].inquiryId,
+                inquiryInfoId: message[info].inquiryInfoId,
+                state: 1
+            }));
+            router.push(`/inquire/case/detail`);
+        }
     }
 
+    //图片列表
     getInformMenu(message) {
         let menuList;
         if (Array.isArray(message) && message.length > 0) {
@@ -176,6 +189,7 @@ export default class User extends Component {
         }
     }
 
+    //切换医生状态操作，退出操作
     onMenuChange = ({item})=> {
         const {dispatch, doctorId} = this.props;
         if (item.props.eventKey == 5) {
@@ -229,14 +243,15 @@ export default class User extends Component {
     }
 }
 const mapStateToProps = (globalStore, ownProps) => {
-    const {doctorStore, authStore}  = globalStore;
+    const {doctorStore, authStore, callStore}  = globalStore;
 
     return {
         data: Object.assign({}, doctorStore.data),
         doctorId: authStore.id,
         scheduletList: doctorStore.scheduletList,
         queue: doctorStore.queue,
-        message: doctorStore.message
+        message: doctorStore.message,
+        callState: callStore.callState
     };
 };
 
