@@ -60,12 +60,14 @@ class Call extends Component {
 
     getUser(props) {
         if (props.phone) {
+            let {incomingCallInfo={}} = props;
             this.state.disabled = true;
             props.dispatch(getUserByMPTV({
                 mobilephone: props.phone,
                 callType: props.callType + 1,
                 voipId: props.account.voipId,
-                patientId: props.patientId
+                patientId: props.patientId,
+                inquiryInfoId: incomingCallInfo.inquiryInfoId
             })).then(
                 (action)=> {
                     let user = (action.response || {}).data || {};
