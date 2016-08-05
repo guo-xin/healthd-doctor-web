@@ -23,6 +23,8 @@
     "html-webpack-plugin": "^2.16.0",
     "less": "^2.6.1",
     "less-loader": "^2.2.3",
+    "raw-loader": "^0.5.1",
+    "redux-reset": "^0.2.0",
     "reload": "^0.2.0",
     "rimraf": "^2.5.2",
     "serve-static": "^1.10.2",

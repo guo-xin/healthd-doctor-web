@@ -69,8 +69,8 @@ module.exports = {
         new ExtractTextPlugin("./css/[name]-[hash].css"),
         new HtmlWebpackPlugin({
             title: "Webpack",
-            filename: 'index.html',
-            template: 'src/index_prod.html',
+            filename: 'index.jsp',
+            template: 'raw!src/index.jsp',
             favicon: 'src/assets/images/healthd.ico',
             isProduction: false
         })
