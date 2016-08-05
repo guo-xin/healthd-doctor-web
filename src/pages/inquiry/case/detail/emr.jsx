@@ -16,6 +16,11 @@ class Emr extends React.Component {
 
     formData = {};
 
+    constructor(props) {
+        super(props);
+        this.locationHash = window.location.hash;
+    }
+
     componentWillReceiveProps(nextProps) {
         if (!this.state.isInit && nextProps.caseData && nextProps.caseData.id) {
             this.updateFormValues(nextProps.caseData);
@@ -25,6 +30,14 @@ class Emr extends React.Component {
         if (!nextProps.isEditable && nextProps.isEditable !== this.props.isEditable) {
             if (this.props.form) {
                 this.state.opinionsText = this.props.form.getFieldValue('opinionsText');
+            }
+        }
+
+        //病历或者病人变更后重置数据
+        if (this.locationHash.indexOf('inquire/case/detail') !== -1) {
+            if (this.locationHash !== window.location.hash) {
+                this.locationHash = window.location.hash;
+                this.state.isInit = false;
             }
         }
     }
