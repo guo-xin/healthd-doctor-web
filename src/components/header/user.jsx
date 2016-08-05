@@ -146,14 +146,13 @@ export default class User extends Component {
     }
 
     onSettingClick(menu) {
-        let info = menu.item.props.content;
-        const {dispatch, router} = this.props;
+        let info = menu.key;
+        const {dispatch, router, message=[]} = this.props;
         dispatch(setCurrentCase({
-            patientId: info.patientId,
-            caseId: info.caseId,
-            inquiryId: info.inquiryId,
-            inquiryInfoId: info.inquiryInfoId,
-            userId: info.userId,
+            patientId: message[info].patientId,
+            caseId: message[info].historyCaseId,
+            inquiryId: message[info].inquiryId,
+            inquiryInfoId: message[info].inquiryInfoId,
             state: 1
         }));
         router.push(`/inquire/case/detail`);
@@ -163,8 +162,7 @@ export default class User extends Component {
         let menuList;
         if (Array.isArray(message) && message.length > 0) {
             menuList = message.map((item, index)=> {
-                let content = JSON.parse(item.content) || {};
-                return (<Menu.Item key={index} content={content}>患者 {content.realName} 上传{content.count}张新图片 <a
+                return (<Menu.Item key={index}>{item.content}<a
                     className={styles.check}>查看</a></Menu.Item>);
             });
             return (<Menu onClick={::this.onSettingClick} className={styles.informMenu}>
