@@ -97,8 +97,8 @@ class Events {
                 let doctorId = store.getState().authStore.id;
                 store.dispatch(setDoctorClose(this.name, doctorId)).then(()=> {
                     this.source.close();
+                    this.createSource();
                 });
-                this.createSource();
             }
         }
     }
