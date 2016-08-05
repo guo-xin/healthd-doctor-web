@@ -28,6 +28,7 @@ class Describe extends Component {
         this.getDoctorList();
     }
 
+    //页面加载时调用，默认加载本地图片
     getDoctorList(props) {
         const {dispatch, currentCase = {}} = props || this.props;
 
@@ -95,7 +96,7 @@ class Describe extends Component {
         }
     }
 
-    //点击图片
+    //点击图片,放大功能
     bigPicture(href, index, msgIndex) {
         if (this.state.currentTab) {
             let {dispatch, doctorId} = this.props;
@@ -228,6 +229,7 @@ class Describe extends Component {
         }
     }
 
+    //图片信息列表
     formatMessage(list = [], tab) {
         let pictureList;
         let createdTime;
