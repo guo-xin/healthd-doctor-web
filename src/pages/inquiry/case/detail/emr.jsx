@@ -134,6 +134,17 @@ class Emr extends React.Component {
 
     }
 
+    setIsHasDiagnosis(flag) {
+        let {form} = this.props;
+
+        form.setFields({
+            diagnosisInfo: {
+                value: flag ? 'value' : '',
+                errors: flag ? [''] : ['诊断信息不能为空，请录入']
+            }
+        });
+    }
+
     render() {
         const {getFieldProps, getFieldValue} = this.props.form;
         const {isEditable, caseData={}} = this.props;
@@ -288,7 +299,7 @@ class Emr extends React.Component {
                         </FormItem>
                         <FormItem
                             label="诊断">
-                            <Diagnosis isEditable={isEditable}></Diagnosis>
+                            <Diagnosis isEditable={isEditable} setIsHasDiagnosis={::this.setIsHasDiagnosis}></Diagnosis>
                             {isEditable && <Input {...getFieldProps('diagnosisInfo', {
                                 rules: [
                                     {required: true, message: "诊断信息不能为空，请录入"}

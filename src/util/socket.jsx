@@ -94,12 +94,10 @@ class Events {
                 }
                 //this.source = null;
             } else {
-                if (this.source.readyState !== EventSource.CLOSED) {
-                    let doctorId = store.getState().authStore.id;
-                    store.dispatch(setDoctorClose(this.name, doctorId)).then(()=> {
-                        this.source.close();
-                    });
-                }
+                let doctorId = store.getState().authStore.id;
+                store.dispatch(setDoctorClose(this.name, doctorId)).then(()=> {
+                    this.source.close();
+                });
                 this.createSource();
             }
         }

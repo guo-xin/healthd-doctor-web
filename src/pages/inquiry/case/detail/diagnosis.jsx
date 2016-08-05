@@ -66,7 +66,8 @@ class InputEdit extends React.Component {
 
     render() {
         return (
-            <div className="diagnosisDescWrapper" ref="container" tabIndex={this.props.tabIndex} onSelectStart={()=>{return false}}
+            <div className="diagnosisDescWrapper" ref="container" tabIndex={this.props.tabIndex}
+                 onSelectStart={()=>{return false}}
                  onDoubleClick={()=>this.onDoubleClick()}
                  onKeyPress={(e)=>this.onContainerKeyPress(e)}>
                 {!this.state.isShowCtrl ? (this.state.value) : (<Input
@@ -155,10 +156,13 @@ class SelectEdit extends React.Component {
             timeout = null;
         }
 
+        if (typeof this.props.onDiagnosisChange == 'function') {
+            this.props.onDiagnosisChange(val);
+        }
 
         currentValue = val;
-
-        if (!val) {
+        
+        if(!val){
             return;
         }
 
@@ -172,7 +176,6 @@ class SelectEdit extends React.Component {
                 }
             });
         }, 300);
-
     }
 
     onSelect(value, option) {
@@ -233,9 +236,10 @@ class Diagnosis extends React.Component {
             dataIndex: 'diagnosisName',
             width: '34%',
             className: 'cell-diagnose',
-            render: function (text, record, index) {
+            render: (text, record, index)=> {
                 tabIndex++;
-                return <SelectEdit record={record} tabIndex={tabIndex}></SelectEdit>;
+                return <SelectEdit record={record} tabIndex={tabIndex}
+                                   onDiagnosisChange={::this.onDiagnosisChange}></SelectEdit>;
             }
         },
         {
@@ -427,6 +431,34 @@ class Diagnosis extends React.Component {
         });
     }
 
+    st = null;
+    onDiagnosisChange(val) {
+        clearTimeout(this.st);
+        this.st = setTimeout(()=>{
+            let flag = false;
+            if (val) {
+                flag = true;
+            } else {
+                let {data} = this.props;
+                if(data && data.length>0){
+                    for(let i=0; i<data.length; i++){
+                        if (data[i].diagnosisName) {
+                            flag = true;
+                            break;
+                        }
+                    }
+                }
+            }
+
+            if (typeof this.props.setIsHasDiagnosis == 'function') {
+                this.props.setIsHasDiagnosis(flag);
+            }
+
+            clearTimeout(this.st);
+            this.st = null;
+        },100);
+    }
+
     render() {
         tabIndex = 0;
         let {data=[], expandedRowKeys, isEditable} = this.props;
@@ -448,7 +480,7 @@ class Diagnosis extends React.Component {
 
         let table;
 
-        if(isEditable){
+        if (isEditable) {
             table = <Table ref="table"
                            rowKey={record => record.key}
                            columns={this.columns}
@@ -459,8 +491,8 @@ class Diagnosis extends React.Component {
                     return (<a href="javascript:;" onClick={()=>this.addRow()}><Icon type="plus-circle-o" />添加主诊断</a>);
                 }}
                            bordered/>;
-        }else{
-            if(list.length>0){
+        } else {
+            if (list.length > 0) {
                 table = <table className={styles.table}>{list}</table>;
             }
         }

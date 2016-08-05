@@ -909,6 +909,7 @@ class Detail extends React.Component {
         let form = this.refs.emr;
         this.diagnosis = this.formatDiagnosis(props);
 
+        
         form.setFieldsValue({
             diagnosisInfo: this.diagnosis.isHasDiagnosis ? 'value' : ''
         });
