@@ -98,9 +98,6 @@ class Video extends React.Component {
 
     timer = null;
 
-    loopCallHandler = null;
-    loopCallCount = 0;
-
     //查找摄像头信息并设置视频窗口
     setVideoView() {
         let remoteView = this.remoteView;
@@ -340,24 +337,12 @@ class Video extends React.Component {
                  type: this.inquiryCallType === 0 ? 2 : 1
                  }));*/
 
-
-                //开始循环呼叫30秒，每隔3秒呼叫一次
-                if (this.loopCallCount < 10 && this.loopCallCount >= 0) {
-                    if (this.loopCallCount === 0) {
-                        //推送未接来电
-                        if (userId) {
-                            dispatch(missedCall({
-                                userId: userId,
-                                startTime: this.startTime || new Date().valueOf()
-                            }));
-                        }
-                    }
-
-                    this.loopCallHandler = setTimeout(()=> {
-                        this.startLoopCall();
-                    }, 3000);
-
-                    return;
+                //推送未接来电
+                if (userId) {
+                    dispatch(missedCall({
+                        userId: userId,
+                        startTime: this.startTime || new Date().valueOf()
+                    }));
                 }
             } else {
                 //视频呼叫拒接或不接，发短信通知
@@ -463,8 +448,6 @@ class Video extends React.Component {
         //音频
         if (this.callType === 0) {
             this.startTimer();
-        } else {
-            this.stopLoopCall();
         }
 
         //设置音量
@@ -514,22 +497,6 @@ class Video extends React.Component {
         }));
 
         console.log('video--------------收到呼叫', msg);
-    }
-
-    startLoopCall() {
-        let ClientOCX = this.ClientOCX;
-        let callType = this.callType;
-        let phone = '88' + this.phone;
-
-        this.loopCallCount++;
-
-        ClientOCX.CCPmakeCall(callType, phone);
-        ClientOCX.CCPsetVideoBitRates(400);
-    }
-
-    stopLoopCall() {
-        clearTimeout(this.loopCallHandler);
-        this.loopCallHandler = null;
     }
 
     startTimer() {
@@ -670,8 +637,6 @@ class Video extends React.Component {
     callback(obj) {
         let {phone, callType, userId, queueId} = obj;
 
-        this.loopCallCount = 0;
-
         this.startTime = new Date().valueOf();
         this.queueId = queueId;
         this.callType = callType;
@@ -691,12 +656,12 @@ class Video extends React.Component {
         dispatch(setCallState(0));
 
         //排队回呼推送, 只有视频时推送
-        if (callType === 1) {
+        /*if (callType === 1) {
             dispatch(queueBack({
                 startTime: this.startTime,
                 userId: userId
             }));
-        }
+        }*/
 
         if (callType === 0) {
             //外呼时设置对方显示的主叫号码，需要和服务器的配置配合使用
@@ -726,8 +691,6 @@ class Video extends React.Component {
         let {phone, callType, userId} = obj;
         let {dispatch, doctor} = this.props;
 
-        this.loopCallCount = 0;
-
         this.callType = callType;
         this.inquiryCallType = 0; //医生呼叫用户
         this.phone = phone;
@@ -744,12 +707,12 @@ class Video extends React.Component {
         dispatch(setCallState(0));
 
         //待归档回呼推送, 只有视频时推送
-        if (callType === 1) {
+        /*if (callType === 1) {
             dispatch(queueBack({
                 startTime: this.startTime,
                 userId: userId
             }));
-        }
+        }*/
 
         if (callType === 0) {
             //外呼时设置对方显示的主叫号码，需要和服务器的配置配合使用
