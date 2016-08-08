@@ -7,6 +7,9 @@ const cases = (state = {
         caseId: null,
         patientId: null,
         inquiryId: null,
+        inquiryInfoId: null,
+        userId: null,
+        description: '',
         state: -1 // -1：新建， 1：已存在
     },
     showTool: true,
@@ -72,6 +75,8 @@ const cases = (state = {
                     flag = true;
                 }
 
+                state.currentCase.inquiryInfoId = null;
+                state.currentCase.description = null;
                 state.currentCase = Object.assign({}, state.currentCase, data);
 
                 if(flag){
