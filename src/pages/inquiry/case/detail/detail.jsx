@@ -899,7 +899,7 @@ class Detail extends React.Component {
     isArchive = false;
 
     archive() {
-        if (this.isArchive) {
+        if (this.isArchive || this.state.caseState == 2) {
             return;
         }
 
