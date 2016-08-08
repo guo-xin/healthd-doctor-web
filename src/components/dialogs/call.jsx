@@ -48,7 +48,9 @@ class Call extends Component {
         }
 
         if (nextIsVisible === false && nextIsVisible != isVisible) {
-            this.isClickAnswer = false;
+            setTimeout(()=> {
+                this.isClickAnswer = false;
+            }, 50);
         }
 
         if (nextProps.callType === 0) {
@@ -169,9 +171,12 @@ class Call extends Component {
             else {
                 //由呼叫中直接到挂断为呼叫失败
                 if (this.props.callState === 0) {
-                    this.setState({
-                        tip: '接听失败'
-                    });
+                    /*this.setState({
+                     tip: '接听失败'
+                     });*/
+
+                    this.hangUp();
+                    message.error('接听失败');
                 } else {
                     if (!this.props.isVisible) {
                         this.state.tip = "";

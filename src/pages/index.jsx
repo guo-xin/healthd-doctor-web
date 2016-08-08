@@ -3,6 +3,7 @@ import styles from './layout.less';
 import Video from '../components/video/video';
 
 import React from 'react';
+import {message} from 'antd';
 import Header from '../components/header';
 import * as socket from '../util/socket.jsx';
 import * as store from 'redux/store';
@@ -17,6 +18,10 @@ class App extends React.Component {
     }
 
     componentDidMount(){
+        message.config({
+            duration: 2
+        });
+
         this.resetToken();
         socket.windowListen();
     }
