@@ -754,7 +754,7 @@ class Detail extends React.Component {
 
     //归档
     _archive(num) {
-        if (this.isSaving) {
+        if (this.isSaving || this.state.caseState == 2) {
             return;
         }
 
