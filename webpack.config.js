@@ -11,22 +11,23 @@ module.exports = {
         ]
     },
     entry:{
-        app: ['babel-polyfill', path.resolve(__dirname, 'src/index')]
+        app: ['babel-polyfill', path.resolve(__dirname, 'src/index')],
+        vendor: ['react', 'react-dom', 'react-router', 'redux', 'react-redux', 'redux-thunk', 'redux-reset', 'react-cookie', 'isomorphic-fetch', 'history', 'es6-promise','antd']
     },
     output:{
-        path: path.resolve(__dirname, 'build'),
+        path: path.resolve(__dirname, 'dist'),
         filename:'index-[hash:7].js'
     },
     module:{
         loaders:[
             {
                 test:/\.(js|jsx)$/,
-                loaders: ['babel-loader?compact=false'],
+                loaders: ['babel-loader?cacheDirectory&compact=false&retainLines=true'],
                 exclude: /node_modules/
             },
             {
                 test: /\.less$/,
-                include: [path.resolve(__dirname, 'src/assets/style'),'node_modules'],
+                include: [path.resolve(__dirname, 'src/assets/style'),'node_modules/antd'],
                 loader: ExtractTextPlugin.extract(['css', 'less'], { publicPath: '../'})
             },
             {
@@ -53,7 +54,11 @@ module.exports = {
         ]
     },
     plugins:[
-        new webpack.optimize.CommonsChunkPlugin('common.js'),
+        new webpack.optimize.CommonsChunkPlugin({
+            name: 'vendor',
+            minChunks: Infinity,
+            filename: 'vendor.bundle.js'
+        }),
         new ExtractTextPlugin("./css/[name]-[contenthash:7].css"),
         new HtmlWebpackPlugin({
             title: "Webpack",
@@ -63,6 +68,7 @@ module.exports = {
             isProduction: false
         })
     ],
+
     devServer: {
         proxy: {
             '/v2/parser/*': {

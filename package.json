@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "webpack-dev-server --content-base ./build --inline --hot --port 8086 --host 0.0.0.0",
+    "start": "webpack-dev-server --content-base ./dist --inline --profile --hot --port 8086 --host 0.0.0.0",
     "build": "rimraf build && webpack --config webpack.config.prod.js --progress --production"
   },
   "devDependencies": {
@@ -24,7 +24,6 @@
     "less": "^2.6.1",
     "less-loader": "^2.2.3",
     "raw-loader": "^0.5.1",
-    "redux-reset": "^0.2.0",
     "reload": "^0.2.0",
     "rimraf": "^2.5.2",
     "serve-static": "^1.10.2",
@@ -37,13 +36,13 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "antd": "^1.6.5",
+    "antd": "1.6.5",
     "es6-promise": "^3.2.1",
     "history": "^2.1.1",
     "isomorphic-fetch": "^2.2.1",
-    "react": "^15.1.0",
+    "react": "15.1.0",
     "react-cookie": "^0.4.6",
-    "react-dom": "^15.1.0",
+    "react-dom": "15.1.0",
     "react-redux": "^4.4.5",
     "react-router": "^2.5.2",
     "redux": "^3.5.2",
