@@ -150,12 +150,11 @@ class Emr extends React.Component {
     setIsHasDiagnosis(flag) {
         let {form} = this.props;
 
-        form.setFields({
-            diagnosisInfo: {
-                value: flag ? 'value' : '',
-                errors: flag ? [''] : ['诊断信息不能为空，请录入']
-            }
+        form.setFieldsValue({
+            diagnosisInfo: flag ? 'value' : ''
         });
+
+        form.validateFields(['diagnosisInfo']);
     }
 
     render() {
@@ -317,7 +316,7 @@ class Emr extends React.Component {
                                 rules: [
                                     {required: true, message: "诊断信息不能为空，请录入"}
                                 ]
-                            })} style={{display: 'none'}}/>}
+                            })} style={{display:"none"}}/>}
                         </FormItem>
                         <FormItem
                             label="诊疗意见">
