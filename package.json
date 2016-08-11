@@ -8,6 +8,7 @@
     "build": "rimraf build && webpack --config webpack.config.prod.js --progress --production"
   },
   "devDependencies": {
+    "autoprefixer": "^6.4.0",
     "babel-core": "^6.7.7",
     "babel-loader": "^6.2.4",
     "babel-plugin-antd": "^0.4.0",
@@ -23,6 +24,7 @@
     "html-webpack-plugin": "^2.16.0",
     "less": "^2.6.1",
     "less-loader": "^2.2.3",
+    "postcss-loader": "^0.9.1",
     "raw-loader": "^0.5.1",
     "reload": "^0.2.0",
     "rimraf": "^2.5.2",

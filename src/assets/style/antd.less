@@ -108,34 +108,3 @@
   font-size: @fontSizeLg;
   color: @textColor;
 }
-
-
-
-
-.ant-spin {
-  -webkit-transition: -webkit-transform 0.3s cubic-bezier(0.78, 0.14, 0.15, 0.86);
-}
-
-.ant-spin-container {
-  -webkit-transition: all 0.3s cubic-bezier(0.78, 0.14, 0.15, 0.86);
-}
-.ant-spin-nested-loading > .ant-spin-container {
-  -webkit-filter: blur(1px);
-}
-.ant-spin-dot:before,
-.ant-spin-dot:after {
-  -webkit-animation: antSpinBounce 2.2s infinite ease-in-out;
-}
-.ant-spin-dot:after {
-  -webkit-animation-delay: -1.1s;
-}
-
-@-webkit-keyframes antSpinBounce {
-  0%,
-  100% {
-    -webkit-transform: scale(0);
-  }
-  50% {
-    -webkit-transform: scale(1);
-  }
-}
