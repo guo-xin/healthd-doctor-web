@@ -175,6 +175,7 @@ class ExceptionalInquiry extends React.Component {
         let list = this.props.list.map((item, index)=> {
             let callStatus = status[item.byeType + ''];
             let inqueryType = '';
+            //1为用户呼入，0为医生呼出
             if (item.inquiryCallType === 1) {
                 if (item.byeType === -3 || item.byeType === -5 || item.byeType > 0) {
                     inqueryType = <Icon type="arrow-down"/>;
