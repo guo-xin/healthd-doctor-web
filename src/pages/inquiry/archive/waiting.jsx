@@ -21,10 +21,14 @@ class Waiting extends React.Component {
 
         dispatch(getInquireQueue()).then(
             ()=> {
-                this.setState({loading: false});
+                if (this._isMounted) {
+                    this.setState({loading: false});
+                }
             },
             ()=> {
-                this.setState({loading: false});
+                if (this._isMounted) {
+                    this.setState({loading: false});
+                }
             }
         );
     }
@@ -38,6 +42,13 @@ class Waiting extends React.Component {
         }
     }
 
+    componentDidMount() {
+        this._isMounted = true;
+    }
+
+    componentWillUnmount() {
+        this._isMounted = false;
+    }
 
     onCallBack(data, callType) {
         let item = Object.assign({}, data);
@@ -90,16 +101,20 @@ class Waiting extends React.Component {
                     item.material = data;
                 }
 
-                this.setState({
-                    timestamp: new Date().valueOf()
-                });
+                if (this._isMounted) {
+                    this.setState({
+                        timestamp: new Date().valueOf()
+                    });
+                }
             },
             ()=> {
                 item.isLoading = false;
 
-                this.setState({
-                    timestamp: new Date().valueOf()
-                });
+                if (this._isMounted) {
+                    this.setState({
+                        timestamp: new Date().valueOf()
+                    });
+                }
             }
         );
     }
@@ -113,10 +128,11 @@ class Waiting extends React.Component {
                 let des = material.description;
                 let paths = material.savePath || [];
 
-                if(des){
+                if (des) {
                     let pics = paths.map((item, index)=> {
                         if (item) {
-                            return <img key={index} src={item+"@80h_80w_0e"} alt=""  onClick={()=>this.checkPics(material.savePath, index)}/>;
+                            return <img key={index} src={item+"@80h_80w_0e"} alt=""
+                                        onClick={()=>this.checkPics(material.savePath, index)}/>;
                         } else {
                             return null;
                         }
@@ -130,7 +146,7 @@ class Waiting extends React.Component {
                             </div>}
                         </div>
                     );
-                }else{
+                } else {
                     return <span className="empty">暂无描述</span>
                 }
             } else {
