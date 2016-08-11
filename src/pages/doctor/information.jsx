@@ -150,14 +150,15 @@ class Information extends React.Component {
                                 <Input type="textarea" rows="5" value={this.state.specialSkill}
                                        onChange={(e)=>this.onSkillChange(e)}/>
                                 <div className={styles.wordTip}><span>{300-(this.state.specialSkill?this.state.specialSkill.length:0)}</span><span>/300</span></div>
+
+                                <div className={styles.action}>
+                                    <Button type="primary" size="large" onClick={(e)=>this.onOK(e)}>确定</Button>
+                                    <Button type="ghost" size="large" onClick={()=>this.onCancel()}>取消</Button>
+                                </div>
+
                             </FormItem>
                         </div>
                     </Form>
-                </div>
-
-                <div className={styles.action}>
-                    <Button type="primary" size="large" onClick={(e)=>this.onOK(e)}>确定</Button>
-                    <Button type="ghost" size="large" onClick={()=>this.onCancel()}>取消</Button>
                 </div>
             </div>
         );
