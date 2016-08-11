@@ -54,7 +54,13 @@ class Waiting extends React.Component {
         let item = Object.assign({}, data);
 
         if (item.userMobilePhone) {
-            let {dispatch} = this.props;
+            let {dispatch, doctor} = this.props;
+
+            if (doctor.workingStatus == 2 || doctor.workingStatus == 9) {
+                message.error('离线或忙碌状态不可以呼叫患者！');
+                return;
+            }
+            
             dispatch(setCallbackUserId(item.userId, item));
 
             let st = setTimeout(()=> {
@@ -255,10 +261,11 @@ class Waiting extends React.Component {
 
 
 const mapStateToProps = (globalStore) => {
-    const {inquireStore, callStore}  = globalStore;
+    const {inquireStore, callStore, doctorStore}  = globalStore;
 
 
     return {
+        doctor: Object.assign({}, doctorStore.data),
         isShowCallingDialog: callStore.isShowCallingDialog,
         list: inquireStore.queue
     };

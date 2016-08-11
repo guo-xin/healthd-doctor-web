@@ -736,11 +736,18 @@ class Video extends React.Component {
     }
 
     showCallFromCaseDialog(callType) {
+        let {dispatch, doctor} = this.props;
+
+        if (doctor.workingStatus == 2 || doctor.workingStatus == 9) {
+            message.error('离线或忙碌状态不可以呼叫患者！');
+            return;
+        }
+
         this.state.isShowVideoCtrl = false;
 
         this.pause();
 
-        this.props.dispatch(showCallbackFromCaseDialog(true, callType));
+        dispatch(showCallbackFromCaseDialog(true, callType));
     }
 
     selectVideo = {};
