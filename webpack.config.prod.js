@@ -1,3 +1,4 @@
+var autoprefixer = require('autoprefixer');
 var webpack = require('webpack');
 var HtmlWebpackPlugin = require("html-webpack-plugin");
 var ExtractTextPlugin = require("extract-text-webpack-plugin");
@@ -10,35 +11,48 @@ module.exports = {
             path.resolve('./src')
         ]
     },
-    entry:{
+    entry: {
         app: ['babel-polyfill', path.resolve(__dirname, 'src/index')],
-        vendor: ['react', 'react-dom', 'react-router', 'redux', 'react-redux', 'redux-thunk', 'redux-reset', 'react-cookie', 'isomorphic-fetch', 'history', 'es6-promise', 'antd']
+        vendor: [
+            'react',
+            'react-dom',
+            'react-router',
+            'redux',
+            'react-redux',
+            'redux-thunk',
+            'redux-reset',
+            'react-cookie',
+            'isomorphic-fetch',
+            'history',
+            'es6-promise',
+            'antd'
+        ]
     },
-    output:{
+    output: {
         path: path.resolve(__dirname, 'build'),
-        filename:'index-[hash:7].js'
+        filename: 'index-[hash:7].js'
     },
 
-    module:{
-        loaders:[
+    module: {
+        loaders: [
             {
-                test:/\.(js|jsx)$/,
+                test: /\.(js|jsx)$/,
                 loaders: ['babel-loader?cacheDirectory&compact=false&retainLines=true'],
                 exclude: /node_modules/
             },
             {
                 test: /\.less$/,
-                include: [path.resolve(__dirname, 'src/assets/style'),'node_modules/antd'],
-                loader: ExtractTextPlugin.extract(['css', 'less'], { publicPath: '../'})
+                include: [path.resolve(__dirname, 'src/assets/style'), 'node_modules/antd'],
+                loader: ExtractTextPlugin.extract(['css', 'postcss', 'less'], {publicPath: '../'})
             },
             {
                 test: /\.less$/,
-                exclude: [path.resolve(__dirname, 'src/assets/style'),'node_modules'],
-                loader: ExtractTextPlugin.extract("style-loader", "css-loader?modules&importLoaders=1&localIdentName=[name]_[local]_[hash:base64:5]!less-loader", { publicPath: '../'})
+                exclude: [path.resolve(__dirname, 'src/assets/style'), 'node_modules'],
+                loader: ExtractTextPlugin.extract("style-loader", "css-loader?modules&importLoaders=1&localIdentName=[name]_[local]_[hash:base64:5]!postcss-loader!less-loader", {publicPath: '../'})
             },
             {
                 test: /.(jpg|png)$/,
-                loader:'url?name=images/[name][sha512:hash:base64:7].[ext]&limit=1000',
+                loader: 'url?name=images/[name][sha512:hash:base64:7].[ext]&limit=1000',
                 exclude: /node_modules/
             },
             {
@@ -58,7 +72,10 @@ module.exports = {
             }
         ]
     },
-    plugins:[
+
+    postcss: [autoprefixer],
+
+    plugins: [
         new webpack.DefinePlugin({
             'process.env': {
                 'NODE_ENV': JSON.stringify('production')
@@ -77,7 +94,7 @@ module.exports = {
         }),
 
         //new webpack.optimize.DedupePlugin(),
-        
+
         new ExtractTextPlugin("./css/[name]-[hash].css"),
         new HtmlWebpackPlugin({
             title: "Webpack",

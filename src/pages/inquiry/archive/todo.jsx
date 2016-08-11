@@ -8,28 +8,39 @@ import {withRouter} from 'react-router';
 import {getTodoCasesByDoctorId, setCurrentCase} from 'redux/actions/case';
 import * as global from 'util/global';
 
-class Todo extends React.Component{
+class Todo extends React.Component {
     state = {
         loading: true
     };
 
-    componentDidMount(){
+    componentDidMount() {
+        this._isMounted = true;
         const {dispatch, id} = this.props;
 
-        if(id){
+        if (id) {
             dispatch(getTodoCasesByDoctorId(id)).then(
-                ()=>{
-                    this.setState({ loading: false });
+                ()=> {
+                    this.changeState(false);
                 },
-                ()=>{
-                    this.setState({ loading: false });
+                ()=> {
+                    this.changeState(false);
                 }
             );
         }
 
     }
 
-    onPerfectCase(item){
+    componentWillUnmount() {
+        this._isMounted = false;
+    }
+
+    changeState(flag) {
+        if (this._isMounted) {
+            this.setState({loading: flag});
+        }
+    }
+
+    onPerfectCase(item) {
         let {router, dispatch} = this.props;
 
         dispatch(setCurrentCase({
@@ -46,15 +57,16 @@ class Todo extends React.Component{
 
     render() {
         const {todoCases = {}} = this.props;
-        let results = todoCases.results || [], list=[];
-        Array.isArray(results) &&( list = results.map((item,index) =>{
+        let results = todoCases.results || [], list = [];
+        Array.isArray(results) && ( list = results.map((item, index) => {
             return (
                 <Col key={index} span="8" className="item">
                     <div className={styles.card}>
                         <div className={styles.cardBody}>
                             <div className="pic">
                                 <span>
-                                     <Image src={item.head || global.defaultHead} defaultImg={global.defaultHead}></Image>
+                                     <Image src={item.head || global.defaultHead}
+                                            defaultImg={global.defaultHead}></Image>
                                 </span>
                             </div>
                             <div className="detail">
@@ -66,7 +78,8 @@ class Todo extends React.Component{
                                 </div>
                                 <div className="middle clearfix">
                                     <ul>
-                                        <li className="patientName">问诊人：{item.userName || item.userMobilePhone || '--'}</li>
+                                        <li className="patientName">
+                                            问诊人：{item.userName || item.userMobilePhone || '--'}</li>
                                         <li>与问诊人关系：{global.getRelationText(item.relation)}</li>
                                         <li>就诊次数：第{item.caseCount || 0}次</li>
                                         <li className="lastInquery">上次诊断：{item.diagnosisName || '--'}</li>
@@ -76,7 +89,7 @@ class Todo extends React.Component{
                             </div>
 
                             <div className="bottom">
-                                {item.operatorRoleCode==105 && (
+                                {item.operatorRoleCode == 105 && (
                                     <Popover content={'医助编辑'} title="" overlayClassName="assistant">
                                         <Button type="primary" shape="circle">助</Button>
                                     </Popover>
@@ -86,8 +99,10 @@ class Todo extends React.Component{
 
                         </div>
                         <div className={styles.cardFooter + " clearfix"}>
-                            <span className={styles.footText}>问诊时间：{global.formatDate(item.createdTime, 'yyyy-MM-dd HH:mm')}</span>
-                            <span className={styles.footTextRight}>保存时间：{global.formatDate(item.updateTime, 'yyyy-MM-dd HH:mm')}</span>
+                            <span
+                                className={styles.footText}>问诊时间：{global.formatDate(item.createdTime, 'yyyy-MM-dd HH:mm')}</span>
+                            <span
+                                className={styles.footTextRight}>保存时间：{global.formatDate(item.updateTime, 'yyyy-MM-dd HH:mm')}</span>
                         </div>
                     </div>
                 </Col>
@@ -102,13 +117,13 @@ class Todo extends React.Component{
 
                 <Spin spinning={this.state.loading} tip={global.loadingTip} className="panel">
                     <div className={styles.cardList}>
-                        {list.length>0 && (
+                        {list.length > 0 && (
                             <Row>
                                 {list}
                             </Row>
                         )}
 
-                        {(!this.state.loading && list.length==0) && <div className="noData">{global.noData}</div>}
+                        {(!this.state.loading && list.length == 0) && <div className="noData">{global.noData}</div>}
                     </div>
                 </Spin>
 

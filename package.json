@@ -8,6 +8,7 @@
     "build": "rimraf build && webpack --config webpack.config.prod.js --progress --production"
   },
   "devDependencies": {
+    "autoprefixer": "^6.4.0",
     "babel-core": "^6.7.7",
     "babel-loader": "^6.2.4",
     "babel-plugin-antd": "^0.4.0",
@@ -17,18 +18,17 @@
     "babel-preset-stage-0": "^6.5.0",
     "cors": "^2.7.1",
     "css-loader": "^0.23.1",
-    "express": "^4.13.4",
+    "express": "^4.14.0",
     "extract-text-webpack-plugin": "^1.0.1",
     "file-loader": "^0.8.5",
     "html-webpack-plugin": "^2.16.0",
     "less": "^2.6.1",
     "less-loader": "^2.2.3",
+    "postcss-loader": "^0.9.1",
     "raw-loader": "^0.5.1",
     "reload": "^0.2.0",
     "rimraf": "^2.5.2",
-    "serve-static": "^1.10.2",
     "style-loader": "^0.13.1",
-    "supervisor": "^0.10.0",
     "url-loader": "^0.5.7",
     "webpack": "^1.13.0",
     "webpack-dev-server": "^1.14.1"

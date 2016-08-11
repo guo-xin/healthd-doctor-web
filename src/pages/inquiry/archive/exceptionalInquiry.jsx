@@ -22,10 +22,14 @@ class ExceptionalInquiry extends React.Component {
 
         dispatch(getInquireQueueException()).then(
             ()=> {
-                this.setState({loading: false});
+                if (this._isMounted) {
+                    this.setState({loading: false});
+                }
             },
             ()=> {
-                this.setState({loading: false});
+                if (this._isMounted) {
+                    this.setState({loading: false});
+                }
             }
         );
     }
@@ -37,6 +41,14 @@ class ExceptionalInquiry extends React.Component {
                 comp.setVisible(false);
             }
         }
+    }
+
+    componentDidMount() {
+        this._isMounted = true;
+    }
+
+    componentWillUnmount() {
+        this._isMounted = false;
     }
 
     onCallBack(data, callType) {
@@ -91,16 +103,21 @@ class ExceptionalInquiry extends React.Component {
                     item.material = data;
                 }
 
-                this.setState({
-                    timestamp: new Date().valueOf()
-                });
+                if (this._isMounted) {
+                    this.setState({
+                        timestamp: new Date().valueOf()
+                    });
+                }
+
             },
             ()=> {
                 item.isLoading = false;
 
-                this.setState({
-                    timestamp: new Date().valueOf()
-                });
+                if (this._isMounted) {
+                    this.setState({
+                        timestamp: new Date().valueOf()
+                    });
+                }
             }
         );
     }
@@ -114,10 +131,11 @@ class ExceptionalInquiry extends React.Component {
                 let des = material.description;
                 let paths = material.savePath || [];
 
-                if(des){
+                if (des) {
                     let pics = paths.map((item, index)=> {
                         if (item) {
-                            return <img key={index} src={item+"@80h_80w_0e"} alt=""  onClick={()=>this.checkPics(material.savePath, index)}/>;
+                            return <img key={index} src={item+"@80h_80w_0e"} alt=""
+                                        onClick={()=>this.checkPics(material.savePath, index)}/>;
                         } else {
                             return null;
                         }
@@ -131,7 +149,7 @@ class ExceptionalInquiry extends React.Component {
                             </div>}
                         </div>
                     );
-                }else{
+                } else {
                     return <span className="empty">暂无描述</span>;
                 }
             } else {
@@ -140,10 +158,10 @@ class ExceptionalInquiry extends React.Component {
         }
     }
 
-    checkPics(list=[], index){
+    checkPics(list = [], index) {
         let comp = this.refs.picViewer;
-        
-        if(comp){
+
+        if (comp) {
             comp.setData(list, true, index);
         }
     }

@@ -70,14 +70,14 @@ class Done extends React.Component {
                 return global.getRelationText(text);
             }
         },
-       /* {
-            title: '问诊时长',
-            dataIndex: 'timeCount',
-            width: '10%',
-            render(text, record) {
-                return global.formatTime((record.endTime - record.startTime) / 1000) || '--';
-            }
-        },*/
+        /* {
+         title: '问诊时长',
+         dataIndex: 'timeCount',
+         width: '10%',
+         render(text, record) {
+         return global.formatTime((record.endTime - record.startTime) / 1000) || '--';
+         }
+         },*/
         {
             title: '问诊时间',
             dataIndex: 'createdTime',
@@ -139,10 +139,10 @@ class Done extends React.Component {
             this.setState({loading: true});
             dispatch(getDoneCasesByDoctorId(id, params.currentPage, params.pageSize)).then(
                 ()=> {
-                    this.setState({loading: false});
+                    this.changeState(false);
                 },
                 ()=> {
-                    this.setState({loading: false});
+                    this.changeState(false);
                 }
             );
         }
@@ -150,10 +150,22 @@ class Done extends React.Component {
     }
 
     componentDidMount() {
+        this._isMounted = true;
+
         this.fetch({
             pageSize: 10,
             currentPage: 1
         });
+    }
+
+    componentWillUnmount() {
+        this._isMounted = false;
+    }
+
+    changeState(flag) {
+        if (this._isMounted) {
+            this.setState({loading: flag});
+        }
     }
 
     render() {

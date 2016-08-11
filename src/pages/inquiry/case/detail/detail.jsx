@@ -461,9 +461,10 @@ class Detail extends React.Component {
         let values = formData || this.refs.emr.getFieldsValue();
         let params = this.getCaseData(props, values, 1);
         let caseState = this.state.caseState;
+        let {currentCase={}}=props;
 
         //新建调用postCase， 更新调用putCase
-        return this.props.dispatch((this.state.caseState === -1 ? postCase : putCase)(params)).then(
+        return props.dispatch((this.state.caseState === -1 ? postCase : putCase)(params)).then(
             (action)=> {
                 let result = (action.response || {}).result;
                 let data = (action.response || {}).data;
@@ -474,7 +475,6 @@ class Detail extends React.Component {
                     }
 
                     if (caseState === -1 && data) {
-                        let {currentCase={}}=props;
                         this.state.caseState = 1;
                         this.state.caseId = data.id;
                         this.state.patientId = data.patientId;
@@ -497,7 +497,6 @@ class Detail extends React.Component {
 
                     //创建病历时更新诊前资料信息
                     if (caseState === -1) {
-                        let {currentCase={}}=props;
                         if (props.inquiryId && currentCase.inquiryInfoId) {
                             props.dispatch(updateInquiryInfoByInquiryId({
                                 inquiryId: props.inquiryId,
@@ -526,10 +525,11 @@ class Detail extends React.Component {
         let hide = message.loading('正在保存...', 0);
         let values = this.refs.emr.getFieldsValue();
         let obj = this.isFormChanged(values);
+        let props = this.props;
 
         if (values.opinionsText && obj.isOpinionChanged) {
             let {patientId} = this.state;
-            let {doctorId, dispatch} = this.props;
+            let {doctorId, dispatch} = props;
             let num = pad(Math.floor(Math.random() * 10000), 4);
             let folder = 'opinions_' + (new Date()).valueOf() + '_' + num + '_' + doctorId + '_' + patientId;
 
@@ -544,7 +544,7 @@ class Detail extends React.Component {
 
                     if (result === 0 && url) {
                         this.opinionsUrl = url;
-                        _submit.apply(this);
+                        _submit.call(this, props);
 
                     } else {
                         this.isSaving = false;
@@ -565,12 +565,12 @@ class Detail extends React.Component {
                 this.opinionsUrl = '';
             }
 
-            _submit.apply(this);
+            _submit.call(this, props);
         }
 
 
-        function _submit() {
-            this._save(this.props).then(
+        function _submit(curProps) {
+            this._save(curProps).then(
                 (action)=> {
                     this.isSaving = false;
                     hide();
@@ -967,7 +967,7 @@ const mapStateToProps = (globalStore) => {
         patients: Object.assign({}, patientStore.patients),
         diagnosis: caseStore.diagnosis,
         callState: callStore.callState,
-        currentCase: caseStore.currentCase,
+        currentCase: Object.assign({},caseStore.currentCase),
         autoSaveCount: caseStore.autoSaveCount
     };
 };
