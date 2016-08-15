@@ -56,7 +56,7 @@ class ExceptionalInquiry extends React.Component {
 
         if (item.userMobilePhone) {
             let {dispatch, doctor} = this.props;
-            
+
             if (doctor.workingStatus == 2 || doctor.workingStatus == 9) {
                 message.error('离线或忙碌状态不可以呼叫患者！');
                 return;
@@ -195,84 +195,92 @@ class ExceptionalInquiry extends React.Component {
             list1: [],
             list2: []
         };
+        let caseIndex = 0;
         let list = this.props.list.map((item, index)=> {
-            let callStatus = status[item.byeType + ''];
-            let inqueryType = '';
-            //1为用户呼入，0为医生呼出
-            if (item.inquiryCallType === 1) {
-                if (item.byeType === -3 || item.byeType === -5 || item.byeType > 0) {
-                    inqueryType = <Icon type="arrow-down"/>;
-                    this.state.callTime = true;
+            //电话不能为空，为空不显示
+            if (item.userMobilePhone) {
+                caseIndex = caseIndex + 1;
+                let callStatus = status[item.byeType + ''];
+                let inqueryType = '';
+                //1为用户呼入，0为医生呼出
+                if (item.inquiryCallType === 1) {
+                    if (item.byeType === -3 || item.byeType === -5 || item.byeType > 0) {
+                        inqueryType = <Icon type="arrow-down"/>;
+                        this.state.callTime = true;
+                    } else {
+                        inqueryType = <Icon type="arrow-down" className={styles.textRed}/>;
+                        this.state.callTime = false;
+                    }
                 } else {
-                    inqueryType = <Icon type="arrow-down" className={styles.textRed}/>;
-                    this.state.callTime = false;
+                    if (item.byeType === -3 || item.byeType === -5 || item.byeType > 0) {
+                        inqueryType = <Icon type="arrow-up"/>;
+                        this.state.callTime = true;
+                    } else {
+                        inqueryType = <Icon type="arrow-up" className={styles.textRed}/>;
+                        this.state.callTime = false;
+                    }
                 }
-            } else {
-                if (item.byeType === -3 || item.byeType === -5 || item.byeType > 0) {
-                    inqueryType = <Icon type="arrow-up"/>;
-                    this.state.callTime = true;
-                } else {
-                    inqueryType = <Icon type="arrow-up" className={styles.textRed}/>;
-                    this.state.callTime = false;
-                }
-            }
 
-            let material = this.formatMaterial(item);
+                let material = this.formatMaterial(item);
 
-            let rt = <div key={index} className={"item columnItem" + (item.id==selectedCardId?(' '+styles.active):'')}>
-                <div className={styles.card}>
-                    <div className={styles.cardBody}>
-                        <div className="pic">
+                let rt = <div key={index}
+                              className={"item columnItem" + (item.id==selectedCardId?(' '+styles.active):'')}>
+                    <div className={styles.card}>
+                        <div className={styles.cardBody}>
+                            <div className="pic">
                                 <span>
                                     <Image src={item.head || global.defaultHead} defaultImg={global.defaultHead}/>
                                 </span>
-                        </div>
-                        <div className="detail">
-                            <div className="top">
-                                <span className="name">患者：{item.realName || '--'}</span>
-                                <span className="age">{global.getAge(item.birthday) || '--岁'}</span>
+                            </div>
+                            <div className="detail">
+                                <div className="top">
+                                    <span className="name">患者：{item.realName || '--'}</span>
+                                    <span className="age">{global.getAge(item.birthday) || '--岁'}</span>
                                     <span
                                         className="serial">ID:{global.formatPatientCode(item.patientCode) || '--'}</span>
                                     <span className="gender">
                                         <img src={global.getGenderUrl(item.sex)} alt=""/>
                                     </span>
-                            </div>
-                            <div className="middle clearfix">
-                                <ul>
-                                    <li className="patientName">问诊人：{item.userName || item.userMobilePhone || '--'}</li>
-                                    <li>与问诊人关系：{global.getRelationText(item.relation) || '--'}</li>
-                                    <li className="lastInquery" style={{width:"100%"}}>
-                                        上次诊断：{item.diagnosisName || '--'}</li>
-                                </ul>
-                            </div>
-                            <div className="bottom">
-                                <Button type="ghost" onClick={()=>this.onCallBack(item, 0)}>电话回呼</Button>
-                                <Button type="primary" onClick={()=>this.onCallBack(item, 1)}>视频回呼</Button>
+                                </div>
+                                <div className="middle clearfix">
+                                    <ul>
+                                        <li className="patientName">
+                                            问诊人：{item.userName || item.userMobilePhone || '--'}</li>
+                                        <li>与问诊人关系：{global.getRelationText(item.relation) || '--'}</li>
+                                        <li className="lastInquery" style={{width:"100%"}}>
+                                            上次诊断：{item.diagnosisName || '--'}</li>
+                                    </ul>
+                                </div>
+                                <div className="bottom">
+                                    <Button type="ghost" onClick={()=>this.onCallBack(item, 0)}>电话回呼</Button>
+                                    <Button type="primary" onClick={()=>this.onCallBack(item, 1)}>视频回呼</Button>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    <div className={styles.cardFooter}>
+                        <div className={styles.cardFooter}>
                             <span className={styles.footText}>
                                 {inqueryType}
                                 {item.callType === 1 ? ("电话问诊：") : ("视频问诊：")}{item.startTime && global.formatDate(item.startTime, 'yyyy-MM-dd HH:mm')}
                             </span>
-                        <span className={styles.footTextRed}>{callStatus}</span>
-                        {this.state.callTime ? (<span
-                            className={styles.footTextRed}>{item.callType === 1 ? ("通话") : ("视频")}{global.formatTime((item.endTime - item.startTime) / 1000) + "　"}</span>) : ""}
-                    </div>
-                    <div className={styles.material}>
-                        <div className="title">
-                            <a href="javascript: void(0)" onClick={()=>{this.toggleMaterial(item)}}>患者描述<Icon
-                                type={item.id==selectedCardId?'up':'down'}/></a>
+                            <span className={styles.footTextRed}>{callStatus}</span>
+                            {this.state.callTime ? (<span
+                                className={styles.footTextRed}>{item.callType === 1 ? ("通话") : ("视频")}{global.formatTime((item.endTime - item.startTime) / 1000) + "　"}</span>) : ""}
                         </div>
-                        <div className="detail">
-                            {material}
+                        <div className={styles.material}>
+                            <div className="title">
+                                <a href="javascript: void(0)" onClick={()=>{this.toggleMaterial(item)}}>患者描述<Icon
+                                    type={item.id==selectedCardId?'up':'down'}/></a>
+                            </div>
+                            <div className="detail">
+                                {material}
+                            </div>
                         </div>
                     </div>
-                </div>
-            </div>;
+                </div>;
+                listMap['list' + (caseIndex - 1) % 3].push(rt);
+            }
 
-            listMap['list' + index % 3].push(rt);
+
         });
 
         return (
