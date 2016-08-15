@@ -179,7 +179,7 @@ class Emr extends React.Component {
                 <div className={styles.panelBody}>
                     <Form form={this.props.form}>
                         <FormItem
-                            label="主诉">
+                            label="主　诉">
                             {isEditable ? <Input {...getFieldProps('pc', {
                                 rules: [
                                     {required: true, message: "主诉信息不能为空，请录入"},
