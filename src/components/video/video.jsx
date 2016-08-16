@@ -882,12 +882,13 @@ class Video extends React.Component {
 
     render() {
         const {isConnecting, isPlay, isShowVideoCtrl} = this.state;
-        const {isShowVideo, callRecords, userForVideoArea} = this.props;
+        const {isShowVideo, callRecords, userForVideoArea, patients={}, currentCase} = this.props;
 
         let callType = this.callType;
         let hash = window.location.hash;
         let isCasePage = (hash.indexOf('inquire/case/detail') !== -1);
         let records = this.getCallRecords(callRecords);
+        let patient = patients[currentCase.patientId];
 
         if (!(this.callState === -1 && callRecords.length > 0 && isCasePage && isShowVideoCtrl)) {
             if (this.refs.video) {
@@ -936,7 +937,7 @@ class Video extends React.Component {
                                         style={{display: this.callState===-1 && callRecords.length>0 && isCasePage? 'inline-block': 'none'}}
                                         shape="circle" onClick={()=>{this.togglePlay()}}></Button>
                             </div>
-                            <div className={styles.right} style={{display: isCasePage? 'block': 'none'}}>
+                            <div className={styles.right} style={{display: isCasePage && patient? 'block': 'none'}}>
                                 <Button type="ghost" onClick={()=>{this.showCallFromCaseDialog(0)}}>电话回呼</Button>
                                 <Button onClick={()=>{this.showCallFromCaseDialog(1)}}>视频回呼</Button>
                             </div>
@@ -981,9 +982,11 @@ class Video extends React.Component {
 }
 
 const mapStateToProps = (globalStore) => {
-    const {callStore, authStore, caseStore, doctorStore} = globalStore;
+    const {callStore, authStore, caseStore, doctorStore, patientStore} = globalStore;
 
     return {
+        patients: Object.assign({}, patientStore.patients),
+        currentCase: caseStore.currentCase,
         inquiryId: callStore.inquiryId,
         incomingUser: callStore.incomingUser,
         callbackUser: callStore.callbackUser,
