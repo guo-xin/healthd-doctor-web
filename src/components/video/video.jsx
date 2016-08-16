@@ -460,7 +460,15 @@ class Video extends React.Component {
 
     //收到呼叫时处理
     OnIncomingCallReceived(msg) {
-        let {dispatch, doctor} = this.props;
+        let {dispatch, doctor, isShowCallingDialog} = this.props;
+        let ClientOCX = this.ClientOCX;
+
+        //如果当前有来电阻止弹出下一个来电
+        if(isShowCallingDialog){
+            ClientOCX.CCPrejectCall(ClientOCX.callid, 3);
+            return;
+        }
+
 
         this.callType = 1; //视频
         this.inquiryCallType = 1; //用户呼叫医生

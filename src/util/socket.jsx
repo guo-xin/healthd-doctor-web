@@ -118,7 +118,14 @@ export const receiveMessages = ()=> {
                 fn: function (event) {
                     console.info('Received addEventListener event ' + event.type + ': ' + event.data);
                     if (event.data) {
-                        let preWorkingStatus = store.getState().doctorStore.data.workingStatus;
+                        let allState = store.getState();
+                        let preWorkingStatus = allState.doctorStore.data.workingStatus;
+                        let isShowCallingDialog = allState.callStore.isShowCallingDialog;
+
+                        //如果当前有来电阻止弹出下一个来电
+                        if(isShowCallingDialog){
+                            return;
+                        }
 
                         store.dispatch(changeDoctorState({
                             workingStatus: 1
