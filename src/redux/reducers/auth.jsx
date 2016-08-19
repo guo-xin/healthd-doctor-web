@@ -27,11 +27,11 @@ const auth = (state = {
         case actions.SET_AUTH:
             data = action.data || {};
             
-            state.userName = data.userName;
-            state.token = data.token;
-            state.id = data.id;
-            state.isAuthenticated = data.isAuthenticated;
-            state.isResetting = false;
+            state.userName = data.userName || '';
+            state.token = data.token || '';
+            state.id = data.id || '';
+            state.isAuthenticated = data.isAuthenticated || false;
+            state.isResetting = data.isResetting;
 
             return Object.assign({}, state);
 

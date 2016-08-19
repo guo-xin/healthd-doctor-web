@@ -45,7 +45,8 @@ export function requireAuthentication(Component) {
                     dispatch(setAuth({
                         userName: data.userName,
                         token: data.token,
-                        id: data.id
+                        id: data.id,
+                        isResetting: true
                     }));
 
                     //刷新后进入系统前掉任一接口验证登录是否过期
@@ -59,10 +60,9 @@ export function requireAuthentication(Component) {
                                 userName: data.userName,
                                 token: data.token,
                                 id: data.id,
-                                isAuthenticated: true
+                                isAuthenticated: true,
+                                isResetting: false
                             }));
-
-
 
                             this.resetData();
                         }

@@ -50,7 +50,11 @@ function callAsyncActionsMiddleware({dispatch, getState}) {
             let rt = (json || {}).code;
 
             if(rt === -14 || rt === -17){
-                message.warning('登录超时，请重新登录');
+                let isResetting = getState().authStore.isResetting;
+
+                if(!isResetting){
+                    message.warning('登录超时，请重新登录');
+                }
             }
 
             return dispatch(Object.assign({}, payload, {
