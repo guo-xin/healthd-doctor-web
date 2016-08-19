@@ -49,7 +49,7 @@ function callAsyncActionsMiddleware({dispatch, getState}) {
         }).then(json => {
             let rt = (json || {}).code;
 
-            if(rt === -14){
+            if(rt === -14 || rt === -17){
                 message.warning('登录超时，请重新登录');
             }
 
