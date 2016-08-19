@@ -10,9 +10,13 @@ import {setCurrentCase} from 'redux/actions/case';
 import {setCurrentPatient} from 'redux/actions/patient';
 import {Spin} from 'antd';
 
-function parseCookie(val = '') {
-    val = val.replace(/\\"/gi, '"');
-    return JSON.parse(val);
+function parseCookie(val) {
+    if(val){
+        val = val.replace(/\\"/gi, '"');
+        return JSON.parse(val);
+    }else{
+        return null;
+    }
 }
 
 export function requireAuthentication(Component) {
