@@ -1,5 +1,5 @@
 import * as actions from './actions';
-import fetch from 'isomorphic-fetch';
+const fetch = actions.fetch;
 
 //设置当前操作用户
 export const setCurrentPatient = actions.create(actions.SET_CURRENT_PATIENT, 'data');

@@ -1,4 +1,5 @@
 import * as actions from './actions';
+const fetch = actions.fetch;
 
 //点击问诊优先进入有内容模块
 export const getInquireNumber = () => {

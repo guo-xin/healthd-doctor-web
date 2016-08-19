@@ -10,7 +10,7 @@ class Message extends Component {
 
     getDoctorList() {
         const {dispatch, doctorId} = this.props;
-        dispatch(getDoctorQueueCountByUserId(doctorId));
+        //dispatch(getDoctorQueueCountByUserId(doctorId));
         dispatch(getDoctorInquiryCountByUserId(doctorId));
     }
 

@@ -23,6 +23,18 @@ const auth = (state = {
     let data, result;
 
     switch (action.type) {
+        //设置登录认证信息
+        case actions.SET_AUTH:
+            data = action.data || {};
+            
+            state.userName = data.userName;
+            state.token = data.token;
+            state.id = data.id;
+            state.isAuthenticated = data.isAuthenticated;
+            state.isResetting = false;
+
+            return Object.assign({}, state);
+
         //登录
         case actions.SIGN_IN + "_SUCCESS":
             result = (action.response || {}).result;
@@ -38,15 +50,15 @@ const auth = (state = {
                     state.userName = data.email || '';
                     state.id = data.id || '';
                     state.headPic = data.headPic || '';
+
                     let exp = new Date();
                     exp.setTime(exp.getTime() + 14 * 60 * 60 * 1000);
 
-                    cookie.save('healthD', {
-                        id: state.id,
+                    cookie.save('HEALTHWEB',{
                         u: state.userName,
-                        t: state.token,
-                        h: state.headPic
-                    },{expires: exp});
+                        h: state.headPic,
+                        j: data.jsessionId
+                    }, {expires: exp});
                 }
             }
 
@@ -56,24 +68,6 @@ const auth = (state = {
 
         //重置
         case actions.TOKEN_RESET + "_SUCCESS":
-            result = (action.response || {}).result;
-
-            if(result === 0){
-                data = (action.response || {}).data || {};
-
-                if(data['access_token']){
-                    let exp = new Date();
-                    exp.setTime(exp.getTime() + 14 * 60 * 60 * 1000);
-
-                    state.token = data['access_token'];
-
-                    let cookieData = cookie.load('healthD');
-                    cookie.save('healthD', Object.assign(cookieData, {
-                        t: state.token
-                    }),{expires: exp});
-                }
-            }
-
             state.isResetting = false;
 
             return Object.assign({}, state);
@@ -85,10 +79,6 @@ const auth = (state = {
             state.id = '';
             state.headPic = '';
             state.isAuthenticated = false;
-
-            let cookieData = cookie.load('healthD');
-            delete cookieData.t;
-            cookie.save('healthD', cookieData);
 
             return Object.assign({}, state);
 
@@ -107,9 +97,6 @@ const auth = (state = {
                 state.isAuthenticated = false;
                 state.id = '';
                 state.headPic = '';
-                let cookieData = cookie.load('healthD');
-                delete cookieData.t;
-                cookie.save('healthD', cookieData);
             }
 
             return Object.assign({}, state);

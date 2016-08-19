@@ -2,10 +2,7 @@ import {compose, createStore, applyMiddleware} from 'redux';
 import reduxReset from 'redux-reset';
 import thunkMiddleware from 'redux-thunk'
 import reducers from './reducers';
-import {setCurrentCase} from './actions/case';
-import {setCurrentPatient} from './actions/patient';
 import {message} from 'antd';
-import cookie from 'react-cookie';
 
 //处理异步动作中间件
 function callAsyncActionsMiddleware({dispatch, getState}) {
@@ -40,7 +37,8 @@ function callAsyncActionsMiddleware({dispatch, getState}) {
 
         let token = getState().authStore.token;
 
-        return callAPI(token).then(response=> {
+
+        return callAPI(token || '').then(response=> {
             if (response.status >= 400) {
                 dispatch(Object.assign({}, payload, {
                     type: failureType
@@ -75,8 +73,5 @@ const store = enHanceCreateStore(reducers);
     reducers,
     applyMiddleware(callAsyncActionsMiddleware, thunkMiddleware)
 );*/
-
-store.dispatch(setCurrentCase(cookie.load('c')));
-store.dispatch(setCurrentPatient(cookie.load('p')));
 
 module.exports  = store;

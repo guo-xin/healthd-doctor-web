@@ -1,18 +1,32 @@
 import React from 'react';
 import {connect} from 'react-redux';
 import {withRouter} from 'react-router';
-import {verifyToken, resetToken} from 'redux/actions/auth';
 import cookie from 'react-cookie';
 import * as socket from 'util/socket.jsx';
-import {getDoctorStartInquery, changeDoctorState} from 'redux/actions/doctor';
+
+import {setAuth} from "redux/actions/auth";
+import {getDoctorStartInquery, changeDoctorState, getDoctorQueueCountByUserId} from 'redux/actions/doctor';
+import {setCurrentCase} from 'redux/actions/case';
+import {setCurrentPatient} from 'redux/actions/patient';
 import {Spin} from 'antd';
+
+function parseCookie(val = '') {
+    val = val.replace(/\\"/gi, '"');
+    return JSON.parse(val);
+}
 
 export function requireAuthentication(Component) {
 
     class AuthenticatedComponent extends React.Component {
 
         componentWillMount() {
-            this.checkAuth(this.props.isAuthenticated);
+            let {dispatch, isAuthenticated} = this.props;
+
+            //设置刷新前最近一次操作的病历和病人
+            dispatch(setCurrentCase(cookie.load('c')));
+            dispatch(setCurrentPatient(cookie.load('p')));
+
+            this.checkAuth(isAuthenticated);
         }
 
         componentWillReceiveProps(nextProps) {
@@ -21,27 +35,33 @@ export function requireAuthentication(Component) {
 
         checkAuth(isAuthenticated) {
             if (!isAuthenticated) {
-                let data = cookie.load('healthD');
+                let data = parseCookie(cookie.load('healthD'));
                 let {dispatch} = this.props;
-                if (data && data.t && data.u) {
-                    dispatch(verifyToken(data)).then((action)=> {
+                if (data && data.token && data.id) {
+                    dispatch(setAuth({
+                        userName: data.userName,
+                        token: data.token,
+                        id: data.id
+                    }));
+
+                    //刷新后进入系统前掉任一接口验证登录是否过期
+                    dispatch(getDoctorQueueCountByUserId(data.id)).then((action)=> {
                         let result = (action.response || {}).result;
 
                         if (result !== 0) {
                             this.reLogin();
                         } else {
-                            dispatch(resetToken({
-                                u: data.u
-                            })).then(
-                                (action)=> {
-                                    this.resetData();
-                                },
-                                ()=> {
-                                    this.resetData();
-                                }
-                            );
-                        }
+                            dispatch(setAuth({
+                                userName: data.userName,
+                                token: data.token,
+                                id: data.id,
+                                isAuthenticated: true
+                            }));
 
+
+
+                            this.resetData();
+                        }
                     }, ()=> {
                         this.reLogin();
                     });
@@ -54,6 +74,7 @@ export function requireAuthentication(Component) {
         resetData() {
             let {dispatch, doctorId} = this.props;
 
+            //根据刷新前记住的医生状态进行改变
             let doctorS = cookie.load('doctorStatu');
             let workingStatus = doctorS.workingStatus;
             if (doctorS && doctorS.attendance === false) {

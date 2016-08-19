@@ -1,5 +1,5 @@
 import * as actions from './actions';
-import fetch from 'isomorphic-fetch';
+const fetch = actions.fetch;
 
 export const getNation = () => {
     let action = actions.GET_NATION_LIST;

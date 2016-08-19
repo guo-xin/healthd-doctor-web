@@ -1,4 +1,5 @@
 import * as actions from './actions';
+const fetch = actions.fetch;
 
 export const showCallingDialog = actions.create(actions.SHOW_CALLING_DIALOG, 'isShowCallingDialog', 'callType', 'data');
 export const showCallbackDialog = actions.create(actions.SHOW_CALLBACK_DIALOG, 'isShowCallbackDialog', 'callType');

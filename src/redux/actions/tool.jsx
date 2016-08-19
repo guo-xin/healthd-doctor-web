@@ -1,5 +1,5 @@
 import * as actions from './actions';
-import fetch from 'isomorphic-fetch';
+const fetch = actions.fetch;
 
 //将未读图片设置为已读
 export const setInquiryPictureRead = (messageInfoId) => {

@@ -1,5 +1,5 @@
 import * as actions from './actions';
-import fetch from 'isomorphic-fetch';
+const fetch = actions.fetch;
 
 //显示工具栏
 export const toggleTool = actions.create(actions.TOGGLE_CASES_TOOLS);

@@ -1,5 +1,5 @@
 import * as actions from './actions';
-import fetch from 'isomorphic-fetch';
+const fetch = actions.fetch;
 
 //根据用户ID查询用户
 export const getUserById = (userId) => {

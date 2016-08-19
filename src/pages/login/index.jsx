@@ -118,7 +118,7 @@ class Login extends Component {
 
     componentWillMount() {
         cookie.remove('doctorStatu');
-        let cookieData = cookie.load('healthD');
+        let cookieData = cookie.load('HEALTHWEB');
         this.state.data = cookieData || {};
     }
 

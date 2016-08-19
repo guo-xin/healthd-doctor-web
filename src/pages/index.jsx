@@ -22,7 +22,7 @@ class App extends React.Component {
             duration: 2
         });
 
-        this.resetToken();
+        //this.resetToken();
         socket.windowListen();
     }
 

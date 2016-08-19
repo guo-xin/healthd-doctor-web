@@ -1,5 +1,8 @@
 import * as actions from './actions';
-import fetch from 'isomorphic-fetch';
+const fetch = actions.fetch;
+
+//显示工具栏
+export const setAuth = actions.create(actions.SET_AUTH, 'data');
 
 //登录
 export const signIn = (params) => {

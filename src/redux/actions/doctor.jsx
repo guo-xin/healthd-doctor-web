@@ -1,5 +1,5 @@
 import * as actions from './actions';
-import fetch from 'isomorphic-fetch';
+const fetch = actions.fetch;
 
 //推送排队人数
 export const setDoctorQueueCount = actions.create(actions.SET_DOCTOR_QUEUE_COUNT, 'queue');

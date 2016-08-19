@@ -1,3 +1,6 @@
+import {default as fetchData} from 'isomorphic-fetch';
+import cookie from 'react-cookie';
+
 export const WEB_API_URI = window.baseApi;
 export const WEB_API_FILE_URI = window.fileApi;
 export const HEADER_AUTH_FIELD = "T";
@@ -41,6 +44,7 @@ export const PHONE_TIMEOUT_AND_HANGUP = "PHONE_TIMEOUT_AND_HANGUP"; //电话预�
 
 
 /* ---------- 登录认证相关操作 start ---------- */
+export const SET_AUTH = "SET_AUTH"; //刷新时设置登录认证信息
 export const SIGN_IN = "SIGN_IN";//登录
 export const SIGN_OUT = "SIGN_OUT";//退出
 export const TOKEN_VERIFY = "TOKEN_VERIFY";//token验证
@@ -150,4 +154,20 @@ export function create(type, ...argNames) {
         });
         return action;
     }
+}
+
+export function fetch(url, ...params) {
+    if (!/\/(sign|signout)/gi.test(url)) {
+        let healthWEB = cookie.load('HEALTHWEB') || {};
+        let list = url.split('?');
+        let first = "";
+
+        if (list.length > 0) {
+            first = list.shift() + ';jsessionid=' + (healthWEB.j || '');
+        }
+
+        url = first + (list.length > 0 ? ('?' + list.join('?') ) : '');
+    }
+
+    return fetchData(url, ...params);
 }
