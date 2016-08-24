@@ -86,32 +86,23 @@ module.exports = {
         })
     ],
 
+    devtool: 'source-map',
+
     devServer: {
-        proxy: {
-            '/v2/parser/*': {
+        proxy: [
+            {
+                path: /\/v2\/(parser|oss|lucene)\/*/gi,
                 target: "https://test.d.healthdoc.cn/healthd-tools",
                 secure: false,
                 changeOrigin: true
             },
-
-            '/v2/oss/*': {
-                target: "https://test.d.healthdoc.cn/healthd-tools",
-                secure: false,
-                changeOrigin: true
-            },
-
-            '/v2/lucene/*': {
-                target: "https://test.d.healthdoc.cn/healthd-tools",
-                secure: false,
-                changeOrigin: true
-            },
-
-            '/v2/*': {
+            {
+                path: '/v2/*',
                 target: "https://test.d.healthdoc.cn",
                 secure: false,
                 changeOrigin: true
             }
-        }
+        ]
     }
 
 };
