@@ -38,9 +38,9 @@ export function requireAuthentication(Component) {
         }
 
         checkAuth(isAuthenticated) {
+            let data = parseCookie(cookie.load('healthD'));
+            let {dispatch} = this.props;
             if (!isAuthenticated) {
-                let data = parseCookie(cookie.load('healthD'));
-                let {dispatch} = this.props;
                 if (data && data.token && data.id) {
                     dispatch(setAuth({
                         userName: data.userName,
@@ -72,6 +72,8 @@ export function requireAuthentication(Component) {
                 } else {
                     this.reLogin();
                 }
+            }else{
+                dispatch(getDoctorQueueCountByUserId(data.id));
             }
         }
 
