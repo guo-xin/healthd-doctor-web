@@ -82,27 +82,31 @@ export function requireAuthentication(Component) {
 
             //根据刷新前记住的医生状态进行改变
             let doctorS = cookie.load('doctorStatu');
-            let workingStatus = doctorS.workingStatus;
-            if (doctorS && doctorS.attendance === false) {
-                dispatch(getDoctorStartInquery());
-                socket.receiveMessages();
+            let workingStatus;
 
-                if (workingStatus === 1) {
-                    workingStatus = 0;
-                }
-                let params = {
-                    id: doctorId,
-                    workingStatus: workingStatus
-                };
-                dispatch(changeDoctorState(params));
-            } else {
-                if (workingStatus === 1) {
-                    workingStatus = 9;
+            if(doctorS){
+                workingStatus = doctorS.workingStatus;
+                if (doctorS.attendance === false) {
+                    dispatch(getDoctorStartInquery());
+                    socket.receiveMessages();
+
+                    if (workingStatus === 1) {
+                        workingStatus = 0;
+                    }
                     let params = {
                         id: doctorId,
                         workingStatus: workingStatus
                     };
                     dispatch(changeDoctorState(params));
+                } else {
+                    if (workingStatus === 1) {
+                        workingStatus = 9;
+                        let params = {
+                            id: doctorId,
+                            workingStatus: workingStatus
+                        };
+                        dispatch(changeDoctorState(params));
+                    }
                 }
             }
         }

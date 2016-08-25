@@ -41,15 +41,23 @@ export default class User extends Component {
     }
 
     getDoctorList() {
-        const {dispatch, doctorId = {}} = this.props;
+        const {dispatch, doctorId = ''} = this.props;
         let dateInfo = global.getDateRange();
         dispatch(getDoctorPictureMessage(doctorId));
         dispatch(getDoctorByUserIdDate(doctorId, dateInfo.startTime, dateInfo.endTime));
-        dispatch(getDoctorByUserId()).then(()=> {
+        dispatch(getDoctorByUserId()).then((action)=> {
             const {data = {}} = this.props;
             let doctorS = cookie.load('doctorStatu');
             if ((data.workingStatus || data.workingStatus === 0) && data.workingStatus !== 9 && !doctorS) {
                 socket.receiveMessages();
+            }
+
+            //登录后或者刷新后如果医生状态为占线则自动置为在线
+            if(data.workingStatus === 1){
+                dispatch(changeDoctorState({
+                    id: doctorId,
+                    workingStatus: 0
+                }));
             }
         });
     }
