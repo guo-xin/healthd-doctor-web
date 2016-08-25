@@ -33,9 +33,9 @@ export function requireAuthentication(Component) {
             this.checkAuth(isAuthenticated);
         }
 
-        componentWillReceiveProps(nextProps) {
+       /* componentWillReceiveProps(nextProps) {
             this.checkAuth(nextProps.isAuthenticated);
-        }
+        }*/
 
         checkAuth(isAuthenticated) {
             let data = parseCookie(cookie.load('healthD'));
