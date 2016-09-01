@@ -38,13 +38,13 @@ export function requireAuthentication(Component) {
         }*/
 
         checkAuth(isAuthenticated) {
-            let data = parseCookie(cookie.load('healthD'));
+            let data = cookie.load('HEALTHWEB');
             let {dispatch} = this.props;
             if (!isAuthenticated) {
-                if (data && data.token && data.id) {
+                if (data && data.t && data.id) {
                     dispatch(setAuth({
-                        userName: data.userName,
-                        token: data.token,
+                        userName: data.u,
+                        token: data.t,
                         id: data.id,
                         isResetting: true
                     }));
@@ -57,8 +57,8 @@ export function requireAuthentication(Component) {
                             this.reLogin();
                         } else {
                             dispatch(setAuth({
-                                userName: data.userName,
-                                token: data.token,
+                                userName: data.u,
+                                token: data.t,
                                 id: data.id,
                                 isAuthenticated: true,
                                 isResetting: false

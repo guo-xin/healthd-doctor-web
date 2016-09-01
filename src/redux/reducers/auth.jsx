@@ -55,6 +55,8 @@ const auth = (state = {
                     exp.setTime(exp.getTime() + 14 * 60 * 60 * 1000);
 
                     cookie.save('HEALTHWEB',{
+                        id: state.id,
+                        t: state.token,
                         u: state.userName,
                         h: state.headPic,
                         j: data.jsessionId
