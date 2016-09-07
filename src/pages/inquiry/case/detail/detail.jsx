@@ -104,6 +104,9 @@ class Detail extends React.Component {
                 let curCase = nextProps.currentCase || {};
 
                 if (!(curCase.caseId && curCase.caseId === preCase.caseId)) {
+                    //切换前自动保存
+                    this.autoSave(this.refs.emr.getFieldsValue(), nextProps);
+
                     this.initState();
                     this.refs.emr.resetFields();
                     this.resetData(nextProps);
@@ -700,10 +703,11 @@ class Detail extends React.Component {
         }
     }
 
-    autoSave(formData) {
+    autoSave(formData, props) {
         if (this.isSaving || this.isArchive || this.state.caseState == 2) {
             return;
         } else {
+            props = props || this.props;
             let obj = this.isFormChanged(formData);
 
             if (obj.isFormChanged) {
@@ -717,7 +721,7 @@ class Detail extends React.Component {
 
                 if (obj.isOpinionChanged) {
                     let {patientId} = this.state;
-                    let {doctorId, dispatch} = this.props;
+                    let {doctorId, dispatch} = props;
                     let values = formData || {};
                     let num = pad(Math.floor(Math.random() * 10000), 4);
 
@@ -734,19 +738,19 @@ class Detail extends React.Component {
 
                             if (result === 0 && url) {
                                 this.opinionsUrl = url;
-                                this._save(this.props, formData);
+                                this._save(props, formData);
 
                             } else {
-                                this._save(this.props, formData);
+                                this._save(props, formData);
                             }
                         },
                         ()=> {
-                            this._save(this.props, formData);
+                            this._save(props, formData);
                         }
                     );
 
                 } else {
-                    this._save(this.props, formData);
+                    this._save(props, formData);
                 }
             }
         }
