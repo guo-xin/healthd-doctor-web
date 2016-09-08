@@ -83,7 +83,7 @@ export const getDoctorStartInquery = () => {
 };
 
 //医生结束出诊
-export const getDoctorEndInquery = () => {
+export const getDoctorEndInquery = (isHideAuthTip) => {
     let action = actions.DOCTOR_END_INQUERY;
 
     return {
@@ -97,7 +97,10 @@ export const getDoctorEndInquery = () => {
             headers: {
                 [actions.HEADER_AUTH_FIELD]: actions.HEADER_AUTH_PREFIX + token
             }
-        })
+        }),
+        payload: {
+            isHideAuthTip: isHideAuthTip
+        }
         // 在 actions 的开始和结束注入的参数
     };
 };

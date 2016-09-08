@@ -118,12 +118,13 @@ export default class User extends Component {
                     onOk: ()=> {
                         const {dispatch, doctorId} = this.props;
 
-                        dispatch(getDoctorEndInquery());
+                        dispatch(getDoctorEndInquery(true));
                         socket.seClose();
+
                         setTimeout(()=> {
                             router.replace(`/login`);
                             dispatch(signOut(this.props.data.email));
-                        }, 200);
+                        }, 50);
 
                     },
                     onCancel: ()=> {

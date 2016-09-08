@@ -53,7 +53,10 @@ function callAsyncActionsMiddleware({dispatch, getState}) {
                 let isResetting = getState().authStore.isResetting;
 
                 if(!isResetting){
-                    message.warning('登录超时，请重新登录');
+                    let obj = Object.assign({}, payload);
+                    if(!obj.isHideAuthTip){
+                        message.warning('登录超时，请重新登录');
+                    }
                 }
             }
 
