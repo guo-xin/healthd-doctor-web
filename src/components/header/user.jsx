@@ -72,7 +72,7 @@ export default class User extends Component {
         if (this.props.callState !== -1) {
             return;
         } else {
-            const {dispatch, data = {}, doctorId = {}, queue = {}, scheduletList = {}, router} = this.props;
+            const {dispatch, data = {}, doctorId = {}, queue = {}, scheduletList = [], router} = this.props;
             let dateInfo = global.getDateRange();
             let content = "";
             let time = '';
@@ -158,7 +158,11 @@ export default class User extends Component {
             }
 
         }
-        return [];
+        return (
+            (<Menu onClick={this.onMenuChange}>
+                <Menu.Item key="5" name="退出"><Icon type="logout"/>退出</Menu.Item>
+            </Menu>)
+        );
     }
 
     //点击图片列表
