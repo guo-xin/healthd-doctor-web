@@ -11,7 +11,7 @@
     <script>
         window.baseApi = "v2";
         window.fileApi = "healthd-tools/v2";
-        window.msgApi = "http://test.d.healthdoc.cn:9105";
+        window.msgApi = "platform-message";
     </script>
 </head>
 <body>
