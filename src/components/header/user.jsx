@@ -92,7 +92,7 @@ export default class User extends Component {
                     }
                 });
             } else {
-                dispatch(getDoctorQueueCountByUserId(doctorId));
+                //dispatch(getDoctorQueueCountByUserId(doctorId));
 
                 scheduletList.slice(0, 7).map((obj, index)=> {
                     if (index === dateInfo.weekday - 1) {
