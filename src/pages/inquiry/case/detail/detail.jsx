@@ -107,9 +107,11 @@ class Detail extends React.Component {
                     //切换前自动保存
                     this.autoSave(this.refs.emr.getFieldsValue(), nextProps);
 
-                    this.initState();
-                    this.refs.emr.resetFields();
-                    this.resetData(nextProps);
+                    setTimeout(()=>{
+                        this.initState();
+                        this.refs.emr.resetFields();
+                        this.resetData(nextProps);
+                    }, 50);
                 }
             }
         }
