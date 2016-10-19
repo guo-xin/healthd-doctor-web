@@ -38,7 +38,7 @@ module.exports = {
             {
                 test: /\.(js|jsx)$/,
                 loaders: ['babel-loader?cacheDirectory&compact=false&retainLines=true'],
-                exclude: /node_modules/
+                exclude: ['node_modules', path.resolve(__dirname, 'src/assets/js/AgoraRtcAgentSDK-1.5.2.js')]
             },
             {
                 test: /\.less$/,

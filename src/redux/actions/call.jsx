@@ -11,16 +11,17 @@ export const setCallbackUserId = actions.create(actions.SET_CALLBACK_USER_ID, 'u
 export const setCallState = actions.create(actions.SET_CALL_STATE, 'state', 'msg');
 export const setUserForVideoArea = actions.create(actions.SET_USER_FOR_VIDEO_AREA, 'user');
 
-//通话接通后创建问诊会话
-export const addCallRecord = (params) => {
-    let action = actions.ADD_CALL_RECORD;
+
+//WEB回呼APP接口-统一接口
+export const agoraCall = (params)=>{
+    let action = 'agoraCall';
     return {
         // 要在之前和之后发送的 action types
         types: [action + '_REQUEST', action + '_SUCCESS', action + '_FAILURE'],
         // 检查缓存 (可选):
         //shouldCallAPI: (state) => !state.users[userId],
         // 进行取：
-        callAPI: (token) => fetch(`${actions.WEB_API_URI}/ocx/record/add`, {
+        callAPI: (token) => fetch(`${actions.WEB_API_URI}/agora/call`,{
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
@@ -30,18 +31,19 @@ export const addCallRecord = (params) => {
             body: JSON.stringify(params)
         })
     };
+
 };
 
-//病历回呼调用
-export const addCallbackRecord = (params) => {
-    let action = actions.ADD_CALLBACK_RECORD;
+//WEB收到呼叫之后-统一接口
+export const agoraAccept = (params)=>{
+    let action = 'agoraAccept';
     return {
         // 要在之前和之后发送的 action types
         types: [action + '_REQUEST', action + '_SUCCESS', action + '_FAILURE'],
         // 检查缓存 (可选):
         //shouldCallAPI: (state) => !state.users[userId],
         // 进行取：
-        callAPI: (token) => fetch(`${actions.WEB_API_URI}/ocx/case-callback/add`, {
+        callAPI: (token) => fetch(`${actions.WEB_API_URI}/agora/accept`,{
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
@@ -51,11 +53,57 @@ export const addCallbackRecord = (params) => {
             body: JSON.stringify(params)
         })
     };
+
 };
 
-//查询通话计划
-export const getInquiryRecord = () => {
-    let action = actions.GET_INQUIRY_RECORD;
+//WEB医生挂断(接听后)
+export const agoraVoipInviteBye = (params)=>{
+    let action = 'agoraVoipInviteBye';
+    return {
+        // 要在之前和之后发送的 action types
+        types: [action + '_REQUEST', action + '_SUCCESS', action + '_FAILURE'],
+        // 检查缓存 (可选):
+        //shouldCallAPI: (state) => !state.users[userId],
+        // 进行取：
+        callAPI: (token) => fetch(`${actions.WEB_API_URI}/agora/voip-invite-bye`,{
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json; charset=UTF-8',
+                [actions.HEADER_AUTH_FIELD]: actions.HEADER_AUTH_PREFIX + token
+            },
+            body: JSON.stringify(params)
+        })
+    };
+
+};
+
+
+//WEB医生拒接接听
+export const agoraVoipInviteRefuse = (params)=>{
+    let action = 'agoraVoipInviteRefuse';
+    return {
+        // 要在之前和之后发送的 action types
+        types: [action + '_REQUEST', action + '_SUCCESS', action + '_FAILURE'],
+        // 检查缓存 (可选):
+        //shouldCallAPI: (state) => !state.users[userId],
+        // 进行取：
+        callAPI: (token) => fetch(`${actions.WEB_API_URI}/agora/voip-invite-refuse`,{
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json; charset=UTF-8',
+                [actions.HEADER_AUTH_FIELD]: actions.HEADER_AUTH_PREFIX + token
+            },
+            body: JSON.stringify(params)
+        })
+    };
+
+};
+
+//WEB订阅服务端账号事件
+export const subscribeServerEvent = (doctorId) => {
+    let action = 'subscribeServerEvent';
 
     return {
         // 要在之前和之后发送的 action types
@@ -63,7 +111,7 @@ export const getInquiryRecord = () => {
         // 检查缓存 (可选):
         //shouldCallAPI: (state) => !state.users[userId],
         // 进行取：
-        callAPI: (token) => fetch(`${actions.WEB_API_URI}/ocx/user-call-session/inquiry`,{
+        callAPI: (token) => fetch(`${actions.WEB_API_URI}/agora/start-server/${doctorId}`,{
             method: 'GET',
             headers: {
                 [actions.HEADER_AUTH_FIELD]: actions.HEADER_AUTH_PREFIX + token
@@ -71,6 +119,17 @@ export const getInquiryRecord = () => {
         })
     };
 };
+
+
+
+
+
+
+
+
+
+
+
 
 //查询通话计划
 export const getCallRecords = (inquiryId) => {

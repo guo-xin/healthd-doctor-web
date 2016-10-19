@@ -6,8 +6,13 @@ import {withRouter} from 'react-router';
 import {connect} from 'react-redux';
 import {getUserById} from 'redux/actions/user';
 import {getInquireCallbackNumber} from 'redux/actions/inquire';
-import {showCallbackFromCaseDialog, setCallbackUserId, addCallbackRecord} from 'redux/actions/call';
+import {
+    agoraCall,
 
+    showCallbackFromCaseDialog,
+    setCallbackUserId
+} from 'redux/actions/call';
+import {noticeChangeDoctorState} from 'redux/actions/doctor';
 import Image from '../image/image.jsx';
 import * as global from 'util/global';
 
@@ -26,65 +31,6 @@ class CallbackFromCase extends Component {
 
 
     componentWillReceiveProps(nextProps) {
-        if (nextProps.isVisible) {
-            //呼叫中
-            if (nextProps.callState === 0) {
-                this.setState({
-                    disabled: true,
-                    tip: '呼叫中。。。'
-                });
-            }
-            else if (nextProps.callState === 1) {
-                this.state.disabled = false;
-                this.state.tip = '';
-                this.setVisible(false);
-            }
-            else {
-                //由呼叫中直接到挂断为呼叫失败
-                if (this.props.callState === 0) {
-                    let tip = '呼叫失败，请重新呼叫。';
-                    let callMessage = nextProps.callMessage;
-                    let callType = nextProps.callType;
-
-                    if (callType == 1) {
-                        if (callMessage.reason === 175001) {
-                            tip = '未响应，请稍后再试。';
-                        }
-                        else if (callMessage.reason && callMessage.reason.reason) {
-                            let reason = callMessage.reason.reason;
-
-                            switch (+reason) {
-                                case 175404:
-                                    tip = '对方不在线，请选择电话呼叫。';
-                                    break;
-
-                                case 175486:
-                                    tip = '对方忙碌，请稍后再试。';
-                                    break;
-
-                                case 175001:
-                                    tip = '未响应，请检查网络，稍后再试。';
-                                    break;
-
-                                default:
-
-                            }
-
-                        }
-                    }
-
-
-                    this.setState({
-                        disabled: false,
-                        tip: tip
-                    });
-                } else {
-                    if (!this.props.isVisible) {
-                        this.state.tip = "你是否需要回呼患者";
-                    }
-                }
-            }
-        }
 
 
         if (nextProps.isVisible && nextProps.isVisible !== this.props.isVisible) {
@@ -144,7 +90,7 @@ class CallbackFromCase extends Component {
         );
     }
 
-    //接听
+    //回呼
     onOk() {
         let {userId} = this.state;
         let {users = {}, callType, currentCase={}} = this.props;
@@ -156,59 +102,90 @@ class CallbackFromCase extends Component {
         });
 
         if (user && user.mobilePhone) {
-            let {callback, dispatch, doctor={}} = this.props;
+            let {dispatch, doctor={}} = this.props;
 
-            if (typeof callback === 'function') {
-                let params = {
-                    inquiryCallType: 0,
-                    phone: user.mobilePhone,
-                    callType: callType + 1,
-                    inquiryId: currentCase.inquiryId,
-                    operatorRoleCode: doctor.workingStatus === 4 ? 105 : 104
-                };
+            let params = {
+                inquiryCallType: 0,
+                phone: user.mobilePhone,
+                callType: callType,
+                inquiryId: currentCase.inquiryId,
+                doctorId: doctor.id,
+                operatorRoleCode: doctor.workingStatus === 4 ? 105 : 104
+            };
 
-                if(currentCase.patientId){
-                    params.patientId = currentCase.patientId;
-                }
+            if(currentCase.patientId){
+                params.patientId = currentCase.patientId;
+            }
 
-                if(currentCase.inquiryInfoId){
-                    params.inquiryInfoId = currentCase.inquiryInfoId;
-                }
+            if(currentCase.inquiryInfoId){
+                params.inquiryInfoId = currentCase.inquiryInfoId;
+            }
 
-                //回呼前创建会话ID
-                dispatch(addCallbackRecord(params)).then(
-                    (action)=> {
-                        let result = (action.response || {}).result;
+            //将医生状态置为占线
+            dispatch(noticeChangeDoctorState({
+                workingStatus: 1
+            }));
 
-                        if (result === 0) {
-                            callback({
-                                phone: user.mobilePhone,
-                                callType: callType,
-                                userId: userId
-                            });
-                        } else {
-                            console.log('呼叫失败-------------创建会话（inquireId）失败');
-                            this.setState({
-                                tip: '呼叫失败，请重新呼叫',
-                                disabled: false
-                            });
-                        }
-                    },
-                    ()=> {
+            //回呼前创建会话ID
+            dispatch(agoraCall(params)).then(
+                (action)=> {
+                    let result = (action.response || {}).result;
+                    let data = (action.response || {}).data;
+
+                    if (result === 0) {
+                        this._callback(params, data, doctor.workingStatus);
+                    } else {
                         console.log('呼叫失败-------------创建会话（inquireId）失败');
                         this.setState({
                             tip: '呼叫失败，请重新呼叫',
                             disabled: false
                         });
+
+                        //将医生状态置为占线前的状态
+                        dispatch(noticeChangeDoctorState({
+                            workingStatus: doctor.workingStatus
+                        }));
                     }
-                );
-            }
+                },
+                ()=> {
+                    console.log('呼叫失败-------------创建会话（inquireId）失败');
+                    this.setState({
+                        tip: '呼叫失败，请重新呼叫',
+                        disabled: false
+                    });
+
+                    //将医生状态置为占线前的状态
+                    dispatch(noticeChangeDoctorState({
+                        workingStatus: doctor.workingStatus
+                    }));
+                }
+            );
         } else {
             console.log('呼叫失败-------------用户信息获取错误');
             this.setState({
                 tip: '呼叫失败，请重新呼叫',
                 disabled: false
             });
+        }
+    }
+
+    //回呼
+    _callback(params, data, workingStatus) {
+        let {dispatch, joinChannel, doctor} = this.props;
+        let doctorId = doctor.id;
+
+        if (typeof joinChannel == 'function') {
+            joinChannel({
+                recordingKey: data.recordingKey,
+                key: data.dynamicKey,
+                channel: data.channelName,
+                id: doctorId,
+                workingStatus: workingStatus,
+                phone: params.phone,
+                callType: params.callType
+            });
+
+            this.setVisible(false);
         }
     }
 

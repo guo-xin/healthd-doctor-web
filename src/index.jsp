@@ -16,5 +16,6 @@
 </head>
 <body>
 <div id="app"></div>
+    <script src="./assets/js/AgoraRtcAgentSDK-1.5.2.js"></script>
 </body>
 </html>

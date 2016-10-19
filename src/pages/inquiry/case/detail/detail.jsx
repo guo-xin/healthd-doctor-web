@@ -352,7 +352,7 @@ class Detail extends React.Component {
     //获取提交的病历数据
     getCaseData(props, values, status) {
         let params = this.formatFieldValues(props, values);
-        let {patients, inquiryId, currentCase} = props;
+        let {patients, currentCase} = props;
         let {patientId, caseId} = this.state;
         let patient = patients[patientId] || {};
 
@@ -361,12 +361,12 @@ class Detail extends React.Component {
         params.userId = patient.userId;
         params.patientId = patientId;
 
+        params.inquiryId = currentCase.inquiryId;
+
         if (caseId !== null && caseId != undefined) {
             params.id = caseId;
-            params.inquiryId = currentCase.inquiryId;
         } else {
-            params.inquiryId = inquiryId;
-            this.state.caseData.inquiryId = inquiryId;
+            this.state.caseData.inquiryId = currentCase.inquiryId;
         }
 
         delete params.isServiceCount;
@@ -840,7 +840,7 @@ class Detail extends React.Component {
                         if (caseState === -1) {
                             let {currentCase={}}=props;
 
-                            this.state.caseData.inquiryId = this.props.inquiryId;
+                            this.state.caseData.inquiryId = currentCase.inquiryId;
                             this.state.caseId = data.id;
                             this.state.patientId = data.patientId;
 
@@ -849,15 +849,15 @@ class Detail extends React.Component {
                                 userId: data.userId,
                                 caseId: data.id,
                                 patientId: data.patientId,
-                                inquiryId: props.inquiryId,
+                                inquiryId: currentCase.inquiryId,
                                 state: 2
                             }));
 
                             //创建病历时更新诊前资料信息
 
-                            if (props.inquiryId && currentCase.inquiryInfoId) {
+                            if (currentCase.inquiryId && currentCase.inquiryInfoId) {
                                 props.dispatch(updateInquiryInfoByInquiryId({
-                                    inquiryId: props.inquiryId,
+                                    inquiryId: currentCase.inquiryId,
                                     inquiryInfoId: currentCase.inquiryInfoId
                                 }));
                             }
@@ -968,7 +968,6 @@ const mapStateToProps = (globalStore) => {
 
     return {
         doctorId: authStore.id,
-        inquiryId: callStore.inquiryId,
         showTool: caseStore.showTool,
         patients: Object.assign({}, patientStore.patients),
         diagnosis: caseStore.diagnosis,

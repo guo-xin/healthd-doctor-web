@@ -4,10 +4,17 @@ import {Modal, Button, message} from 'antd';
 import {withRouter} from 'react-router';
 
 import {connect} from 'react-redux';
-import {showCallbackDialog, setIncomingUserId, setCallbackUserId, addCallRecord} from 'redux/actions/call';
+import {
+    agoraCall,
+
+    showCallbackDialog,
+    setIncomingUserId,
+    setCallbackUserId,
+    addCallRecord
+} from 'redux/actions/call';
 import {setCurrentCase} from 'redux/actions/case';
 import {getMaterialBeforeCase} from 'redux/actions/inquire';
-
+import {noticeChangeDoctorState} from 'redux/actions/doctor';
 import Image from '../image/image.jsx';
 import * as global from 'util/global';
 
@@ -24,25 +31,22 @@ class Callback extends Component {
         super(props);
     }
 
-    toNextPage() {
+    toCasePage() {
         let {dispatch, callbackUser={}, router} = this.props;
 
         this.setVisible(false);
 
-        if (callbackUser.patientId) {
-            dispatch(setCurrentCase({
-                description: this.state.description,
-                inquiryInfoId: callbackUser.inquiryInfoId,
-                inquiryId: callbackUser.inquiryId,
-                userId: callbackUser.userId,
-                patientId: callbackUser.patientId,
-                caseId: null,
-                state: -1
-            }));
-            router.push(`/inquire/case/detail`);
-        } else {
-            router.push(`/inquire/case/selectPatient`);
-        }
+        dispatch(setCurrentCase({
+            description: this.state.description,
+            inquiryInfoId: callbackUser.inquiryInfoId,
+            inquiryId: callbackUser.inquiryId,
+            userId: callbackUser.userId,
+            patientId: callbackUser.patientId,
+            caseId: null,
+            state: -1
+        }));
+
+        router.push(`/inquire/case/detail`);
 
         setTimeout(()=> {
             dispatch(setIncomingUserId(callbackUser.userId, callbackUser));
@@ -50,66 +54,6 @@ class Callback extends Component {
     }
 
     componentWillReceiveProps(nextProps) {
-        if (nextProps.isVisible) {
-            //呼叫中
-            if (nextProps.callState === 0) {
-                this.setState({
-                    disabled: true,
-                    tip: '呼叫中。。。'
-                });
-            }
-            else if (nextProps.callState === 1) {
-                this.state.disabled = false;
-                this.state.tip = '';
-                this.toNextPage();
-            }
-            else {
-                //由呼叫中直接到挂断为呼叫失败
-                if (this.props.callState === 0) {
-                    let tip = '呼叫失败，请重新呼叫。';
-                    let callMessage = nextProps.callMessage;
-                    let callType = nextProps.callType;
-
-                    if (callType == 1) {
-                        if (callMessage.reason === 175001) {
-                            tip = '未响应，请稍后再试。';
-                        }
-                        else if (callMessage.reason && callMessage.reason.reason) {
-                            let reason = callMessage.reason.reason;
-
-                            switch (+reason) {
-                                case 175404:
-                                    tip = '对方不在线，请选择电话呼叫。';
-                                    break;
-
-                                case 175486:
-                                    tip = '对方忙碌，请稍后再试。';
-                                    break;
-
-                                case 175001:
-                                    tip = '未响应，请检查网络，稍后再试。';
-                                    break;
-
-                                default:
-
-                            }
-
-                        }
-                    }
-
-
-                    this.setState({
-                        disabled: false,
-                        tip: tip
-                    });
-                } else {
-                    if (!this.props.isVisible) {
-                        this.state.tip = "你是否需要回呼患者";
-                    }
-                }
-            }
-        }
-
         if (nextProps.isVisible && nextProps.isVisible != this.props.isVisible) {
             this.state.description = '';
             this.getPatientDesc(nextProps);
@@ -144,66 +88,95 @@ class Callback extends Component {
         }
     }
 
-    //接听
+    //回呼
     onOk() {
-        let {callback, dispatch, doctor={}} = this.props;
+        let {dispatch, doctor={}} = this.props;
 
-        if (typeof callback === 'function') {
-            let {callbackUser={}, callType} = this.props;
+        let {callbackUser={}, callType} = this.props;
 
-            this.setState({
-                tip: '呼叫中。。。',
-                disabled: true
-            });
+        let doctorId = doctor.id;
 
-            let params = {
-                inquiryCallType: 0,
-                phone: callbackUser.userMobilePhone,
-                userGpkgId: callbackUser.userGpkgId,
-                gpkgId: callbackUser.gpkgId,
-                callType: callType + 1,
-                operatorRoleCode: doctor.workingStatus === 4 ? 105 : 104
-            };
+        this.setState({
+            tip: '呼叫中。。。',
+            disabled: true
+        });
 
-            if (callbackUser.patientId) {
-                params.patientId = callbackUser.patientId;
-            }
+        let params = {
+            inquiryCallType: 0,
+            phone: callbackUser.userMobilePhone,
+            userGpkgId: callbackUser.userGpkgId,
+            gpkgId: callbackUser.gpkgId,
+            callType: callType + 1,
+            doctorId: doctorId,
+            operatorRoleCode: doctor.workingStatus === 4 ? 105 : 104
+        };
 
-            if (callbackUser.inquiryInfoId) {
-                params.inquiryInfoId = callbackUser.inquiryInfoId;
-            }
+        if (callbackUser.patientId) {
+            params.patientId = callbackUser.patientId;
+        }
 
-            //回呼前创建会话ID
-            dispatch(addCallRecord(params)).then(
-                (action)=> {
-                    let result = (action.response || {}).result;
+        if (callbackUser.inquiryInfoId) {
+            params.inquiryInfoId = callbackUser.inquiryInfoId;
+        }
 
-                    if (result === 0) {
-                        callback({
-                            phone: callbackUser.userMobilePhone,
-                            callType: callType,
-                            userId: callbackUser.userId,
-                            startTime: callbackUser.createdTime,
-                            queueId: callbackUser.id
-                        });
-                    } else {
-                        console.log('呼叫失败-------------创建会话（inquireId）失败');
-                        this.setState({
-                            tip: '呼叫失败，请重新呼叫',
-                            disabled: false
-                        });
-                    }
-                },
-                ()=> {
+        //将医生状态置为占线
+        dispatch(noticeChangeDoctorState({
+            workingStatus: 1
+        }));
+
+        //回呼前创建会话ID
+        dispatch(agoraCall(params)).then(
+            (action)=> {
+                let result = (action.response || {}).result;
+                let data = (action.response || {}).data;
+
+                if (result === 0) {
+                    this._callback(params, data, doctor.workingStatus);
+                } else {
                     console.log('呼叫失败-------------创建会话（inquireId）失败');
                     this.setState({
                         tip: '呼叫失败，请重新呼叫',
                         disabled: false
                     });
+
+                    //将医生状态置为占线前的状态
+                    dispatch(noticeChangeDoctorState({
+                        workingStatus: doctor.workingStatus
+                    }));
                 }
-            );
+            },
+            ()=> {
+                console.log('呼叫失败-------------创建会话（inquireId）失败');
+                this.setState({
+                    tip: '呼叫失败，请重新呼叫',
+                    disabled: false
+                });
 
+                //将医生状态置为占线前的状态
+                dispatch(noticeChangeDoctorState({
+                    workingStatus: doctor.workingStatus
+                }));
+            }
+        );
+    }
 
+    //回呼
+    _callback(params, data, workingStatus) {
+        let {dispatch, joinChannel, doctor} = this.props;
+        let doctorId = doctor.id;
+
+        if (typeof joinChannel == 'function') {
+            joinChannel({
+                recordingKey: data.recordingKey,
+                key: data.dynamicKey,
+                channel: data.channelName,
+                id: doctorId,
+                workingStatus: workingStatus,
+                phone: params.phone,
+                callType: params.callType
+            });
+
+            this.toCasePage();
         }
     }
 

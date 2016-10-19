@@ -10,19 +10,16 @@ const call = (state = {
     incomingUser: {},
     incomingCount: 0,
     incomingCallInfo: {},
-    inquiryId: null, //会话Id
     callbackUserId: -1,
     callbackUser: {},
     callState: -1, //0：呼叫中 1：通话中 -1：通话结束,
-    callMessage: {}, //通话接口返回的信息
-    callType: -1, //呼叫类型，0：音频，1：视频,
+    callType: -1, //呼叫类型，1：音频，2：视频,
     inquiryCallType: -1 // 0：医生（或医助）呼叫用户 1：用户呼叫医生
 }, action) => {
     let result, data;
     switch (action.type) {
         case actions.SET_CALL_STATE:
             state.callState = action.state;
-            state.callMessage = action.msg || {};
             return Object.assign({}, state);
 
         //设置正在来电用户
@@ -66,40 +63,8 @@ const call = (state = {
                 state.isShowCallbackFromCaseDialog = false;
 
                 state.callType = action.callType;
-
-                //视频来电
-                if(action.callType === 1){
-                    data = action.data;
-                    state.callState = data.callState;
-                    info = data.msg || {};
-                    if(info.caller){
-                        info = Object.assign({}, info);
-
-                        let list = info.caller.split('$');
-
-                        if (list.length > 0) {
-                            info.phone = list[1];
-                        }
-                    }
-
-                    state.incomingCallInfo = info;
-                }
-
-                //音频来电
-                if(action.callType === 0){
-                    data = action.data;
-                    info.workingStatus = data.workingStatus;
-                    info.id = data.id;
-                    info.type = data.type;
-
-                    info = Object.assign(info, data.data);
-                    info.phone = info.tel;
-                    info.callType = 0;
-                    delete info.tel;
-
-                    state.incomingCallInfo = info;
-                }
-
+                state.incomingCallInfo = action.data;
+                
                 state.inquiryCallType = 1;
             }
             
@@ -123,42 +88,7 @@ const call = (state = {
         case actions.SHOW_CALC_DIALOG:
             state.isShowCalcDialog = action.isShowCalcDialog;
             return Object.assign({}, state);
-
-        //添加问诊通话记录
-        case actions.ADD_CALL_RECORD + '_SUCCESS':
-            result = (action.response || {}).result;
-
-            if(result === 0){
-                data = (action.response || {}).data || {};
-
-                return Object.assign({}, state, {
-                    inquiryId: data.inquiryId || null
-                });
-            }else{
-                return Object.assign({}, state, {
-                    inquiryId: null
-                });
-            }
-
-            return state;
-
-        //添加问诊通话记录
-        case actions.GET_INQUIRY_RECORD + '_SUCCESS':
-            result = (action.response || {}).result;
-
-            if(result === 0){
-                data = (action.response || {}).data || {};
-
-                return Object.assign({}, state, {
-                    inquiryId: data.inquiryId || null
-                });
-            }else{
-                return Object.assign({}, state, {
-                    inquiryId: null
-                });
-            }
-
-            return state;
+        
 
         default:
             return state

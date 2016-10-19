@@ -1,5 +1,4 @@
 import Case from './case';
-import SelectPatient from './patient/selectPatient';
 import EditPatient from './patient/editPatient';
 import Detail from './detail/detail';
 import * as store from 'redux/store';
@@ -19,18 +18,7 @@ module.exports = {
         {
             path: 'detail', component: Detail, onLeave: ()=> {}
         },
-        {
-            path: 'selectPatient', component: SelectPatient, onEnter: (nextState, replace)=> {
-            let {callStore} = store.getState();
-
-            //非通话中禁止进入患者选择页
-            if (callStore.callState === -1) {
-                store.dispatch(toggleVideo(false));
-                replace('/inquire/archive/waiting');
-            }
-        }
-        },
         {path: 'patient', component: EditPatient},
         {path: 'viewPatient', component: EditPatient}
     ]
-}
+};

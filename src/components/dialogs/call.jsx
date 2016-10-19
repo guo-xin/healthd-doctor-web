@@ -6,14 +6,16 @@ import {withRouter} from 'react-router';
 import {connect} from 'react-redux';
 import {getUserByMPTV} from 'redux/actions/user';
 import {
+    agoraAccept,
+    agoraVoipInviteRefuse,
+
     showCallingDialog,
     setIncomingUserId,
-    getInquiryRecord,
-    addCallRecord,
     addRecordForTimeoutAndHangup
 } from 'redux/actions/call';
 import {setCurrentCase} from 'redux/actions/case';
 import {getMaterialBeforeCase} from 'redux/actions/inquire';
+import {noticeChangeDoctorState} from 'redux/actions/doctor';
 import Image from '../image/image.jsx';
 import * as global from 'util/global';
 
@@ -40,11 +42,10 @@ class Call extends Component {
             this.state.user = {};
             this.getUser(nextProps);
 
-            if (nextProps.callType === 0) {
-                this.st = setTimeout(()=> {
-                    this.hangUp(nextProps, true);
-                }, 60 * 1000);
-            }
+            //超过一分钟未接听直接挂断
+            this.st = setTimeout(()=> {
+                this.hangUp(nextProps, true);
+            }, 60 * 1000);
         }
 
         if (nextIsVisible === false && nextIsVisible != isVisible) {
@@ -52,23 +53,19 @@ class Call extends Component {
                 this.isClickAnswer = false;
             }, 50);
         }
-
-        if (nextProps.callType === 0) {
-            this.checkCall(nextProps);
-        } else {
-            this.state.tip = "";
-        }
     }
 
     getUser(props) {
-        if (props.phone) {
-            let {incomingCallInfo={}} = props;
+        let {incomingCallInfo={}, doctorId} = props;
+
+        if (incomingCallInfo.tel) {
+
             this.state.disabled = true;
             props.dispatch(getUserByMPTV({
-                mobilephone: props.phone,
-                callType: props.callType + 1,
-                voipId: props.account.voipId,
-                patientId: props.patientId,
+                mobilephone: incomingCallInfo.tel,
+                callType: incomingCallInfo.callType + 1,
+                voipId: doctorId,
+                patientId: incomingCallInfo.patientId,
                 inquiryInfoId: incomingCallInfo.inquiryInfoId
             })).then(
                 (action)=> {
@@ -124,84 +121,54 @@ class Call extends Component {
         }
     }
 
-    toSelectPatientPage(props) {
-        let {dispatch, incomingCallInfo, router} = props;
+    toCasePage(props, data) {
+        let {dispatch, router} = props;
         let {user, description} = this.state;
 
         this.setVisible(false);
 
-        let patientId = user.patientId || incomingCallInfo.patientId;
-        let inquiryInfoId = user.inquiryInfoId || incomingCallInfo.inquiryInfoId;
-        let inquiryId = user.inquiryId || incomingCallInfo.inquiryId;
+        dispatch(setCurrentCase({
+            description: description,
+            inquiryInfoId: data.inquiryInfoId,
+            inquiryId: data.inquiryId,
+            userId: user.userId,
+            patientId: data.patientId,
+            caseId: null,
+            state: -1
+        }));
 
-        if (patientId) {
-            dispatch(setCurrentCase({
-                description: description,
-                inquiryInfoId: inquiryInfoId,
-                inquiryId: inquiryId,
-                userId: user.userId,
-                patientId: patientId,
-                caseId: null,
-                state: -1
-            }));
-
-            router.push(`/inquire/case/detail`);
-        } else {
-            router.push(`/inquire/case/selectPatient`);
-        }
+        router.push(`/inquire/case/detail`);
 
         setTimeout(()=> {
             dispatch(setIncomingUserId(user.userId, user));
         }, 100);
     }
 
-    checkCall(nextProps) {
-
-        if (nextProps.isVisible) {
-            //接听
-            if (nextProps.callState === 0) {
-                this.setState({
-                    tip: '接听中。。。'
-                });
-            }
-            else if (nextProps.callState === 1) {
-                this.state.tip = '';
-                this.toSelectPatientPage(nextProps);
-            }
-            else {
-                //由呼叫中直接到挂断为呼叫失败
-                if (this.props.callState === 0) {
-                    /*this.setState({
-                     tip: '接听失败'
-                     });*/
-
-                    this.hangUp();
-                    message.error('接听失败');
-                } else {
-                    if (!this.props.isVisible) {
-                        this.state.tip = "";
-                    }
-                }
-            }
-        }
-    }
-
     //接听
     answer() {
         let props = this.props;
-        let {answer, dispatch} = props;
+        let {dispatch, incomingCallInfo} = props;
+        let doctorId = incomingCallInfo.doctorId;
 
         this.setVisible(false);
 
-        dispatch(getInquiryRecord()).then(
+        dispatch(agoraAccept({
+            channelName: incomingCallInfo.channelName,
+            doctorId: doctorId
+        })).then(
             (action)=> {
                 let result = (action.response || {}).result;
+                let data = (action.response || {}).data || {};
 
                 if (result === 0) {
-                    this.toSelectPatientPage(props);
+                    this.toCasePage(props, {
+                        inquiryInfoId: incomingCallInfo.inquiryInfoId,
+                        patientId:incomingCallInfo.patientId,
+                        inquiryId: data.inquiryId
+                    });
 
                     setTimeout(()=> {
-                        answer();
+                        this._answer(data, doctorId, incomingCallInfo.tel, incomingCallInfo.workingStatus);
                     }, 100);
 
                 } else {
@@ -218,13 +185,20 @@ class Call extends Component {
         );
     }
 
-    //忙碌
-    busy() {
-        this.setVisible(false);
+    //加入频道
+    _answer(data, doctorId, phone, workingStatus){
+        let {joinChannel, callType} = this.props;
 
-        let {busy} = this.props;
-        if (typeof busy === 'function') {
-            busy();
+        if(typeof joinChannel == 'function'){
+            joinChannel({
+                key: data.dynamicKey,
+                recordingKey: data.recordingKey,
+                channel: data.channelName,
+                id: doctorId,
+                workingStatus: workingStatus,
+                phone: phone,
+                callType: callType
+            });
         }
     }
 
@@ -234,69 +208,34 @@ class Call extends Component {
 
         this.setVisible(false);
 
-        let {hangUp, callType, phone, incomingCallInfo, dispatch} = props || this.props;
+       // let {hangUp, callType, phone, incomingCallInfo, dispatch} = props || this.props;
 
         //电话预约之后医生挂断和超时未接调用更新通话记录状态
-        if (callType === 0 && !this.isClickAnswer && incomingCallInfo.recordId) {
+        /*if (callType === 0 && !this.isClickAnswer && incomingCallInfo.recordId) {
             dispatch(addRecordForTimeoutAndHangup({
                 id: incomingCallInfo.recordId,
                 byeType: isTimeout ? -2 : -8
             }));
-        }
+        }*/
 
-        if (typeof hangUp === 'function') {
-            hangUp(phone, callType, this.isClickAnswer, incomingCallInfo.workingStatus);
-        }
+
+        let {dispatch, incomingCallInfo} = props || this.props;
+
+        //拒绝接听时调用
+        dispatch(agoraVoipInviteRefuse({
+            doctorId: incomingCallInfo.doctorId,
+            channelName: incomingCallInfo.channelName,
+            userPhone: incomingCallInfo.tel
+        }));
+
+        //挂断后将医生置为原来的状态
+        dispatch(noticeChangeDoctorState({
+            workingStatus: incomingCallInfo.workingStatus
+        }));
 
         this.isClickAnswer = false;
     }
 
-    //电话接听实质是电话回呼
-    callback() {
-        clearTimeout(this.st);
-
-        this.isClickAnswer = true;
-
-        let {callbackFromCall, phone, doctor, incomingCallInfo, dispatch} = this.props;
-        let {user} = this.state;
-
-        //回呼前创建会话ID
-        dispatch(addCallRecord({
-            patientId: incomingCallInfo.patientId,
-            inquiryInfoId: incomingCallInfo.inquiryInfoId,
-            userGpkgId: incomingCallInfo.userGpkgId,
-            gpkgId: incomingCallInfo.gpkgId,
-            inquiryCallType: 1,
-            phone: phone,
-            callType: 1,
-            operatorRoleCode: incomingCallInfo.workingStatus === 4 ? 105 : 104
-        })).then(
-            (action)=> {
-                let result = (action.response || {}).result;
-                let data = (action.response || {}).data || {};
-
-                if (result === 0) {
-                    this.state.user.inquiryId = data.inquiryId;
-                    dispatch(setIncomingUserId(user.userId, user));
-
-                    if (typeof callbackFromCall === 'function') {
-                        callbackFromCall(phone, incomingCallInfo.workingStatus);
-                    }
-                } else {
-                    message.error('接听失败');
-                    this.setVisible(false);
-                    console.log('呼叫失败-------------创建会话（inquireId）失败');
-
-                }
-            },
-            ()=> {
-                message.error('接听失败');
-                this.setVisible(false);
-                console.log('呼叫失败-------------创建会话（inquireId）失败');
-            }
-        );
-
-    }
 
     setVisible(isVisible) {
         this.props.dispatch(showCallingDialog(isVisible));
@@ -319,12 +258,8 @@ class Call extends Component {
                     <Button size="large" type="ghost" onClick={()=>this.hangUp()}><img
                         src={require('assets/images/hangup-gray.png')} alt=""/>挂断</Button>
 
-                    {callType===1 && <Button size="large" className="answer-btn" onClick={()=>this.answer()} disabled={disabled} ><img
-                        src={require('assets/images/answer.png')} alt=""/>接听</Button>}
-
-                    { (callType===0 && !this.isClickAnswer) && <Button size="large" className="answer-btn" onClick={()=>this.callback()} disabled={disabled} ><img
-                    src={require('assets/images/answer.png')} alt=""/>接听</Button>}
-                    {/*<Button size="large" type="primary" onClick={()=>this.busy()}><img src={require('assets/images/busy.png')} alt=""/>忙碌</Button>*/}
+                   <Button size="large" className="answer-btn" onClick={()=>this.answer()} disabled={disabled} ><img
+                        src={require('assets/images/answer.png')} alt=""/>接听</Button>
             </div>
                 }>
                 <div className={styles.pic}>
@@ -358,17 +293,10 @@ class Call extends Component {
 }
 
 const mapStateToProps = (globalStore) => {
-    const {callStore, doctorStore, authStore} = globalStore;
-
-    let {incomingCallInfo={}} = callStore;
-    let phone = incomingCallInfo.phone;
-    let patientId = incomingCallInfo.patientId;
+    const {callStore, authStore} = globalStore;
 
     return {
-        account: authStore.ocxAccount,
-        phone: phone,
-        patientId: patientId,
-        doctor: Object.assign({}, doctorStore.data),
+        doctorId: authStore.id,
         isVisible: callStore.isShowCallingDialog,
         incomingCallInfo: callStore.incomingCallInfo,
         callType: callStore.callType,

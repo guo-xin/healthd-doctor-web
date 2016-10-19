@@ -4,6 +4,8 @@ import {showCallingDialog} from 'redux/actions/call';
 import {autoSaveCase} from 'redux/actions/case';
 
 import {
+    noticeChangeDoctorState,
+
     setDoctorQueueCount,
     getDoctorPictureMessage,
     changeDoctorState,
@@ -39,24 +41,45 @@ export const receiveMessages = ()=> {
                     let obj = JSON.parse(resp);
                     if (obj.data && obj.type) {
                         switch (obj.type) {
-                            //电话推送
-                            case 'voicecall':
-                                let allState = store.getState();
-                                let preWorkingStatus = allState.doctorStore.data.workingStatus;
-                                let isShowCallingDialog = allState.callStore.isShowCallingDialog;
+                            //声网来电推送
+                            case 'appcall':
+                                if(obj.data){
+                                    let allState = store.getState();
+                                    let preWorkingStatus = allState.doctorStore.data.workingStatus;
+                                    let isShowCallingDialog = allState.callStore.isShowCallingDialog;
 
-                                //如果当前有来电阻止弹出下一个来电
-                                if (isShowCallingDialog) {
-                                    return;
+                                    //如果当前有来电阻止弹出下一个来电
+                                    if (isShowCallingDialog) {
+                                        return;
+                                    }
+                                    console.log('appcall----------', obj.data);
+                                    //接听来电后置为占线状态
+                                    store.dispatch(noticeChangeDoctorState({
+                                        workingStatus: 1
+                                    }));
+
+                                    store.dispatch(showCallingDialog(true, obj.data.callType, Object.assign({workingStatus: preWorkingStatus}, obj.data)));
                                 }
 
-                                store.dispatch(changeDoctorState({
-                                    workingStatus: 1
-                                }));
+                                break;
 
-                                store.dispatch(showCallingDialog(true, 0, Object.assign({workingStatus: preWorkingStatus}, obj)));
+                            case 'appaccept':
+
+                                if(obj.data){
+                                    console.log('appaccept----------', obj.data);
+                                }
 
                                 break;
+
+                            case 'apphangup':
+
+                                if(obj.data){
+                                    console.log('apphangup----------', obj.data);
+                                }
+
+                                break;
+
+                            
 
                             //排队推送
                             case 'queue':
