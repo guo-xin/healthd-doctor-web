@@ -11,9 +11,10 @@
     <script>
         window.baseApi = "v2";
         window.fileApi = "healthd-tools/v2";
+        window.msgApi = "platform-message";
     </script>
-<link rel="shortcut icon" href="healthd.ico"><link href="./css/app-8c5c5d9b915d2feb1cec.css" rel="stylesheet"></head>
+<link rel="shortcut icon" href="healthd.ico"><link href="./css/app-161e3892e1366112a881.css" rel="stylesheet"></head>
 <body>
 <div id="app"></div>
-<script type="text/javascript" src="vendor.bundle.js"></script><script type="text/javascript" src="index-8c5c5d9.js"></script></body>
+<script type="text/javascript" src="vendor.bundle.js"></script><script type="text/javascript" src="index-161e389.js"></script></body>
 </html>
