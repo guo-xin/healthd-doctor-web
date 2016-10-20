@@ -146,6 +146,8 @@ class Call extends Component {
 
     //接听
     answer() {
+        clearTimeout(this.st);
+
         let props = this.props;
         let {dispatch, incomingCallInfo} = props;
         let doctorId = incomingCallInfo.doctorId;
@@ -207,17 +209,6 @@ class Call extends Component {
         clearTimeout(this.st);
 
         this.setVisible(false);
-
-       // let {hangUp, callType, phone, incomingCallInfo, dispatch} = props || this.props;
-
-        //电话预约之后医生挂断和超时未接调用更新通话记录状态
-        /*if (callType === 0 && !this.isClickAnswer && incomingCallInfo.recordId) {
-            dispatch(addRecordForTimeoutAndHangup({
-                id: incomingCallInfo.recordId,
-                byeType: isTimeout ? -2 : -8
-            }));
-        }*/
-
 
         let {dispatch, incomingCallInfo} = props || this.props;
 
