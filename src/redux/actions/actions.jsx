@@ -163,7 +163,9 @@ export function fetch(url, ...params) {
         let first = "";
 
         if (list.length > 0) {
-            first = list.shift() + ';jsessionid=' + (healthWEB.j || '');
+            //first = list.shift() + ';jsessionid=' + (healthWEB.j || '');
+
+            first = list.shift();
         }
 
         url = first + (list.length > 0 ? ('?' + list.join('?') ) : '');
