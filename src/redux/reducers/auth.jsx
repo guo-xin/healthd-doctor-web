@@ -8,16 +8,6 @@ const auth = (state = {
     token: '',
     isAuthenticated: false,
     expires: -1,
-    ocxAccount: {
-        ip: "",
-        port: "",
-        acountSid: "",
-        authToken: "",
-        subAccount: "",
-        subAccountPwd: "",
-        voipId: "",
-        voipPwd: ""
-    },
     isResetting: true
 }, action) => {
     let data, result;
@@ -103,16 +93,6 @@ const auth = (state = {
 
             return Object.assign({}, state);
 
-        //获取荣联账号
-        case actions.GET_OCX_ACCOUNT + "_SUCCESS":
-            result = (action.response || {}).result;
-
-            if (result === 0) {
-                data = (action.response || {}).data || {};
-                state.ocxAccount = data;
-            }
-
-            return Object.assign({}, state);
 
         default:
             return state

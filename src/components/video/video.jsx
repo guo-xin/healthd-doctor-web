@@ -8,11 +8,9 @@ import CallbackFromCase from 'components/dialogs/callbackFromCase';
 import {
     subscribeServerEvent,
     agoraVoipInviteBye,
-
+    setCallInfo,
 
     setUserForVideoArea,
-    showCallbackFromCaseDialog,
-    setCallState,
     queueBack,
     missedCall,
     cancelQueue,
@@ -26,13 +24,11 @@ import {connect} from 'react-redux';
 import * as global from 'util/global';
 import styles from './video.less';
 
-let pubSub = require('pubsub-js');
+import pubSub from 'util/pubsub';
 
 let ringFile = require('assets/ring.wav');
 
 class Video extends React.Component {
-    startTime = null; //问诊开始时间
-
     queueId = null; //排队id
 
 
@@ -56,7 +52,7 @@ class Video extends React.Component {
     /*声网*/
     key = '';
     recordingKey = '';
-    appId = 'a1c1fd064c4b4ae58f2dd8ac66ef9458';
+    appId = '7eca1d509eaa4075bcfa068032a19ee0';
     client = null;
     localStream = null;
     lastLocalStreamId = null;
@@ -81,9 +77,9 @@ class Video extends React.Component {
             );
         }, 1000);
 
-        pubSub.subscribe('apphangup', ()=>{
+        pubSub.subAppHangUp(()=>{
             this.clearAllStream();
-        })
+        });
     }
 
     componentWillUnmount() {
@@ -104,7 +100,7 @@ class Video extends React.Component {
             nextProps.dispatch(setUserForVideoArea({}));
         }
 
-        if (nextProps.isShowCallingDialog && nextProps.isShowCallingDialog != this.props.isShowCallingDialog) {
+        /*if (nextProps.isShowCallingDialog && nextProps.isShowCallingDialog != this.props.isShowCallingDialog) {
             if (nextProps.callType === 1) {
                 //开始响铃
                 this.refs.audio.setAttribute('src', ringFile);
@@ -116,7 +112,7 @@ class Video extends React.Component {
             //停止响铃
             this.refs.audio.setAttribute('src', '');
             this.refs.audio.pause();
-        }
+        }*/
     }
 
 
@@ -202,7 +198,9 @@ class Video extends React.Component {
         let {dispatch} = this.props;
 
         if (client) {
-            dispatch(setCallState(1));
+            dispatch(setCallInfo({
+                callState: 1
+            }));
 
             this.key = params.key;
             this.recordingKey = params.recordingKey;
@@ -327,7 +325,9 @@ class Video extends React.Component {
             isConnecting: false
         });
 
-        dispatch(setCallState(-1));
+        dispatch(setCallInfo({
+            callState: -1
+        }));
         dispatch(noticeChangeDoctorState({
             workingStatus:this.workingStatus
         }));
@@ -346,7 +346,30 @@ class Video extends React.Component {
         this.hangup();
     }
 
-    
+    showCallFromCaseDialog(callType) {
+        let {doctor, dispatch} = this.props;
+
+        if (doctor.workingStatus == 2 || doctor.workingStatus == 9) {
+            message.error('离线或忙碌状态不可以呼叫患者！');
+            return;
+        }
+
+        this.state.isShowVideoCtrl = false;
+
+        this.pause();
+
+        //设置通话信息
+        dispatch(setCallInfo({
+            callType: callType,
+            inquiryCallType: 0,
+            callState: -1
+        }));
+
+        //显示回呼对话框
+        pubSub.showCallbackDialogInCase({
+            callType: callType
+        });
+    }
     
     
     
@@ -361,20 +384,10 @@ class Video extends React.Component {
 
         let seconds = -1;
         let container = this.refs.timer;
+        let {callUser={}} = this.props;
 
         //来电时设置用户头像
-        if (this.inquiryCallType === 1) {
-            let {callbackUser={}} = this.props;
-            if (callbackUser.headPic) {
-                this.refs.userHeadPic.src = callbackUser.headPic;
-            }
-
-        } else {
-            let {incomingUser={}} = this.props;
-            if (incomingUser.headPic) {
-                this.refs.userHeadPic.src = incomingUser.headPic;
-            }
-        }
+        this.refs.userHeadPic.src = callUser.headPic;
 
         changeTime();
 
@@ -393,23 +406,6 @@ class Video extends React.Component {
     stopTimer() {
         this.refs.userHeadPic.src = global.defaultHead;
         clearInterval(this.timer);
-    }
-
-
-
-    showCallFromCaseDialog(callType) {
-        let {dispatch, doctor} = this.props;
-
-        if (doctor.workingStatus == 2 || doctor.workingStatus == 9) {
-            message.error('离线或忙碌状态不可以呼叫患者！');
-            return;
-        }
-
-        this.state.isShowVideoCtrl = false;
-
-        this.pause();
-
-        dispatch(showCallbackFromCaseDialog(true, callType));
     }
 
     selectVideo = {};
@@ -643,14 +639,12 @@ const mapStateToProps = (globalStore) => {
     return {
         patients: Object.assign({}, patientStore.patients),
         currentCase: caseStore.currentCase,
-        incomingUser: callStore.incomingUser,
-        callbackUser: callStore.callbackUser,
+        callUser: callStore.callUser,
         userForVideoArea: callStore.userForVideoArea,
         doctorId: authStore.id,
         doctor: Object.assign({}, doctorStore.data),
         callType: callStore.callType,
         isShowVideo: caseStore.isShowVideo,
-        isShowCallingDialog: callStore.isShowCallingDialog,
         callRecords: caseStore.callRecords
     }
 };

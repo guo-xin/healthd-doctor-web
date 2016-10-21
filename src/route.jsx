@@ -16,7 +16,6 @@ module.exports = {
                 require(baseDir + '/inquiry/route'),
                 require(baseDir + '/callback/route'),
                 require(baseDir + '/toolbar/route'),
-                require(baseDir + '/patient/route'),
                 require(baseDir + '/doctor/route')
             ]
         },

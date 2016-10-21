@@ -1,16 +1,13 @@
 import * as actions from './actions';
 const fetch = actions.fetch;
 
-export const showCallingDialog = actions.create(actions.SHOW_CALLING_DIALOG, 'isShowCallingDialog', 'callType', 'data');
-export const showCallbackDialog = actions.create(actions.SHOW_CALLBACK_DIALOG, 'isShowCallbackDialog', 'callType');
-export const showCallbackFromCaseDialog = actions.create(actions.SHOW_CALLBACK_FROM_CASE_DIALOG, 'isShowCallbackFromCaseDialog', 'callType');
+
+
 export const showCalcDialog = actions.create(actions.SHOW_CALC_DIALOG, 'isShowCalcDialog');
 
-export const setIncomingUserId = actions.create(actions.SET_INCOMING_USER_ID, 'userId', 'user');
-export const setCallbackUserId = actions.create(actions.SET_CALLBACK_USER_ID, 'userId', 'user');
-export const setCallState = actions.create(actions.SET_CALL_STATE, 'state', 'msg');
 export const setUserForVideoArea = actions.create(actions.SET_USER_FOR_VIDEO_AREA, 'user');
 
+export const setCallInfo = actions.create(actions.SET_CALL_INFO, 'data');
 
 //WEB回呼APP接口-统一接口
 export const agoraCall = (params)=>{
@@ -77,7 +74,6 @@ export const agoraVoipInviteBye = (params)=>{
     };
 
 };
-
 
 //WEB医生拒接接听
 export const agoraVoipInviteRefuse = (params)=>{

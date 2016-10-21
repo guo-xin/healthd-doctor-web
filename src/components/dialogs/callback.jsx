@@ -2,15 +2,10 @@ import styles from './callback.less';
 import React, {Component} from 'react';
 import {Modal, Button, message} from 'antd';
 import {withRouter} from 'react-router';
-
 import {connect} from 'react-redux';
 import {
     agoraCall,
-
-    showCallbackDialog,
-    setIncomingUserId,
-    setCallbackUserId,
-    addCallRecord
+    setCallInfo
 } from 'redux/actions/call';
 import {setCurrentCase} from 'redux/actions/case';
 import {getMaterialBeforeCase} from 'redux/actions/inquire';
@@ -18,13 +13,13 @@ import {noticeChangeDoctorState} from 'redux/actions/doctor';
 import Image from '../image/image.jsx';
 import * as global from 'util/global';
 
-let pubSub = require('pubsub-js');
+import pubSub from 'util/pubsub';
 
 class Callback extends Component {
     state = {
         isVisible: false,
         disabled: false,
-        user: {},
+        callbackUser: {},
         description: '',
         tip: '您是否需要回呼患者'
     };
@@ -34,7 +29,8 @@ class Callback extends Component {
     }
 
     toCasePage() {
-        let {dispatch, callbackUser={}, router} = this.props;
+        let {dispatch, router} = this.props;
+        let {callbackUser={}} = this.state;
 
         this.setVisible(false);
 
@@ -48,28 +44,33 @@ class Callback extends Component {
             state: -1
         }));
 
+        dispatch(setCallInfo({
+            callUser: callbackUser
+        }));
+
         router.push(`/inquire/case/detail`);
-
-        setTimeout(()=> {
-            dispatch(setIncomingUserId(callbackUser.userId, callbackUser));
-        }, 200);
-    }
-
-    componentWillReceiveProps(nextProps) {
-        if (nextProps.isVisible && nextProps.isVisible != this.props.isVisible) {
-            this.state.description = '';
-            this.getPatientDesc(nextProps);
-        }
     }
 
     componentDidMount(){
-        pubSub.subscribe('apphangup', ()=>{
+        //订阅app挂断事件
+        pubSub.subAppHangUp(()=>{
             this.setVisible(false);
-        })
+        });
+        
+        //订阅显示回呼对话框
+        pubSub.subShowCallbackDialog((topic, data)=>{
+            this.state.description = '';
+            this.state.callbackUser = data.callbackUser;
+            this.state.callType = data.callType;
+            this.getPatientDesc();
+
+            this.setVisible(true);
+        });
     }
 
-    getPatientDesc(props) {
-        let {dispatch, callbackUser} = props;
+    getPatientDesc() {
+        let {dispatch} = this.props;
+        let {callbackUser={}} = this.state;
 
         if (callbackUser.inquiryInfoId && callbackUser.patientId) {
             this.setState({
@@ -100,7 +101,7 @@ class Callback extends Component {
     onOk() {
         let {dispatch, doctor={}} = this.props;
 
-        let {callbackUser={}, callType} = this.props;
+        let {callbackUser={}, callType} = this.state;
 
         let doctorId = doctor.id;
 
@@ -114,7 +115,7 @@ class Callback extends Component {
             phone: callbackUser.userMobilePhone,
             userGpkgId: callbackUser.userGpkgId,
             gpkgId: callbackUser.gpkgId,
-            callType: callType + 1,
+            callType: callType,
             doctorId: doctorId,
             operatorRoleCode: doctor.workingStatus === 4 ? 105 : 104
         };
@@ -170,7 +171,7 @@ class Callback extends Component {
 
     //回呼
     _callback(params, data, workingStatus) {
-        let {dispatch, joinChannel, doctor} = this.props;
+        let {joinChannel, doctor} = this.props;
         let doctorId = doctor.id;
 
         if (typeof joinChannel == 'function') {
@@ -194,13 +195,14 @@ class Callback extends Component {
     }
 
     setVisible(isVisible) {
-        this.props.dispatch(showCallbackDialog(isVisible));
+        this.setState({
+            isVisible: isVisible
+        });
     }
 
     render() {
-        let {callbackUser={}, isVisible} = this.props;
+        let {disabled, tip, callbackUser={}, isVisible} = this.state;
         let user = callbackUser || {};
-        let {disabled, tip} = this.state;
 
         return (
             <Modal
@@ -248,18 +250,12 @@ class Callback extends Component {
 }
 
 const mapStateToProps = (globalStore) => {
-    const {callStore, doctorStore} = globalStore;
+    const {doctorStore} = globalStore;
 
     return {
-        doctor: Object.assign({}, doctorStore.data),
-        callbackUser: Object.assign({}, callStore.callbackUser),
-        isVisible: callStore.isShowCallbackDialog,
-        callType: callStore.callType,
-        callState: callStore.callState,
-        callMessage: callStore.callMessage
+        doctor: Object.assign({}, doctorStore.data)
     }
 };
-
 
 Callback = connect(mapStateToProps)(Callback);
 

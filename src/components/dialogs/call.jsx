@@ -2,16 +2,12 @@ import styles from './call.less';
 import React, {Component} from 'react';
 import {Modal, Button, message} from 'antd';
 import {withRouter} from 'react-router';
-
 import {connect} from 'react-redux';
 import {getUserByMPTV} from 'redux/actions/user';
 import {
     agoraAccept,
     agoraVoipInviteRefuse,
-
-    showCallingDialog,
-    setIncomingUserId,
-    addRecordForTimeoutAndHangup
+    setCallInfo
 } from 'redux/actions/call';
 import {setCurrentCase} from 'redux/actions/case';
 import {getMaterialBeforeCase} from 'redux/actions/inquire';
@@ -19,13 +15,13 @@ import {noticeChangeDoctorState} from 'redux/actions/doctor';
 import Image from '../image/image.jsx';
 import * as global from 'util/global';
 
-
-let pubSub = require('pubsub-js');
+import pubSub from 'util/pubsub';
 
 class Call extends Component {
     state = {
+        incomingCallInfo: {}, //app来电消息推送内容
         isVisible: false,
-        user: {},
+        user: {}, //当前来电用户详细信息
         disabled: false,
         tip: ''
     };
@@ -36,44 +32,37 @@ class Call extends Component {
 
     st = null; //句柄，电话超过一分钟直接关闭
 
-    //属性改变前调用
-    componentWillReceiveProps(nextProps) {
-        let {dispatch, isVisible} = this.props;
-        let nextIsVisible = nextProps.isVisible;
+    componentDidMount(){
+        //订阅app挂掉事件
+        pubSub.subAppHangUp(()=>{
+            this.setVisible(false);
+        });
 
-        if (nextIsVisible === true && nextIsVisible != isVisible) {
+        //订阅app呼叫来电事件
+        pubSub.subShowCallDialog((topic, data)=>{
+            this.state.incomingCallInfo = data;
             this.state.user = {};
-            this.getUser(nextProps);
+            this.getUser();
+            this.setVisible(true);
 
             //超过一分钟未接听直接挂断
             this.st = setTimeout(()=> {
-                this.hangUp(nextProps, true);
+                this.hangUp(true);
             }, 60 * 1000);
-        }
-
-        if (nextIsVisible === false && nextIsVisible != isVisible) {
-            setTimeout(()=> {
-                this.isClickAnswer = false;
-            }, 50);
-        }
+        });
     }
 
-    componentDidMount(){
-        pubSub.subscribe('apphangup', ()=>{
-            this.setVisible(false);
-        })
-    }
-
-    getUser(props) {
-        let {incomingCallInfo={}, doctorId} = props;
+    //查询用户信息
+    getUser() {
+        let {dispatch} = this.props;
+        let {incomingCallInfo={}} = this.state;
 
         if (incomingCallInfo.tel) {
-
             this.state.disabled = true;
-            props.dispatch(getUserByMPTV({
+            dispatch(getUserByMPTV({
                 mobilephone: incomingCallInfo.tel,
-                callType: incomingCallInfo.callType + 1,
-                voipId: doctorId,
+                callType: incomingCallInfo.callType,
+                voipId: incomingCallInfo.doctorId,
                 patientId: incomingCallInfo.patientId,
                 inquiryInfoId: incomingCallInfo.inquiryInfoId
             })).then(
@@ -82,7 +71,7 @@ class Call extends Component {
                     let result = (action.response || {}).result;
 
                     if (result === 0) {
-                        this.getPatientDesc(props, user);
+                        this.getPatientDesc(user);
 
                     } else {
                         message.info('由于网络异常用户信息获取失败，请挂断');
@@ -96,13 +85,14 @@ class Call extends Component {
         }
     }
 
-    getPatientDesc(props, user) {
-        let {incomingCallInfo={}} = props;
+    getPatientDesc(user) {
+        let {dispatch} = this.props;
+        let {incomingCallInfo={}} = this.state;
         let inquiryInfoId = user.inquiryInfoId || incomingCallInfo.inquiryInfoId;
         let patientId = user.patientId || incomingCallInfo.patientId;
 
         if (inquiryInfoId && patientId) {
-            props.dispatch(getMaterialBeforeCase({
+            dispatch(getMaterialBeforeCase({
                 inquiryInfoId: inquiryInfoId
             })).then(
                 (action)=> {
@@ -130,8 +120,8 @@ class Call extends Component {
         }
     }
 
-    toCasePage(props, data) {
-        let {dispatch, router} = props;
+    toCasePage(data) {
+        let {dispatch, router} = this.props;
         let {user, description} = this.state;
 
         this.setVisible(false);
@@ -146,19 +136,19 @@ class Call extends Component {
             state: -1
         }));
 
-        router.push(`/inquire/case/detail`);
+        dispatch(setCallInfo({
+            callUser: user
+        }));
 
-        setTimeout(()=> {
-            dispatch(setIncomingUserId(user.userId, user));
-        }, 100);
+        router.push(`/inquire/case/detail`);
     }
 
     //接听
     answer() {
         clearTimeout(this.st);
 
-        let props = this.props;
-        let {dispatch, incomingCallInfo} = props;
+        let {dispatch} = this.props;
+        let {incomingCallInfo} = this.state;
         let doctorId = incomingCallInfo.doctorId;
 
         this.setVisible(false);
@@ -172,14 +162,14 @@ class Call extends Component {
                 let data = (action.response || {}).data || {};
 
                 if (result === 0) {
-                    this.toCasePage(props, {
+                    this.toCasePage({
                         inquiryInfoId: incomingCallInfo.inquiryInfoId,
                         patientId:incomingCallInfo.patientId,
                         inquiryId: data.inquiryId
                     });
 
                     setTimeout(()=> {
-                        this._answer(data, doctorId, incomingCallInfo.tel, incomingCallInfo.workingStatus);
+                        this._answer(data, incomingCallInfo);
                     }, 100);
 
                 } else {
@@ -197,29 +187,30 @@ class Call extends Component {
     }
 
     //加入频道
-    _answer(data, doctorId, phone, workingStatus){
-        let {joinChannel, callType} = this.props;
+    _answer(data, incomingCallInfo){
+        let {joinChannel} = this.props;
 
         if(typeof joinChannel == 'function'){
             joinChannel({
                 key: data.dynamicKey,
                 recordingKey: data.recordingKey,
                 channel: data.channelName,
-                id: doctorId,
-                workingStatus: workingStatus,
-                phone: phone,
-                callType: callType
+                id: incomingCallInfo.doctorId,
+                workingStatus: incomingCallInfo.workingStatus,
+                phone: incomingCallInfo.tel,
+                callType: incomingCallInfo.callType
             });
         }
     }
 
     //挂断, isTimeout:是否超时挂断
-    hangUp(props, isTimeout) {
+    hangUp(isTimeout) {
         clearTimeout(this.st);
 
         this.setVisible(false);
 
-        let {dispatch, incomingCallInfo} = props || this.props;
+        let {dispatch} = this.props;
+        let {incomingCallInfo} = this.state;
 
         //拒绝接听时调用
         dispatch(agoraVoipInviteRefuse({
@@ -232,18 +223,20 @@ class Call extends Component {
         dispatch(noticeChangeDoctorState({
             workingStatus: incomingCallInfo.workingStatus
         }));
-
-        this.isClickAnswer = false;
     }
 
-
     setVisible(isVisible) {
-        this.props.dispatch(showCallingDialog(isVisible));
+        if(!isVisible){
+            clearTimeout(this.st);
+        }
+
+        this.setState({
+            isVisible: isVisible
+        });
     }
 
     render() {
-        let {isVisible, callType} = this.props;
-        let {user={}, tip, disabled} = this.state;
+        let {isVisible, user={}, tip, disabled} = this.state;
 
         return (
             <Modal
@@ -293,17 +286,9 @@ class Call extends Component {
 }
 
 const mapStateToProps = (globalStore) => {
-    const {callStore, authStore} = globalStore;
-
-    return {
-        doctorId: authStore.id,
-        isVisible: callStore.isShowCallingDialog,
-        incomingCallInfo: callStore.incomingCallInfo,
-        callType: callStore.callType,
-        callState: callStore.callState
-    }
+    const {} = globalStore;
+    return {}
 };
-
 
 Call = connect(mapStateToProps)(Call);
 

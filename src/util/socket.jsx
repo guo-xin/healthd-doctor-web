@@ -1,20 +1,19 @@
 import * as store from 'redux/store';
 import cookie from 'react-cookie';
-import {showCallingDialog} from 'redux/actions/call';
+import {setCallInfo} from 'redux/actions/call';
 import {autoSaveCase} from 'redux/actions/case';
 
 import {
     noticeChangeDoctorState,
-
     setDoctorQueueCount,
     getDoctorPictureMessage,
-    changeDoctorState,
     getDoctorEndInquery,
     setDoctorClose,
     getDoctorAttendance
 } from 'redux/actions/doctor';
 
-let pubSub = require('pubsub-js');
+import pubSub from 'util/pubsub';
+
 let atmosphere = require('atmosphere.js');
 let socket;
 
@@ -42,7 +41,7 @@ export const receiveMessages = ()=> {
                     let obj = JSON.parse(resp);
                     if (obj.data && obj.type) {
                         switch (obj.type) {
-                            //声网来电推送
+                            //app呼叫推送
                             case 'appcall':
                                 if(obj.data){
                                     let allState = store.getState();
@@ -53,17 +52,26 @@ export const receiveMessages = ()=> {
                                     if (isShowCallingDialog) {
                                         return;
                                     }
-                                    console.log('appcall----------', obj.data);
+
                                     //接听来电后置为占线状态
                                     store.dispatch(noticeChangeDoctorState({
                                         workingStatus: 1
                                     }));
 
-                                    store.dispatch(showCallingDialog(true, obj.data.callType, Object.assign({workingStatus: preWorkingStatus}, obj.data)));
+                                    //设置通话信息
+                                    store.dispatch(setCallInfo({
+                                        callType: obj.data.callType,
+                                        inquiryCallType: 1,
+                                        callState: 0
+                                    }));
+
+                                    //显示来电对话框
+                                    pubSub.showCallDialog(Object.assign({workingStatus: preWorkingStatus}, obj.data));
                                 }
 
                                 break;
 
+                            //app接听推送
                             case 'appaccept':
 
                                 if(obj.data){
@@ -72,15 +80,14 @@ export const receiveMessages = ()=> {
 
                                 break;
 
+                            //app挂断推送
                             case 'apphangup':
 
                                 if(obj.data){
-                                    pubSub.publish('apphangup');
+                                    pubSub.appHangUp();
                                 }
 
                                 break;
-
-                            
 
                             //排队推送
                             case 'queue':

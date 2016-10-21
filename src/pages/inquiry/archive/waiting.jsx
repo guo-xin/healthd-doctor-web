@@ -6,9 +6,10 @@ import Image from 'components/image/image.jsx';
 import {connect} from 'react-redux';
 import {withRouter} from 'react-router';
 import {getInquireQueue, getMaterialBeforeCase} from 'redux/actions/inquire';
-import {showCallbackDialog, setCallbackUserId} from 'redux/actions/call';
+import {setCallInfo} from 'redux/actions/call';
 import * as global from 'util/global';
 import PictureViewer from 'components/dialogs/pictureViewer';
+import pubSub from 'util/pubsub';
 
 class Waiting extends React.Component {
     state = {
@@ -33,21 +34,24 @@ class Waiting extends React.Component {
         );
     }
 
-    componentWillReceiveProps(nextProps) {
-        if (nextProps.isShowCallingDialog && nextProps.isShowCallingDialog !== this.props.isShowCallingDialog) {
+    componentDidMount() {
+        this._isMounted = true;
+
+        //订阅app呼叫来电事件
+        this.subToken = pubSub.subShowCallDialog((topic, data)=>{
             let comp = this.refs.picViewer;
             if (comp) {
                 comp.setVisible(false);
             }
-        }
-    }
-
-    componentDidMount() {
-        this._isMounted = true;
+        });
     }
 
     componentWillUnmount() {
         this._isMounted = false;
+
+        if(this.subToken){
+            pubSub.unSubscribe(this.subToken)
+        }
     }
 
     onCallBack(data, callType) {
@@ -60,14 +64,20 @@ class Waiting extends React.Component {
                 message.error('离线或忙碌状态不可以呼叫患者！');
                 return;
             }
-            
-            dispatch(setCallbackUserId(item.userId, item));
 
-            let st = setTimeout(()=> {
-                clearTimeout(st);
-                st = null;
-                dispatch(showCallbackDialog(true, callType));
-            }, 50);
+            //设置通话信息
+            dispatch(setCallInfo({
+                callUser: item,
+                callType: callType,
+                inquiryCallType: 0,
+                callState: -1
+            }));
+
+            //显示回呼对话框
+            pubSub.showCallbackDialog({
+                callbackUser: item,
+                callType: callType
+            });
 
         }
         else {
@@ -266,7 +276,6 @@ const mapStateToProps = (globalStore) => {
 
     return {
         doctor: Object.assign({}, doctorStore.data),
-        isShowCallingDialog: callStore.isShowCallingDialog,
         list: inquireStore.queue
     };
 };

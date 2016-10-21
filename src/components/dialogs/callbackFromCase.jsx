@@ -8,15 +8,13 @@ import {getUserById} from 'redux/actions/user';
 import {getInquireCallbackNumber} from 'redux/actions/inquire';
 import {
     agoraCall,
-
-    showCallbackFromCaseDialog,
-    setCallbackUserId
+    setCallInfo
 } from 'redux/actions/call';
 import {noticeChangeDoctorState} from 'redux/actions/doctor';
 import Image from '../image/image.jsx';
 import * as global from 'util/global';
 
-let pubSub = require('pubsub-js');
+import pubSub from 'util/pubsub';
 
 class CallbackFromCase extends Component {
     state = {
@@ -31,19 +29,26 @@ class CallbackFromCase extends Component {
         super(props);
     }
 
-    componentWillReceiveProps(nextProps) {
+    componentDidMount(){
+        //订阅app挂断事件
+        pubSub.subAppHangUp(()=>{
+            this.setVisible(false);
+        });
+
+        //订阅病历中回呼事件
+        pubSub.subShowCallbackDialogInCase((topic, data)=>{
+            this.state.callType = data.callType;
 
 
-        if (nextProps.isVisible && nextProps.isVisible !== this.props.isVisible) {
-            let {patientId, inquiryId} = nextProps.currentCase;
+            let {currentCase, patients, dispatch} = this.props;
+            let {patientId, inquiryId} = currentCase;
 
             if (patientId) {
-                let patients = nextProps.patients;
                 let patient = patients[patientId];
 
-                this.getUser(nextProps, patient.userId);
+                this.getUser(patient.userId);
 
-                nextProps.dispatch(getInquireCallbackNumber({
+                dispatch(getInquireCallbackNumber({
                     patientId: patientId,
                     inquiryId: inquiryId
                 })).then(
@@ -57,20 +62,14 @@ class CallbackFromCase extends Component {
                     }
                 );
             }
-        }
 
 
-        let currentCase = nextProps.currentCase;
-
+            this.setVisible(true);
+        });
     }
 
-    componentDidMount(){
-        pubSub.subscribe('apphangup', ()=>{
-            this.setVisible(false);
-        })
-    }
-
-    getUser(props, id) {
+    getUser(id) {
+        let {dispatch} = this.props;
         this.state.userId = id;
 
         this.setState({
@@ -79,10 +78,12 @@ class CallbackFromCase extends Component {
             disabled: true
         });
 
-        props.dispatch(getUserById(id)).then(
+        dispatch(getUserById(id)).then(
             (action)=> {
                 let user = (action.response || {}).data || {};
-                props.dispatch(setCallbackUserId(user.userId, user));
+                dispatch(setCallInfo({
+                    callUser: user
+                }));
 
                 this.setState({
                     user: user,
@@ -99,8 +100,8 @@ class CallbackFromCase extends Component {
 
     //回呼
     onOk() {
-        let {userId} = this.state;
-        let {users = {}, callType, currentCase={}} = this.props;
+        let {userId, callType} = this.state;
+        let {users = {}, currentCase={}} = this.props;
         let user = users[userId];
 
         this.setState({
@@ -202,7 +203,9 @@ class CallbackFromCase extends Component {
     }
 
     setVisible(isVisible) {
-        this.props.dispatch(showCallbackFromCaseDialog(isVisible));
+        this.setState({
+            isVisible: isVisible
+        });
     }
 
     getDiagnosisName() {
@@ -217,9 +220,9 @@ class CallbackFromCase extends Component {
     }
 
     render() {
-        let {currentCase={}, patients={}, isVisible} = this.props;
+        let {currentCase={}, patients={}} = this.props;
 
-        let {disabled, tip, inquiryNumber, user={}} = this.state;
+        let {isVisible, disabled, tip, inquiryNumber, user={}} = this.state;
 
         let diagnosisName = this.getDiagnosisName();
         let patient = patients[currentCase.patientId] || {};
@@ -271,18 +274,14 @@ class CallbackFromCase extends Component {
 }
 
 const mapStateToProps = (globalStore) => {
-    const {callStore, doctorStore, caseStore, patientStore, userStore} = globalStore;
+    const {doctorStore, caseStore, patientStore, userStore} = globalStore;
 
     return {
         doctor: Object.assign({}, doctorStore.data),
         patients: Object.assign({}, patientStore.patients),
         users: Object.assign({}, userStore.users),
         currentCase: caseStore.currentCase,
-        diagnosis: caseStore.diagnosis,
-        isVisible: callStore.isShowCallbackFromCaseDialog,
-        callType: callStore.callType,
-        callState: callStore.callState,
-        callMessage: callStore.callMessage
+        diagnosis: caseStore.diagnosis
     }
 };
 

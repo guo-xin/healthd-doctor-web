@@ -14,19 +14,15 @@ export const GET_ICD_TEN = "GET_ICD_TEN";
 
 
 /* ---------- 通话相关 start ---------- */
-export const SET_CALL_STATE = "SET_CALL_STATE"; //设置通话状态
-export const SET_INCOMING_USER_ID = "SET_INCOMING_USER_ID"; //设置当前来电用户Id
-export const SET_CALLBACK_USER_ID = "SET_CALLBACK_USER_ID"; //设置回呼的用户Id
-export const SET_USER_FOR_VIDEO_AREA = "SET_USER_FOR_VIDEO_AREA"; //设置视频区域用户信息
-export const SET_INCOMING_CALL_INFO = "SET_INCOMING_CALL_INFO"; //设置来电用户信息
-export const SHOW_CALLING_DIALOG = "SHOW_CALLING_DIALOG"; //设置来电对话框是否显示
-export const SHOW_CALLBACK_DIALOG = "SHOW_CALLBACK_DIALOG"; //设置回呼确认对话框是否显示
-export const SHOW_CALC_DIALOG = "SHOW_CALC_DIALOG"; //设置扣次对话框是否显示
-export const SHOW_CALLBACK_FROM_CASE_DIALOG = "SHOW_CALLBACK_FROM_CASE_DIALOG"; //设置病历中回呼对话框是否显示
+export const SET_CALL_INFO = "SET_CALL_INFO"; //设置通话信息
 
-export const ADD_CALL_RECORD = "ADD_CALL_RECORD"; //创建问诊会话
-export const ADD_CALLBACK_RECORD = "ADD_CALLBACK_RECORD"; //病历回呼创建问诊会话
-export const GET_INQUIRY_RECORD = "GET_INQUIRY_RECORD"; //查询问诊会话
+
+export const SET_USER_FOR_VIDEO_AREA = "SET_USER_FOR_VIDEO_AREA"; //设置视频区域用户信息
+
+
+export const SHOW_CALC_DIALOG = "SHOW_CALC_DIALOG"; //设置扣次对话框是否显示
+
+
 export const DELETE_CALL_CACHE = "DELETE_CALL_CACHE"; //挂掉通话后删除缓存
 export const GET_CALL_RECORD = "GET_CALL_RECORD"; //查询通话记录
 export const CALL_TIMEOUT_REJECT = "CALL_TIMEOUT_REJECT"; //电话呼叫超时拒接调用接口
@@ -49,7 +45,6 @@ export const SIGN_IN = "SIGN_IN";//登录
 export const SIGN_OUT = "SIGN_OUT";//退出
 export const TOKEN_VERIFY = "TOKEN_VERIFY";//token验证
 export const TOKEN_RESET = "TOKEN_RESET";//token重置
-export const GET_OCX_ACCOUNT = "GET_OCX_ACCOUNT"; //获取荣联账号
 /* ---------- 登录认证相关操作 end ---------- */
 
 
@@ -163,7 +158,8 @@ export function fetch(url, ...params) {
         let first = "";
 
         if (list.length > 0) {
-            first = list.shift() + ';jsessionid=' + (healthWEB.j || '');
+            //first = list.shift() + ';jsessionid=' + (healthWEB.j || '');
+            first = list.shift();
         }
 
         url = first + (list.length > 0 ? ('?' + list.join('?') ) : '');

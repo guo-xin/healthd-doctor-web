@@ -82,23 +82,5 @@ export const resetToken = (params) => {
     };
 };
 
-//获取荣联OCX登录账号信息
-export const getOCXAccount = () => {
-    let action = actions.GET_OCX_ACCOUNT;
-    return {
-        // 要在之前和之后发送的 action types
-        types: [action + '_REQUEST', action + '_SUCCESS', action + '_FAILURE'],
-        // 检查缓存 (可选):
-        //shouldCallAPI: (state) => !state.users[userId],
-        // 进行取：
-        callAPI: (token) => fetch(`${actions.WEB_API_URI}/ocx/doctor/account`, {
-            method: 'GET',
-            headers: {
-                [actions.HEADER_AUTH_FIELD]: actions.HEADER_AUTH_PREFIX + token
-            }
-        })
-    };
-};
-
 
 
