@@ -36,6 +36,7 @@ class Call extends Component {
         //订阅app挂掉事件
         pubSub.subAppHangUp(()=>{
             this.setVisible(false);
+            this.resetDocState();
         });
 
         //订阅app呼叫来电事件
@@ -218,6 +219,13 @@ class Call extends Component {
             channelName: incomingCallInfo.channelName,
             userPhone: incomingCallInfo.tel
         }));
+
+        this.resetDocState();
+    }
+
+    resetDocState(){
+        let {dispatch} = this.props;
+        let {incomingCallInfo} = this.state;
 
         //挂断后将医生置为原来的状态
         dispatch(noticeChangeDoctorState({

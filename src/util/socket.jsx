@@ -46,17 +46,11 @@ export const receiveMessages = ()=> {
                                 if(obj.data){
                                     let allState = store.getState();
                                     let preWorkingStatus = allState.doctorStore.data.workingStatus;
-                                    let isShowCallingDialog = allState.callStore.isShowCallingDialog;
 
                                     //如果当前有来电阻止弹出下一个来电
-                                    if (isShowCallingDialog) {
+                                    if (preWorkingStatus == 1) {
                                         return;
                                     }
-
-                                    //接听来电后置为占线状态
-                                    store.dispatch(noticeChangeDoctorState({
-                                        workingStatus: 1
-                                    }));
 
                                     //设置通话信息
                                     store.dispatch(setCallInfo({
@@ -67,6 +61,12 @@ export const receiveMessages = ()=> {
 
                                     //显示来电对话框
                                     pubSub.showCallDialog(Object.assign({workingStatus: preWorkingStatus}, obj.data));
+
+
+                                    //接听来电后置为占线状态
+                                    store.dispatch(noticeChangeDoctorState({
+                                        workingStatus: 1
+                                    }));
                                 }
 
                                 break;
