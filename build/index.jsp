@@ -13,9 +13,9 @@
         window.fileApi = "healthd-tools/v2";
         window.msgApi = "platform-message";
     </script>
-<link rel="shortcut icon" href="healthd.ico"><link href="./css/app-be893e16ec8a6662ab3e.css" rel="stylesheet"></head>
+<link rel="shortcut icon" href="healthd.ico"><link href="./css/app-477578ca920b777dd917.css" rel="stylesheet"></head>
 <body>
 <div id="app"></div>
-    <script src="./assets/js/AgoraRtcAgentSDK-1.5.2.js"></script>
-<script type="text/javascript" src="vendor.bundle.js"></script><script type="text/javascript" src="index-be893e1.js"></script></body>
+    <script src="./assets/js/AgoraRtcAgentSDK.js"></script>
+<script type="text/javascript" src="vendor.bundle.js"></script><script type="text/javascript" src="index-477578c.js"></script></body>
 </html>

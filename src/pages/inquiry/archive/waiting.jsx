@@ -207,8 +207,8 @@ class Waiting extends React.Component {
                                 </ul>
                             </div>
                             <div className="bottom">
-                                <Button type="ghost" onClick={()=>this.onCallBack(data, 0)}>电话回呼</Button>
-                                <Button type="primary" onClick={()=>this.onCallBack(data, 1)}>视频回呼</Button>
+                                <Button type="ghost" onClick={()=>this.onCallBack(data, 1)}>电话回呼</Button>
+                                <Button type="primary" onClick={()=>this.onCallBack(data, 2)}>视频回呼</Button>
                             </div>
                         </div>
                     </div>

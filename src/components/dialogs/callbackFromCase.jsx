@@ -16,6 +16,8 @@ import {noticeChangeDoctorState} from 'redux/actions/doctor';
 import Image from '../image/image.jsx';
 import * as global from 'util/global';
 
+let pubSub = require('pubsub-js');
+
 class CallbackFromCase extends Component {
     state = {
         isVisible: false,
@@ -28,7 +30,6 @@ class CallbackFromCase extends Component {
     constructor(props) {
         super(props);
     }
-
 
     componentWillReceiveProps(nextProps) {
 
@@ -61,6 +62,12 @@ class CallbackFromCase extends Component {
 
         let currentCase = nextProps.currentCase;
 
+    }
+
+    componentDidMount(){
+        pubSub.subscribe('apphangup', ()=>{
+            this.setVisible(false);
+        })
     }
 
     getUser(props, id) {

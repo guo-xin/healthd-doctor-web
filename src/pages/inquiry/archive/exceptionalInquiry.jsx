@@ -252,8 +252,8 @@ class ExceptionalInquiry extends React.Component {
                                     </ul>
                                 </div>
                                 <div className="bottom">
-                                    <Button type="ghost" onClick={()=>this.onCallBack(item, 0)}>电话回呼</Button>
-                                    <Button type="primary" onClick={()=>this.onCallBack(item, 1)}>视频回呼</Button>
+                                    <Button type="ghost" onClick={()=>this.onCallBack(item, 1)}>电话回呼</Button>
+                                    <Button type="primary" onClick={()=>this.onCallBack(item, 2)}>视频回呼</Button>
                                 </div>
                             </div>
                         </div>

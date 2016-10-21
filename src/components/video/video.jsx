@@ -1,4 +1,4 @@
-require("file?name=assets/js/[name].js!../../assets/js/AgoraRtcAgentSDK-1.5.2.js");
+require("file?name=assets/js/[name].js!../../assets/js/AgoraRtcAgentSDK.js");
 
 import React from 'react';
 import {Button, message} from 'antd';
@@ -26,25 +26,11 @@ import {connect} from 'react-redux';
 import * as global from 'util/global';
 import styles from './video.less';
 
+let pubSub = require('pubsub-js');
 
 let ringFile = require('assets/ring.wav');
 
 class Video extends React.Component {
-    selfPhoneNumber = "01053827382"; //外呼时显示号码
-
-    videoPluginData = {
-        //来电信息
-        incomingCall: {
-            callType: -1, //呼叫类型，0：音频，1：视频
-            caller: "", //会话ID，标志此会话
-            callId: "", //主叫号码
-            nickName: "" //昵称
-        },
-
-
-        timeIndex: -1
-    };
-
     startTime = null; //问诊开始时间
 
     queueId = null; //排队id
@@ -94,6 +80,10 @@ class Video extends React.Component {
                 }
             );
         }, 1000);
+
+        pubSub.subscribe('apphangup', ()=>{
+            this.clearAllStream();
+        })
     }
 
     componentWillUnmount() {
@@ -241,7 +231,9 @@ class Video extends React.Component {
                 console.log("用户 " + uid + " 加入频道成功");
                 let localStream = this.initLocalStream(uid);
 
+                this.localStream = localStream;
                 this.lastLocalStreamId = localStream.getId();
+
             }, function (error) {
                 console.log("加入频道失败", error);
             });
@@ -294,12 +286,10 @@ class Video extends React.Component {
         let localStream = this.localStream;
         let remoteStreamList = this.remoteStreamList;
         let client = this.client;
-        
-        client.stopRecording(this.recordingKey, function () {
-            console.log("结束录音");
-        }, function () {
-            console.log("结束录音失败");
-        });
+
+        if(!localStream){
+            return;
+        }
 
         if (localStream) {
             localStream.close();
@@ -309,7 +299,11 @@ class Video extends React.Component {
             remoteStreamList[index].stream.close();
         }
 
-        this.remoteStreamList = [];
+        client.stopRecording(this.recordingKey, function () {
+            console.log("结束录音");
+        }, function () {
+            console.log("结束录音失败");
+        });
 
         if(client){
             client.leave();
@@ -317,6 +311,10 @@ class Video extends React.Component {
 
         document.getElementById('agora-remote').innerHTML = '';
         document.getElementById('agora-local').innerHTML = '';
+
+
+        this.localStream = null;
+        this.remoteStreamList = [];
 
         this.resetState();
     }

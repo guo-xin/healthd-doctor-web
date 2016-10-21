@@ -14,6 +14,7 @@ import {
     getDoctorAttendance
 } from 'redux/actions/doctor';
 
+let pubSub = require('pubsub-js');
 let atmosphere = require('atmosphere.js');
 let socket;
 
@@ -74,7 +75,7 @@ export const receiveMessages = ()=> {
                             case 'apphangup':
 
                                 if(obj.data){
-                                    console.log('apphangup----------', obj.data);
+                                    pubSub.publish('apphangup');
                                 }
 
                                 break;

@@ -41,6 +41,7 @@
     "es6-promise": "^3.2.1",
     "history": "^2.1.1",
     "isomorphic-fetch": "^2.2.1",
+    "pubsub-js": "^1.5.4",
     "react": "15.1.0",
     "react-cookie": "^0.4.6",
     "react-dom": "15.1.0",
