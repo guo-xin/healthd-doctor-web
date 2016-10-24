@@ -26,8 +26,6 @@ import styles from './video.less';
 
 import pubSub from 'util/pubsub';
 
-let ringFile = require('assets/ring.wav');
-
 class Video extends React.Component {
     queueId = null; //排队id
 
@@ -99,20 +97,6 @@ class Video extends React.Component {
             this.state.isShowVideoCtrl = false;
             nextProps.dispatch(setUserForVideoArea({}));
         }
-
-        /*if (nextProps.isShowCallingDialog && nextProps.isShowCallingDialog != this.props.isShowCallingDialog) {
-            if (nextProps.callType === 1) {
-                //开始响铃
-                this.refs.audio.setAttribute('src', ringFile);
-                this.refs.audio.play();
-            }
-        }
-
-        if (!nextProps.isShowCallingDialog && nextProps.isShowCallingDialog != this.props.isShowCallingDialog) {
-            //停止响铃
-            this.refs.audio.setAttribute('src', '');
-            this.refs.audio.pause();
-        }*/
     }
 
 
@@ -547,7 +531,6 @@ class Video extends React.Component {
 
         return (
             <div className={isShowVideo?styles.wrapperShow:styles.wrapper}>
-                <audio ref="audio" autoPlay={false} loop="loop" src={ringFile} style={{display: "none"}}></audio>
 
                 <Call joinChannel={(data)=>this.joinChannel(data)}/>
                 <Callback joinChannel={(data)=>this.joinChannel(data)}/>

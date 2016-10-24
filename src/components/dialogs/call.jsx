@@ -17,6 +17,8 @@ import * as global from 'util/global';
 
 import pubSub from 'util/pubsub';
 
+let ringFile = require('assets/ring.wav');
+
 class Call extends Component {
     state = {
         incomingCallInfo: {}, //app来电消息推送内容
@@ -238,6 +240,14 @@ class Call extends Component {
             clearTimeout(this.st);
         }
 
+        if(isVisible){
+            this.refs.audio.setAttribute('src', ringFile);
+            this.refs.audio.play();
+        }else{
+            this.refs.audio.setAttribute('src', '');
+            this.refs.audio.pause();
+        }
+
         this.setState({
             isVisible: isVisible
         });
@@ -247,6 +257,7 @@ class Call extends Component {
         let {isVisible, user={}, tip, disabled} = this.state;
 
         return (
+            <div>
             <Modal
                 wrapClassName={styles.dialog + " vertical-center-modal"}
                 closable={false}
@@ -263,6 +274,9 @@ class Call extends Component {
                         src={require('assets/images/answer.png')} alt=""/>接听</Button>
             </div>
                 }>
+
+
+
                 <div className={styles.pic}>
                     <span>
                         <Image src={user.head || global.defaultHead} defaultImg={global.defaultHead}>
@@ -289,6 +303,8 @@ class Call extends Component {
 
                 <div className={styles.callTips}>{tip}</div>
             </Modal>
+                <audio ref="audio" autoPlay={false} loop="loop" src={ringFile} style={{display: "none"}}></audio>
+            </div>
         );
     }
 }
