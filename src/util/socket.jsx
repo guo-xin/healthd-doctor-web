@@ -75,7 +75,7 @@ export const receiveMessages = ()=> {
                             case 'appaccept':
 
                                 if(obj.data){
-                                    console.log('appaccept----------', obj.data);
+                                    pubSub.appAccept(Object.assign({},obj.data));
                                 }
 
                                 break;

@@ -5,18 +5,13 @@ import {Button, message} from 'antd';
 import Call from 'components/dialogs/call';
 import Callback from 'components/dialogs/callback';
 import CallbackFromCase from 'components/dialogs/callbackFromCase';
+import CallRecord from './callRecord';
+import Player from './Player';
 import {
     subscribeServerEvent,
     agoraVoipInviteBye,
     setCallInfo,
-
-    setUserForVideoArea,
-    queueBack,
-    missedCall,
-    cancelQueue,
-    sendMissedCallMsg,
-    reduceService,
-    callTimeoutOrReject
+    setUserForVideoArea
 } from 'redux/actions/call';
 import {getOCXAccount} from 'redux/actions/auth';
 import {setDoctorQueueCount, noticeChangeDoctorState} from 'redux/actions/doctor';
@@ -27,17 +22,6 @@ import styles from './video.less';
 import pubSub from 'util/pubsub';
 
 class Video extends React.Component {
-    queueId = null; //排队id
-
-
-    callState = -1; //0：呼叫中 1：通话中 -1：通话结束,
-
-    callType = 1; //1: 音频 2：视频
-
-    inquiryCallType = 0; // 0医生呼叫用户， 1用户呼叫医生
-
-    phone = ''; //通话的电话号码
-
     state = {
         isConnecting: false,
         selectedVideo: {},
@@ -78,6 +62,12 @@ class Video extends React.Component {
         pubSub.subAppHangUp(()=>{
             this.clearAllStream();
         });
+
+        //订阅app呼叫来电事件
+        pubSub.subShowCallDialog((topic, data)=>{
+            this.state.isShowVideoCtrl = false;
+            this.togglePlay(false);
+        });
     }
 
     componentWillUnmount() {
@@ -85,20 +75,12 @@ class Video extends React.Component {
     }
 
     componentWillReceiveProps(nextProps) {
-        if (nextProps.isShowVideo && nextProps.isShowVideo !== this.props.isShowVideo) {
-            this.state.selectedVideo = {};
-            this.refs.video.setAttribute('src', '');
-            this.refs.video.load();
-        }
-
         if (!nextProps.isShowVideo && nextProps.isShowVideo !== this.props.isShowVideo) {
-            this.state.isPlay = false;
-            this.refs.video.pause();
             this.state.isShowVideoCtrl = false;
+            this.togglePlay(false);
             nextProps.dispatch(setUserForVideoArea({}));
         }
     }
-
 
     //初始化声网控件
     init() {
@@ -158,6 +140,7 @@ class Video extends React.Component {
 
     showStreamOnPeerAdded(stream) {
         let list = this.remoteStreamList;
+        let {callType} = this.props;
 
         if (list.length == 0) {
             if (stream) {
@@ -165,7 +148,7 @@ class Video extends React.Component {
                 list.push({
                     id: stream.getId(),
                     stream: stream,
-                    videoEnabled: true,
+                    videoEnabled: callType==2,
                     audioEnabled: true
                 });
             }
@@ -219,6 +202,10 @@ class Video extends React.Component {
             }, function (error) {
                 console.log("加入频道失败", error);
             });
+
+            if(params.callType == 1){
+                this.startTimer();
+            }
         }
     }
 
@@ -227,6 +214,7 @@ class Video extends React.Component {
         let uid = id;
         let localStream = this.localStream;
         let client = this.client;
+        let {callType} = this.props;
 
         if (localStream) {
             // local stream exist already
@@ -239,7 +227,7 @@ class Video extends React.Component {
         localStream = AgoraRTC.createStream({
             streamID: uid,
             audio: true,
-            video: true,
+            video: callType == 2,
             screen: false,
             local: true
         });
@@ -268,6 +256,8 @@ class Video extends React.Component {
         let localStream = this.localStream;
         let remoteStreamList = this.remoteStreamList;
         let client = this.client;
+
+        this.stopTimer();
 
         if(!localStream){
             return;
@@ -340,7 +330,7 @@ class Video extends React.Component {
 
         this.state.isShowVideoCtrl = false;
 
-        this.pause();
+        this.togglePlay(false);
 
         //设置通话信息
         dispatch(setCallInfo({
@@ -354,14 +344,6 @@ class Video extends React.Component {
             callType: callType
         });
     }
-    
-    
-    
-    
-    
-    
-    
-    
 
     startTimer() {
         this.stopTimer();
@@ -371,7 +353,7 @@ class Video extends React.Component {
         let {callUser={}} = this.props;
 
         //来电时设置用户头像
-        this.refs.userHeadPic.src = callUser.headPic;
+        this.refs.userHeadPic.src = callUser.headPic || global.defaultHead;
 
         changeTime();
 
@@ -392,150 +374,40 @@ class Video extends React.Component {
         clearInterval(this.timer);
     }
 
-    selectVideo = {};
-
-    onVideoChange(item, index) {
+    togglePlayState(flag){
         this.setState({
-            selectedVideo: Object.assign({}, {
-                item: item,
-                index: index
-            })
+            isPlay: !!flag
         });
     }
 
-    onDoubleClick(item, index) {
-        this.setState({
-            selectedVideo: Object.assign({}, {
-                item: item,
-                index: index
-            })
-        });
+    togglePlay(flag){
+        let player = this.refs.player;
+        let callRecord = this.refs.callRecord;
 
-        this.togglePlay();
-    }
-
-    _togglePlay() {
-        if (this.state.isPlay) {
-            this.pause();
-        } else {
+        if(flag){
             this.state.isShowVideoCtrl = true;
-            this.play();
+            player.play(callRecord.getUrl());
+        }else{
+            player.pause();
         }
-    }
-
-    play() {
-        this.refs.video.play();
-        this.setState({
-            isPlay: true
-        });
-    }
-
-    pause() {
-        this.refs.video.pause();
-        this.setState({
-            isPlay: false
-        });
-    }
-
-    togglePlay() {
-        let item = this.state.selectedVideo.item;
-
-        if (!this.state.isPlay) {
-            let callRecords = this.props.callRecords || [];
-
-            if (!item) {
-                if (callRecords.length > 0) {
-                    this.state.selectedVideo = {
-                        item: callRecords[0],
-                        index: 0
-                    };
-
-                    item = callRecords[0];
-                }
-            }
-        }
-
-        if (this.refs.video.getAttribute('src') !== item.recordURL) {
-            this.refs.video.setAttribute('src', item.recordURL);
-        }
-
-        this._togglePlay();
-    }
-
-    onPause(e) {
-        this.state.isPlay = false;
-    }
-
-    onError(e) {
-        this.setState({
-            isPlay: false
-        });
-
-
-        if (this.refs.video.getAttribute('src')) {
-            message.error('播放出错');
-        }
-    }
-
-    onEnd(e) {
-        this.setState({
-            isPlay: false
-        });
-    }
-
-    getCallRecords(callRecords = []) {
-        let list;
-        if (callRecords.length > 0) {
-            list = callRecords.map((item, index)=> {
-                return <li key={index} onClick={()=>this.onVideoChange(item, index)}
-                           onDoubleClick={()=>this.onDoubleClick(item, index)}
-                           className={this.state.selectedVideo.index === index?styles.active:''}>
-                <span>
-                    <span className={styles.recordsLeft + ' ' + (item.callType==2? styles.videoIcon:styles.audioIcon)}>
-                    </span>
-                    <span className={styles.recordsRight}>
-                        <span className={styles.date}>
-                            {global.formatDate(item.startTime, 'MM月dd日 HH:mm')}
-                        </span>
-
-                        <span className={styles.duration}>
-                            时长：{global.formatTime((item.endTime - item.startTime) / 1000)}
-                        </span>
-                    </span>
-                </span>
-                </li>
-            });
-
-            return <ul className={styles.callRecords}>{list}</ul>
-        } else {
-            this.state.selectedVideo = {};
-        }
-
-        return null;
     }
 
     render() {
         let {isConnecting, isPlay, isShowVideoCtrl} = this.state;
-        const {isShowVideo, callRecords, userForVideoArea, patients={}, currentCase, callType} = this.props;
+        const {isShowVideo, userForVideoArea, patients={}, currentCase, callType, callRecords, callState} = this.props;
 
         let hash = window.location.hash;
         let isCasePage = (hash.indexOf('inquire/case/detail') !== -1);
-        let records = this.getCallRecords(callRecords);
         let patient = patients[currentCase.patientId];
-
-        if (!(this.callState === -1 && callRecords.length > 0 && isCasePage && isShowVideoCtrl)) {
-            if (this.refs.video) {
-                this.refs.video.pause();
-            }
-        }
+        let isShowCallRecords = callState===-1 && callRecords.length>0 && isCasePage;
 
         return (
             <div className={isShowVideo?styles.wrapperShow:styles.wrapper}>
 
                 <Call joinChannel={(data)=>this.joinChannel(data)}/>
                 <Callback joinChannel={(data)=>this.joinChannel(data)}/>
-
                 <CallbackFromCase joinChannel={(data)=>this.joinChannel(data)}></CallbackFromCase>
+
 
                 <div className={isConnecting?styles.connect:styles.disconnect}>
                     <div className={styles.mask}>
@@ -547,26 +419,16 @@ class Video extends React.Component {
                                 代主诉人：{userForVideoArea.userName || '--'}
                             </span>
 
-                            <div className={styles.videoContainer}
-                                 style={{display: this.callState===-1 && callRecords.length>0 && isCasePage && isShowVideoCtrl ? 'block': 'none'}}>
-                                <video
-                                    ref="video"
-                                    controls="controls"
-                                    preload="none"
-                                    onPause={::this.onPause}
-                                    onEnded={::this.onEnd}
-                                    onError={::this.onError}>
-                                    您的浏览器不支持 video 标签。
-                                </video>
-                            </div>
+                            <Player ref="player" togglePlayState={::this.togglePlayState} isShowCallRecords={isShowCallRecords} isShowVideoCtrl={isShowVideoCtrl}></Player>
+
                         </div>
                         <div className={styles.actions}>
                             <div className={styles.left}>
                                 <Button type="ghost"
                                         className={isPlay?styles.pause: styles.play}
                                         icon={isPlay?'pause': 'caret-right'}
-                                        style={{display: this.callState===-1 && callRecords.length>0 && isCasePage? 'inline-block': 'none'}}
-                                        shape="circle" onClick={()=>{this.togglePlay()}}></Button>
+                                        style={{display: isShowCallRecords? 'inline-block': 'none'}}
+                                        shape="circle" onClick={()=>{this.togglePlay(!isPlay)}}></Button>
                             </div>
                             <div className={styles.right} style={{display: isCasePage && patient? 'block': 'none'}}>
                                 <Button type="ghost" onClick={()=>{this.showCallFromCaseDialog(1)}}>电话回呼</Button>
@@ -578,13 +440,8 @@ class Video extends React.Component {
                     <div className={styles.pluginContainer}>
                         <div className={callType===1?styles.audio:styles.video}>
                             <div id={styles.plugin}>
-                                <div id="agora-remote" className={styles.agoraRemote}>
-
-                                </div>
-
-                                <div id="agora-local" className={styles.agoraLocal}>
-
-                                </div>
+                                <div id="agora-remote" className={styles.agoraRemote}></div>
+                                <div id="agora-local" className={styles.agoraLocal}></div>
                             </div>
 
                             <div id={styles.phone}>
@@ -607,10 +464,10 @@ class Video extends React.Component {
                     </div>
                 </div>
 
-                <div className={styles.recordsContainer}
-                     style={{display: this.callState===-1 && callRecords.length>0 && isCasePage? 'block': 'none'}}>
-                    {records}
-                </div>
+                <CallRecord ref="callRecord"
+                            togglePlay={::this.togglePlay}
+                            callRecords={callRecords} 
+                            isShowCallRecords={isShowCallRecords}></CallRecord>
             </div>
         );
     }
@@ -627,6 +484,7 @@ const mapStateToProps = (globalStore) => {
         doctorId: authStore.id,
         doctor: Object.assign({}, doctorStore.data),
         callType: callStore.callType,
+        callState: callStore.callState,
         isShowVideo: caseStore.isShowVideo,
         callRecords: caseStore.callRecords
     }

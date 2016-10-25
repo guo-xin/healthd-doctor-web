@@ -5,7 +5,10 @@ import {withRouter} from 'react-router';
 import {connect} from 'react-redux';
 import {
     agoraCall,
-    setCallInfo
+    setCallInfo,
+    agoraVoipInviteRefuse,
+    missedCall,
+    sendMissedCallMsg
 } from 'redux/actions/call';
 import {setCurrentCase} from 'redux/actions/case';
 import {getMaterialBeforeCase} from 'redux/actions/inquire';
@@ -24,9 +27,9 @@ class Callback extends Component {
         tip: '您是否需要回呼患者'
     };
 
-    constructor(props) {
-        super(props);
-    }
+    st = null;
+
+    joinChannelData = {};
 
     toCasePage() {
         let {dispatch, router} = this.props;
@@ -52,20 +55,62 @@ class Callback extends Component {
     }
 
     componentDidMount(){
-        //订阅app挂断事件
-        pubSub.subAppHangUp(()=>{
-            this.setVisible(false);
-        });
-        
         //订阅显示回呼对话框
         pubSub.subShowCallbackDialog((topic, data)=>{
+            this.state.tip = '您是否需要回呼患者';
             this.state.description = '';
             this.state.callbackUser = data.callbackUser;
             this.state.callType = data.callType;
+            this.state.disabled = false;
             this.getPatientDesc();
-
             this.setVisible(true);
         });
+
+        //订阅app接听事件
+        pubSub.subAppAccept(()=>{
+            clearTimeout(this.st);
+            if(this.state.isVisible){
+                this._callback();
+            }
+        });
+
+        //订阅app挂断事件
+        pubSub.subAppHangUp(()=>{
+            clearTimeout(this.st);
+            this.appHangUp();
+        });
+    }
+
+    appHangUp(){
+        if(this.state.isVisible){
+            let {dispatch} = this.props;
+            let {workingStatus, phone} = this.joinChannelData;
+            let {userId} = this.state.callbackUser;
+
+            //将医生状态置为占线前的状态
+            dispatch(noticeChangeDoctorState({
+                workingStatus: workingStatus
+            }));
+
+            //呼叫拒接或不接，发短信通知
+            dispatch(sendMissedCallMsg({
+                phone: phone,
+                type: 2
+            }));
+
+            //推送未接来电
+            if (userId) {
+                dispatch(missedCall({
+                    userId: userId,
+                    startTime: new Date().valueOf()
+                }));
+            }
+
+            this.setState({
+                tip: '对方忙碌，请稍后再试',
+                disabled: false
+            });
+        }
     }
 
     getPatientDesc() {
@@ -97,6 +142,29 @@ class Callback extends Component {
         }
     }
 
+    setJoinChannelData(params, data, doctorId, workingStatus){
+        this.joinChannelData = {
+            recordingKey: data.recordingKey,
+            key: data.dynamicKey,
+            channel: data.channelName,
+            id: doctorId,
+            workingStatus: workingStatus,
+            phone: params.phone,
+            callType: params.callType
+        };
+
+        this.st = setTimeout(()=>{
+            this.appHangUp();
+
+            //超时时调用
+            /*this.props.dispatch(agoraVoipInviteRefuse({
+                doctorId: doctorId,
+                channelName: data.channelName,
+                userPhone: params.phone
+            }));*/
+        }, 60*1000);
+    }
+
     //回呼
     onOk() {
         let {dispatch, doctor={}} = this.props;
@@ -110,6 +178,8 @@ class Callback extends Component {
             disabled: true
         });
 
+        let preWorkingStatus = doctor.workingStatus;
+
         let params = {
             inquiryCallType: 0,
             phone: callbackUser.userMobilePhone,
@@ -117,7 +187,7 @@ class Callback extends Component {
             gpkgId: callbackUser.gpkgId,
             callType: callType,
             doctorId: doctorId,
-            operatorRoleCode: doctor.workingStatus === 4 ? 105 : 104
+            operatorRoleCode: preWorkingStatus === 4 ? 105 : 104
         };
 
         if (callbackUser.patientId) {
@@ -140,7 +210,7 @@ class Callback extends Component {
                 let data = (action.response || {}).data;
 
                 if (result === 0) {
-                    this._callback(params, data, doctor.workingStatus);
+                    this.setJoinChannelData(params, data, doctorId, preWorkingStatus);
                 } else {
                     console.log('呼叫失败-------------创建会话（inquireId）失败');
                     this.setState({
@@ -150,7 +220,7 @@ class Callback extends Component {
 
                     //将医生状态置为占线前的状态
                     dispatch(noticeChangeDoctorState({
-                        workingStatus: doctor.workingStatus
+                        workingStatus: preWorkingStatus
                     }));
                 }
             },
@@ -163,28 +233,18 @@ class Callback extends Component {
 
                 //将医生状态置为占线前的状态
                 dispatch(noticeChangeDoctorState({
-                    workingStatus: doctor.workingStatus
+                    workingStatus: preWorkingStatus
                 }));
             }
         );
     }
 
     //回呼
-    _callback(params, data, workingStatus) {
-        let {joinChannel, doctor} = this.props;
-        let doctorId = doctor.id;
+    _callback() {
+        let {joinChannel} = this.props;
 
         if (typeof joinChannel == 'function') {
-            joinChannel({
-                recordingKey: data.recordingKey,
-                key: data.dynamicKey,
-                channel: data.channelName,
-                id: doctorId,
-                workingStatus: workingStatus,
-                phone: params.phone,
-                callType: params.callType
-            });
-
+            joinChannel(this.joinChannelData);
             this.toCasePage();
         }
     }

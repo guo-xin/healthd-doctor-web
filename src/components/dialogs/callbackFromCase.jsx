@@ -5,10 +5,11 @@ import {withRouter} from 'react-router';
 
 import {connect} from 'react-redux';
 import {getUserById} from 'redux/actions/user';
-import {getInquireCallbackNumber} from 'redux/actions/inquire';
 import {
     agoraCall,
-    setCallInfo
+    setCallInfo,
+    missedCall,
+    sendMissedCallMsg
 } from 'redux/actions/call';
 import {noticeChangeDoctorState} from 'redux/actions/doctor';
 import Image from '../image/image.jsx';
@@ -25,46 +26,46 @@ class CallbackFromCase extends Component {
         tip: '您是否需要回呼患者'
     };
 
+    st = null;
+
+    joinChannelData = {};
+
     constructor(props) {
         super(props);
     }
 
     componentDidMount(){
-        //订阅app挂断事件
-        pubSub.subAppHangUp(()=>{
-            this.setVisible(false);
-        });
-
         //订阅病历中回呼事件
         pubSub.subShowCallbackDialogInCase((topic, data)=>{
+            this.state.tip = '您是否需要回呼患者';
             this.state.callType = data.callType;
+            this.state.disabled = false;
 
-
-            let {currentCase, patients, dispatch} = this.props;
-            let {patientId, inquiryId} = currentCase;
+            let {currentCase, patients} = this.props;
+            let {patientId} = currentCase;
 
             if (patientId) {
                 let patient = patients[patientId];
 
                 this.getUser(patient.userId);
-
-                dispatch(getInquireCallbackNumber({
-                    patientId: patientId,
-                    inquiryId: inquiryId
-                })).then(
-                    (action)=> {
-                        let data = (action.response || {}).data || {};
-
-                        this.setState({
-                            inquiryNumber: data.inquiryNumber,
-                            diagnosisName: data.diagnosisName
-                        });
-                    }
-                );
             }
 
 
             this.setVisible(true);
+        });
+
+        //订阅app接听事件
+        pubSub.subAppAccept(()=>{
+            clearTimeout(this.st);
+            if(this.state.isVisible){
+                this._callback();
+            }
+        });
+
+        //订阅app挂断事件
+        pubSub.subAppHangUp(()=>{
+            clearTimeout(this.st);
+            this.appHangUp();
         });
     }
 
@@ -98,6 +99,61 @@ class CallbackFromCase extends Component {
         );
     }
 
+    appHangUp(){
+        if(this.state.isVisible){
+            let {dispatch} = this.props;
+            let {workingStatus, phone} = this.joinChannelData;
+            let {userId} = this.state;
+
+            //将医生状态置为占线前的状态
+            dispatch(noticeChangeDoctorState({
+                workingStatus: workingStatus
+            }));
+
+            //呼叫拒接或不接，发短信通知
+            dispatch(sendMissedCallMsg({
+                phone: phone,
+                type: 2
+            }));
+
+            //推送未接来电
+            if (userId) {
+                dispatch(missedCall({
+                    userId: userId,
+                    startTime: new Date().valueOf()
+                }));
+            }
+
+            this.setState({
+                tip: '对方忙碌，请稍后再试',
+                disabled: false
+            });
+        }
+    }
+
+    setJoinChannelData(params, data, doctorId, workingStatus){
+        this.joinChannelData = {
+            recordingKey: data.recordingKey,
+            key: data.dynamicKey,
+            channel: data.channelName,
+            id: doctorId,
+            workingStatus: workingStatus,
+            phone: params.phone,
+            callType: params.callType
+        };
+
+        this.st = setTimeout(()=>{
+            this.appHangUp();
+
+            //超时时调用
+            /*this.props.dispatch(agoraVoipInviteRefuse({
+                doctorId: doctorId,
+                channelName: data.channelName,
+                userPhone: params.phone
+            }));*/
+        }, 60*1000);
+    }
+
     //回呼
     onOk() {
         let {userId, callType} = this.state;
@@ -112,13 +168,15 @@ class CallbackFromCase extends Component {
         if (user && user.mobilePhone) {
             let {dispatch, doctor={}} = this.props;
 
+            let preWorkingStatus = doctor.workingStatus;
+
             let params = {
                 inquiryCallType: 0,
                 phone: user.mobilePhone,
                 callType: callType,
                 inquiryId: currentCase.inquiryId,
                 doctorId: doctor.id,
-                operatorRoleCode: doctor.workingStatus === 4 ? 105 : 104
+                operatorRoleCode: preWorkingStatus === 4 ? 105 : 104
             };
 
             if(currentCase.patientId){
@@ -141,7 +199,7 @@ class CallbackFromCase extends Component {
                     let data = (action.response || {}).data;
 
                     if (result === 0) {
-                        this._callback(params, data, doctor.workingStatus);
+                        this.setJoinChannelData(params, data, doctor.id, preWorkingStatus);
                     } else {
                         console.log('呼叫失败-------------创建会话（inquireId）失败');
                         this.setState({
@@ -151,7 +209,7 @@ class CallbackFromCase extends Component {
 
                         //将医生状态置为占线前的状态
                         dispatch(noticeChangeDoctorState({
-                            workingStatus: doctor.workingStatus
+                            workingStatus: preWorkingStatus
                         }));
                     }
                 },
@@ -164,7 +222,7 @@ class CallbackFromCase extends Component {
 
                     //将医生状态置为占线前的状态
                     dispatch(noticeChangeDoctorState({
-                        workingStatus: doctor.workingStatus
+                        workingStatus: preWorkingStatus
                     }));
                 }
             );
@@ -178,21 +236,11 @@ class CallbackFromCase extends Component {
     }
 
     //回呼
-    _callback(params, data, workingStatus) {
-        let {dispatch, joinChannel, doctor} = this.props;
-        let doctorId = doctor.id;
+    _callback() {
+        let {joinChannel} = this.props;
 
         if (typeof joinChannel == 'function') {
-            joinChannel({
-                recordingKey: data.recordingKey,
-                key: data.dynamicKey,
-                channel: data.channelName,
-                id: doctorId,
-                workingStatus: workingStatus,
-                phone: params.phone,
-                callType: params.callType
-            });
-
+            joinChannel(this.joinChannelData);
             this.setVisible(false);
         }
     }
@@ -222,7 +270,7 @@ class CallbackFromCase extends Component {
     render() {
         let {currentCase={}, patients={}} = this.props;
 
-        let {isVisible, disabled, tip, inquiryNumber, user={}} = this.state;
+        let {isVisible, disabled, tip, user={}} = this.state;
 
         let diagnosisName = this.getDiagnosisName();
         let patient = patients[currentCase.patientId] || {};

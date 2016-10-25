@@ -2,6 +2,7 @@ let pubSub = require('pubsub-js');
 
 let topic = {
     APP_HANGUP: 'APP_HANGUP',
+    APP_ACCEPT: 'APP_ACCEPT',
     SHOW_CALL_DIALOG: 'SHOW_CALL_DIALOG',
     SHOW_CALLBACK_DIALOG_IN_CASE: 'SHOW_CALLBACK_DIALOG_IN_CASE'
 };
@@ -39,6 +40,17 @@ function subShowCallbackDialogInCase(fn) {
     }
 }
 
+//app端接听
+function appAccept(data) {
+    pubSub.publish(topic.APP_ACCEPT, data)
+}
+
+function subAppAccept(fn) {
+    if(typeof fn === 'function'){
+        pubSub.subscribe(topic.APP_ACCEPT, fn)
+    }
+}
+
 //app端挂断
 function appHangUp(data) {
     pubSub.publish(topic.APP_HANGUP, data)
@@ -66,6 +78,8 @@ module.exports = {
     showCallbackDialogInCase,
     subShowCallbackDialogInCase,
     appHangUp,
-    subAppHangUp
+    subAppHangUp,
+    appAccept,
+    subAppAccept
 };
 
