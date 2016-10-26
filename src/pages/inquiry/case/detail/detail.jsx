@@ -105,13 +105,11 @@ class Detail extends React.Component {
 
                 if (!(curCase.caseId && curCase.caseId === preCase.caseId)) {
                     //切换前自动保存
-                    this.autoSave(this.refs.emr.getFieldsValue(), nextProps);
+                    //this.autoSave(this.refs.emr.getFieldsValue(), nextProps);
 
-                    setTimeout(()=>{
-                        this.initState();
-                        this.refs.emr.resetFields();
-                        this.resetData(nextProps);
-                    }, 50);
+                    this.initState();
+                    this.refs.emr.resetFields();
+                    this.resetData(nextProps);
                 }
             }
         }
@@ -426,6 +424,8 @@ class Detail extends React.Component {
                 }
             }, 2000);
         }
+
+        this.autoSave(this.refs.emr.getFieldsValue(), props);
     }
 
     //扣次
