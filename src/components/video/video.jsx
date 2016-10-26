@@ -6,7 +6,8 @@ import Call from 'components/dialogs/call';
 import Callback from 'components/dialogs/callback';
 import CallbackFromCase from 'components/dialogs/callbackFromCase';
 import CallRecord from './callRecord';
-import Player from './Player';
+import Player from './player';
+import CallUser from './callUser';
 import {
     subscribeServerEvent,
     agoraVoipInviteBye,
@@ -24,12 +25,9 @@ import pubSub from 'util/pubsub';
 class Video extends React.Component {
     state = {
         isConnecting: false,
-        selectedVideo: {},
         isShowVideoCtrl: false,
         isPlay: false
     };
-
-    timer = null;
 
     /*声网*/
     key = '';
@@ -79,6 +77,11 @@ class Video extends React.Component {
             this.state.isShowVideoCtrl = false;
             this.togglePlay(false);
             nextProps.dispatch(setUserForVideoArea({}));
+        }
+
+        if(this.props.isShowVideo && nextProps.currentCase.caseId !== this.props.currentCase.caseId){
+            this.state.isShowVideoCtrl = false;
+            this.togglePlay(false);
         }
     }
 
@@ -204,7 +207,7 @@ class Video extends React.Component {
             });
 
             if(params.callType == 1){
-                this.startTimer();
+                this.refs.callUser.startTimer();
             }
         }
     }
@@ -257,7 +260,7 @@ class Video extends React.Component {
         let remoteStreamList = this.remoteStreamList;
         let client = this.client;
 
-        this.stopTimer();
+        this.refs.callUser.stopTimer();
 
         if(!localStream){
             return;
@@ -345,35 +348,6 @@ class Video extends React.Component {
         });
     }
 
-    startTimer() {
-        this.stopTimer();
-
-        let seconds = -1;
-        let container = this.refs.timer;
-        let {callUser={}} = this.props;
-
-        //来电时设置用户头像
-        this.refs.userHeadPic.src = callUser.headPic || global.defaultHead;
-
-        changeTime();
-
-        this.timer = setInterval(()=> {
-            changeTime();
-        }, 1000);
-
-
-        function changeTime() {
-            seconds += 1;
-            container.innerHTML = [parseInt(seconds / 60 / 60), parseInt(seconds / 60 % 60), seconds % 60].join(":")
-                .replace(/\b(\d)\b/g, "0$1");
-        }
-    }
-
-    stopTimer() {
-        this.refs.userHeadPic.src = global.defaultHead;
-        clearInterval(this.timer);
-    }
-
     togglePlayState(flag){
         this.setState({
             isPlay: !!flag
@@ -394,7 +368,7 @@ class Video extends React.Component {
 
     render() {
         let {isConnecting, isPlay, isShowVideoCtrl} = this.state;
-        const {isShowVideo, userForVideoArea, patients={}, currentCase, callType, callRecords, callState} = this.props;
+        const {isShowVideo, userForVideoArea, patients={}, currentCase, callRecords, callState, callUser, callType} = this.props;
 
         let hash = window.location.hash;
         let isCasePage = (hash.indexOf('inquire/case/detail') !== -1);
@@ -403,24 +377,17 @@ class Video extends React.Component {
 
         return (
             <div className={isShowVideo?styles.wrapperShow:styles.wrapper}>
-
                 <Call joinChannel={(data)=>this.joinChannel(data)}/>
                 <Callback joinChannel={(data)=>this.joinChannel(data)}/>
                 <CallbackFromCase joinChannel={(data)=>this.joinChannel(data)}></CallbackFromCase>
 
-
                 <div className={isConnecting?styles.connect:styles.disconnect}>
+
+                    <CallUser ref="callUser" userForVideoArea={userForVideoArea} callUser={callUser}></CallUser>
+                    
                     <div className={styles.mask}>
                         <div className={styles.media}>
-                            <span className={styles.head}>
-                                <img ref="patientHeadPic" src={userForVideoArea.headPic || global.defaultHead} alt=""/>
-                            </span>
-                            <span className={styles.userName}>
-                                代主诉人：{userForVideoArea.userName || '--'}
-                            </span>
-
                             <Player ref="player" togglePlayState={::this.togglePlayState} isShowCallRecords={isShowCallRecords} isShowVideoCtrl={isShowVideoCtrl}></Player>
-
                         </div>
                         <div className={styles.actions}>
                             <div className={styles.left}>
@@ -438,30 +405,21 @@ class Video extends React.Component {
                     </div>
 
                     <div className={styles.pluginContainer}>
-                        <div className={callType===1?styles.audio:styles.video}>
-                            <div id={styles.plugin}>
+                        <div id={styles.plugin}>
+                            <div style={{display: callType==2 && callState == 1 ?'block': 'none'}}>
                                 <div id="agora-remote" className={styles.agoraRemote}></div>
                                 <div id="agora-local" className={styles.agoraLocal}></div>
                             </div>
+                        </div>
 
-                            <div id={styles.phone}>
-                                <span className={styles.head}>
-                                    <img ref="userHeadPic" src={global.defaultHead} alt=""/>
-                                </span> <span className={styles.userName}>
-                                代主诉人：{userForVideoArea.userName || '--'}
-                            </span>
-                                <span className={styles.process}>正在通话中</span>
-                                <span className={styles.timer} ref="timer"></span>
-                            </div>
-
-                            <div className={styles.actions}>
-                                <div className={styles.left}>
-                                    <Button type="primary" shape="circle"
-                                            onClick={()=>{this.hangUpFromVideo()}}>挂断</Button>
-                                </div>
+                        <div className={styles.actions}>
+                            <div className={styles.left}>
+                                <Button type="primary" shape="circle"
+                                        onClick={()=>{this.hangUpFromVideo()}}>挂断</Button>
                             </div>
                         </div>
                     </div>
+                    
                 </div>
 
                 <CallRecord ref="callRecord"
