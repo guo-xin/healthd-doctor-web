@@ -10,19 +10,24 @@ class CallRecord extends React.Component{
     };
 
     onVideoChange(item) {
-        this.setState({
+        /*this.setState({
             selectedVideo: Object.assign({}, item)
-        });
+        });*/
     }
 
     onDoubleClick(item) {
         let {togglePlay} = this.props;
 
+        this.isHaveSelectedVideo = true;
+
         this.setState({
             selectedVideo: Object.assign({}, item)
         });
 
-        togglePlay(true);
+        let st = setTimeout(()=>{
+            clearTimeout(st);
+            togglePlay(true);
+        }, 50);
     }
 
     getUrl(){

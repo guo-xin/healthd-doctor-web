@@ -332,9 +332,9 @@ class Video extends React.Component {
             this.hangupByDoctor = false;
         }
         else{
-            params = Object.assign({}, params, {
+           /* params = Object.assign({}, params, {
                 byetype:-30
-            });
+            });*/
         }
 
         dispatch(agoraVoipInviteBye(params));
