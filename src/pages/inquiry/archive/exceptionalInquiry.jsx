@@ -272,9 +272,11 @@ class ExceptionalInquiry extends React.Component {
                                 {inqueryType}
                                 {item.callType === 1 ? ("电话问诊：") : ("视频问诊：")}{item.startTime && global.formatDate(item.startTime, 'yyyy-MM-dd HH:mm')}
                             </span>
-                            <span className={styles.footTextRed}>{callStatus}</span>
-                            {this.state.callTime ? (<span
-                                className={styles.footTextRed}>{item.callType === 1 ? ("通话") : ("视频")}{global.formatTime((item.endTime - item.startTime) / 1000) + "　"}</span>) : ""}
+                            <span className={styles.footTextRight}>
+                                <span className={styles.footTextRed}>{callStatus}</span>
+                                {this.state.callTime ? (<span
+                                    className={styles.footTextRed}>{item.callType === 1 ? ("通话") : ("视频")}{global.formatTime((item.endTime - item.startTime) / 1000) + "　"}</span>) : ""}
+                            </span>
                         </div>
                         <div className={styles.material}>
                             <div className="title">
