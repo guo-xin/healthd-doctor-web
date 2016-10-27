@@ -10,6 +10,11 @@ class Player extends React.Component{
         togglePlayState(false);
     }
 
+    onSeeked(e) {
+        let {togglePlayState} = this.props;
+        togglePlayState(true);
+    }
+
     onError(e) {
         let {togglePlayState} = this.props;
         togglePlayState(false);
@@ -55,6 +60,7 @@ class Player extends React.Component{
                     controls="controls"
                     preload="none"
                     onPause={::this.onPause}
+                    onSeeked={::this.onSeeked}
                     onEnded={::this.onEnd}
                     onError={::this.onError}>
                     您的浏览器不支持 video 标签。

@@ -115,31 +115,41 @@ class Video extends React.Component {
 
         client.on('stream-added', (evt)=> {
             var stream = evt.stream;
-            console.log("New stream added: " + stream.getId());
-            //console.log("Timestamp: " + Date.now());
-            //console.log("Subscribe ", stream);
+            console.log('New stream added: ' + stream.getId());
+            //console.log('Timestamp: ' + Date.now());
+            //console.log('Subscribe ', stream);
             client.subscribe(stream, function (err) {
-                console.log("Subscribe stream failed", err);
+                console.log('Subscribe stream failed', err);
             });
         });
 
         client.on('peer-leave', (evt)=> {
-            console.log("Peer has left: " + evt.uid);
+            console.log('Peer has left: ' + evt.uid);
             this.showStreamOnPeerLeave(evt.uid);
             //updateRoomInfo();
         });
 
         client.on('stream-subscribed', (evt)=> {
             var stream = evt.stream;
-            console.log("Subscribe remote stream successfully: " + stream.getId());
+            console.log('Subscribe remote stream successfully: ' + stream.getId());
             this.showStreamOnPeerAdded(stream);
             //updateRoomInfo();
         });
 
-        client.on("stream-removed", (evt)=> {
-            console.log("Stream removed: " + evt.stream.getId());
+        client.on('stream-removed', (evt)=> {
+            console.log('Stream removed: ' + evt.stream.getId());
             this.showStreamOnPeerLeave(evt.stream.getId());
             //updateRoomInfo();
+        });
+
+
+        client.on('error', function (event) {
+            var message = event.msg;
+            if (message.reason === 'CONNECTION_INTERRUPTED') {
+                console.log('connection interrupted');
+            } else if (message.reason === 'CONNECTION_LOST') {
+                console.log('connection lost');
+            }
         });
     }
 
