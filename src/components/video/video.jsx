@@ -29,6 +29,8 @@ class Video extends React.Component {
         isPlay: false
     };
 
+    hangupByDoctor = false; //是否为医生挂断
+
     /*声网*/
     key = '';
     recordingKey = '';
@@ -159,7 +161,7 @@ class Video extends React.Component {
     }
 
     showStreamOnPeerLeave(streamId) {
-        this.clearAllStream();
+        this.clearAllStream(true);
     }
 
     //加入频道
@@ -291,6 +293,7 @@ class Video extends React.Component {
         this.localStream = null;
         this.remoteStreamList = [];
 
+        this.hangup();
         this.resetState();
     }
 
@@ -305,22 +308,32 @@ class Video extends React.Component {
         dispatch(setCallInfo({
             callState: -1
         }));
+
         dispatch(noticeChangeDoctorState({
             workingStatus:this.workingStatus
         }));
     }
-    
+
     hangup(){
         let {dispatch} = this.props;
+        let params = this.hangupParams;
 
-        dispatch(agoraVoipInviteBye(this.hangupParams));
+        if(this.hangupByDoctor){
+            this.hangupByDoctor = false;
+        }
+        else{
+            params = Object.assign({}, params, {
+                byetype:-30
+            });
+        }
+
+        dispatch(agoraVoipInviteBye(params));
     }
 
     //接通视频后或电话后挂断
     hangUpFromVideo() {
+        this.hangupByDoctor = true;
         this.clearAllStream();
-
-        this.hangup();
     }
 
     showCallFromCaseDialog(callType) {

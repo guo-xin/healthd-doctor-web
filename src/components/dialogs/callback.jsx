@@ -6,7 +6,7 @@ import {connect} from 'react-redux';
 import {
     agoraCall,
     setCallInfo,
-    agoraVoipInviteRefuse,
+    agoraVoipInviteBye,
     missedCall,
     sendMissedCallMsg
 } from 'redux/actions/call';
@@ -154,14 +154,15 @@ class Callback extends Component {
         };
 
         this.st = setTimeout(()=>{
-            this.appHangUp();
-
             //超时时调用
-            /*this.props.dispatch(agoraVoipInviteRefuse({
+            this.props.dispatch(agoraVoipInviteBye({
                 doctorId: doctorId,
                 channelName: data.channelName,
                 userPhone: params.phone
-            }));*/
+            }));
+
+
+            this.appHangUp();
         }, 60*1000);
     }
 
