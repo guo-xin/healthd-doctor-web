@@ -1,8 +1,6 @@
 import * as actions from './actions';
 const fetch = actions.fetch;
 
-
-
 export const showCalcDialog = actions.create(actions.SHOW_CALC_DIALOG, 'isShowCalcDialog');
 
 export const setUserForVideoArea = actions.create(actions.SET_USER_FOR_VIDEO_AREA, 'user');
@@ -11,7 +9,7 @@ export const setCallInfo = actions.create(actions.SET_CALL_INFO, 'data');
 
 //WEB回呼APP接口-统一接口
 export const agoraCall = (params)=>{
-    let action = 'agoraCall';
+    let action = actions.AGORA_CALL;
     return {
         // 要在之前和之后发送的 action types
         types: [action + '_REQUEST', action + '_SUCCESS', action + '_FAILURE'],
@@ -33,7 +31,7 @@ export const agoraCall = (params)=>{
 
 //WEB收到呼叫之后-统一接口
 export const agoraAccept = (params)=>{
-    let action = 'agoraAccept';
+    let action = actions.AGORA_ACCEPT;
     return {
         // 要在之前和之后发送的 action types
         types: [action + '_REQUEST', action + '_SUCCESS', action + '_FAILURE'],
@@ -55,7 +53,7 @@ export const agoraAccept = (params)=>{
 
 //WEB医生挂断(接听后)
 export const agoraVoipInviteBye = (params)=>{
-    let action = 'agoraVoipInviteBye';
+    let action = actions.AGORA_VOIP_INVITE_BYE;
     return {
         // 要在之前和之后发送的 action types
         types: [action + '_REQUEST', action + '_SUCCESS', action + '_FAILURE'],
@@ -77,7 +75,7 @@ export const agoraVoipInviteBye = (params)=>{
 
 //WEB医生拒接接听
 export const agoraVoipInviteRefuse = (params)=>{
-    let action = 'agoraVoipInviteRefuse';
+    let action = actions.AGORA_VOIP_INVITE_REFUSE;
     return {
         // 要在之前和之后发送的 action types
         types: [action + '_REQUEST', action + '_SUCCESS', action + '_FAILURE'],
@@ -99,7 +97,7 @@ export const agoraVoipInviteRefuse = (params)=>{
 
 //WEB订阅服务端账号事件
 export const subscribeServerEvent = (doctorId) => {
-    let action = 'subscribeServerEvent';
+    let action = actions.SUBSCRIBE_SERVER_EVENT;
 
     return {
         // 要在之前和之后发送的 action types
@@ -116,17 +114,6 @@ export const subscribeServerEvent = (doctorId) => {
     };
 };
 
-
-
-
-
-
-
-
-
-
-
-
 //查询通话计划
 export const getCallRecords = (inquiryId) => {
     let action = actions.GET_CALL_RECORD;
@@ -138,82 +125,6 @@ export const getCallRecords = (inquiryId) => {
         //shouldCallAPI: (state) => !state.users[userId],
         // 进行取：
         callAPI: (token) => fetch(`${actions.WEB_API_URI}/ocx/record/list/${inquiryId}`,{
-            method: 'GET',
-            headers: {
-                [actions.HEADER_AUTH_FIELD]: actions.HEADER_AUTH_PREFIX + token
-            }
-        })
-    };
-};
-
-//挂掉通话后删除缓存
-export const deleteCallCache = () => {
-    let action = actions.DELETE_CALL_CACHE;
-
-    return {
-        // 要在之前和之后发送的 action types
-        types: [action + '_REQUEST', action + '_SUCCESS', action + '_FAILURE'],
-        // 检查缓存 (可选):
-        //shouldCallAPI: (state) => !state.users[userId],
-        // 进行取：
-        callAPI: (token) => fetch(`${actions.WEB_API_URI}/ocx/record/delete`,{
-            method: 'GET',
-            headers: {
-                [actions.HEADER_AUTH_FIELD]: actions.HEADER_AUTH_PREFIX + token
-            }
-        })
-    };
-};
-
-//电话呼叫超时拒接调用接口
-export const callTimeoutOrReject = () => {
-    let action = actions.CALL_TIMEOUT_REJECT;
-
-    return {
-        // 要在之前和之后发送的 action types
-        types: [action + '_REQUEST', action + '_SUCCESS', action + '_FAILURE'],
-        // 检查缓存 (可选):
-        //shouldCallAPI: (state) => !state.users[userId],
-        // 进行取：
-        callAPI: (token) => fetch(`${actions.WEB_API_URI}/ocx/voicecall/delete`,{
-            method: 'GET',
-            headers: {
-                [actions.HEADER_AUTH_FIELD]: actions.HEADER_AUTH_PREFIX + token
-            }
-        })
-    };
-};
-
-//排队回呼推送
-export const queueBack = (params) => {
-    let action = actions.QUEUE_BACK;
-
-    return {
-        // 要在之前和之后发送的 action types
-        types: [action + '_REQUEST', action + '_SUCCESS', action + '_FAILURE'],
-        // 检查缓存 (可选):
-        //shouldCallAPI: (state) => !state.users[userId],
-        // 进行取：
-        callAPI: (token) => fetch(`${actions.WEB_API_URI}/ocx/queue/back/${params.userId}/${params.startTime}`,{
-            method: 'GET',
-            headers: {
-                [actions.HEADER_AUTH_FIELD]: actions.HEADER_AUTH_PREFIX + token
-            }
-        })
-    };
-};
-
-//取消排队
-export const cancelQueue = (params) => {
-    let action = actions.QUEUE_CANCEL;
-
-    return {
-        // 要在之前和之后发送的 action types
-        types: [action + '_REQUEST', action + '_SUCCESS', action + '_FAILURE'],
-        // 检查缓存 (可选):
-        //shouldCallAPI: (state) => !state.users[userId],
-        // 进行取：
-        callAPI: (token) => fetch(`${actions.WEB_API_URI}/queue/cancel/${params.queueId}`,{
             method: 'GET',
             headers: {
                 [actions.HEADER_AUTH_FIELD]: actions.HEADER_AUTH_PREFIX + token
@@ -318,28 +229,5 @@ export const queryService = (inquiryId) => {
             }
         }),
         payload: { inquiryId }
-    };
-};
-
-
-//电话预约之后医生挂断和超时未接调用更新通话记录状态接口
-export const addRecordForTimeoutAndHangup = (params) => {
-    let action = actions.PHONE_TIMEOUT_AND_HANGUP;
-
-    return {
-        // 要在之前和之后发送的 action types
-        types: [action + '_REQUEST', action + '_SUCCESS', action + '_FAILURE'],
-        // 检查缓存 (可选):
-        //shouldCallAPI: (state) => !state.users[userId],
-        // 进行取：
-        callAPI: (token) => fetch(`${actions.WEB_API_URI}/ocx/communication-record/update`, {
-            method: 'POST',
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json; charset=UTF-8',
-                [actions.HEADER_AUTH_FIELD]: actions.HEADER_AUTH_PREFIX + token
-            },
-            body: JSON.stringify(params)
-        })
     };
 };

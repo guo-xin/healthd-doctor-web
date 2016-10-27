@@ -14,28 +14,21 @@ export const GET_ICD_TEN = "GET_ICD_TEN";
 
 
 /* ---------- 通话相关 start ---------- */
+export const AGORA_CALL = "AGORA_CALL";
+export const AGORA_ACCEPT = "AGORA_ACCEPT";
+export const AGORA_VOIP_INVITE_BYE = "AGORA_VOIP_INVITE_BYE";
+export const AGORA_VOIP_INVITE_REFUSE = "AGORA_VOIP_INVITE_REFUSE";
+export const SUBSCRIBE_SERVER_EVENT = "SUBSCRIBE_SERVER_EVENT";
+
 export const SET_CALL_INFO = "SET_CALL_INFO"; //设置通话信息
-
-
 export const SET_USER_FOR_VIDEO_AREA = "SET_USER_FOR_VIDEO_AREA"; //设置视频区域用户信息
-
-
 export const SHOW_CALC_DIALOG = "SHOW_CALC_DIALOG"; //设置扣次对话框是否显示
-
-
-export const DELETE_CALL_CACHE = "DELETE_CALL_CACHE"; //挂掉通话后删除缓存
 export const GET_CALL_RECORD = "GET_CALL_RECORD"; //查询通话记录
-export const CALL_TIMEOUT_REJECT = "CALL_TIMEOUT_REJECT"; //电话呼叫超时拒接调用接口
-export const QUEUE_BACK = "QUEUE_BACK";//排队回呼推送
-export const QUEUE_CANCEL = "QUEUE_CANCEL";//取消排队
 export const UNREAD_INQUIRY = "UNREAD_INQUIRY";//未读问诊推送
 export const MISSED_CALL = "MISSED_CALL";//未接来电
-
 export const REDUCE_SERVICE = "REDUCE_SERVICE";//挂断扣次
 export const QUERY_SERVICE = "QUERY_SERVICE";//挂断后查询服务包次数
 export const SEND_MISSED_CALL_MSG = "SEND_MISSED_CALL_MSG"; //未接来电短信通知
-
-export const PHONE_TIMEOUT_AND_HANGUP = "PHONE_TIMEOUT_AND_HANGUP"; //电话预约之后医生挂断和超时未接调用更新通话记录状态接口
 /* ---------- 通话相关 end ---------- */
 
 

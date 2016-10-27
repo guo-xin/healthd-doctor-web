@@ -1,13 +1,16 @@
 require("file?name=assets/js/[name].js!../../assets/js/AgoraRtcAgentSDK.js");
-
+import styles from './video.less';
 import React from 'react';
 import {Button, message} from 'antd';
 import Call from 'components/dialogs/call';
+import {connect} from 'react-redux';
+
 import Callback from 'components/dialogs/callback';
 import CallbackFromCase from 'components/dialogs/callbackFromCase';
 import CallRecord from './callRecord';
 import Player from './player';
 import CallUser from './callUser';
+
 import {
     subscribeServerEvent,
     agoraVoipInviteBye,
@@ -16,9 +19,6 @@ import {
 } from 'redux/actions/call';
 import {getOCXAccount} from 'redux/actions/auth';
 import {setDoctorQueueCount, noticeChangeDoctorState} from 'redux/actions/doctor';
-import {connect} from 'react-redux';
-import * as global from 'util/global';
-import styles from './video.less';
 
 import pubSub from 'util/pubsub';
 
@@ -69,7 +69,7 @@ class Video extends React.Component {
     }
 
     componentWillUnmount() {
-        this.stopTimer();
+        this.refs.callUser.stopTimer();
     }
 
     componentWillReceiveProps(nextProps) {
@@ -380,7 +380,6 @@ class Video extends React.Component {
                 <Call joinChannel={(data)=>this.joinChannel(data)}/>
                 <Callback joinChannel={(data)=>this.joinChannel(data)}/>
                 <CallbackFromCase joinChannel={(data)=>this.joinChannel(data)}></CallbackFromCase>
-
                 <div className={isConnecting?styles.connect:styles.disconnect}>
 
                     <CallUser ref="callUser" userForVideoArea={userForVideoArea} callUser={callUser}></CallUser>
@@ -421,7 +420,6 @@ class Video extends React.Component {
                     </div>
                     
                 </div>
-
                 <CallRecord ref="callRecord"
                             togglePlay={::this.togglePlay}
                             callRecords={callRecords} 

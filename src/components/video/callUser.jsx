@@ -5,8 +5,13 @@ import * as global from 'util/global';
 class CallUser extends React.Component{
     timer = null;
 
-    setHead(url){
+    setUser(url, name){
         this.refs.head.src = url || global.defaultHead;
+        this.refs.name.innerHTML = name || '--';
+    }
+
+    showTimer(isShow){
+        this.refs.timerWrapper.style.display = isShow ? 'block':'none';
     }
 
     startTimer() {
@@ -16,10 +21,10 @@ class CallUser extends React.Component{
         let container = this.refs.timer;
         let {callUser={}} = this.props;
 
-        this.refs.timerWrapper.style.display = 'block';
+        this.showTimer(true);
 
         //来电时设置用户头像
-        this.setHead(callUser.headPic);
+        this.setUser(callUser.headPic, callUser.userName);
 
         changeTime();
 
@@ -37,8 +42,8 @@ class CallUser extends React.Component{
 
     stopTimer() {
         let {userForVideoArea} = this.props;
-        this.setHead(userForVideoArea.headPic);
-        this.refs.timerWrapper.style.display = 'none';
+        this.setUser(userForVideoArea.headPic, userForVideoArea.userName);
+        this.showTimer(false);
         clearInterval(this.timer);
     }
 
@@ -52,7 +57,7 @@ class CallUser extends React.Component{
                         <img ref="head" src={userForVideoArea.headPic || global.defaultHead} alt=""/>
                     </span>
                     <span className={styles.userName}>
-                        代主诉人：{userForVideoArea.userName || '--'}
+                        代主诉人：<span ref="name">{userForVideoArea.userName || '--'}</span>
                     </span>
                </div>
                 <div ref="timerWrapper" style={{display:'none'}}>
