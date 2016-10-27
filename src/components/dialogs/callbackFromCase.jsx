@@ -104,26 +104,13 @@ class CallbackFromCase extends Component {
         if(this.state.isVisible){
             let {dispatch} = this.props;
             let {workingStatus, phone} = this.joinChannelData;
-            let {userId} = this.state;
 
             //将医生状态置为占线前的状态
             dispatch(noticeChangeDoctorState({
                 workingStatus: workingStatus
             }));
 
-            //呼叫拒接或不接，发短信通知
-            dispatch(sendMissedCallMsg({
-                phone: phone,
-                type: 2
-            }));
-
-            //推送未接来电
-            if (userId) {
-                dispatch(missedCall({
-                    userId: userId,
-                    startTime: new Date().valueOf()
-                }));
-            }
+            this.sendMissedCall(phone, true);
 
             this.setState({
                 tip: '对方忙碌，请稍后再试',
@@ -153,6 +140,28 @@ class CallbackFromCase extends Component {
 
             this.appHangUp();
         }, 60*1000);
+    }
+
+    sendMissedCall(phone, flag){
+        let {dispatch} = this.props;
+        let {userId} = this.state;
+
+
+        //呼叫拒接或不接，发短信通知
+        if(phone &&  flag){
+            dispatch(sendMissedCallMsg({
+                phone: phone,
+                type: 2
+            }));
+        }
+
+        //推送未接来电
+        if (userId) {
+            dispatch(missedCall({
+                userId: userId,
+                startTime: new Date().valueOf()
+            }));
+        }
     }
 
     //回呼
@@ -193,18 +202,27 @@ class CallbackFromCase extends Component {
                 workingStatus: 1
             }));
 
+            let tip = '呼叫失败，请重新呼叫';
+
             //回呼前创建会话ID
             dispatch(agoraCall(params)).then(
                 (action)=> {
                     let result = (action.response || {}).result;
                     let data = (action.response || {}).data;
+                    let code = (action.response || {}).code;
 
                     if (result === 0) {
                         this.setJoinChannelData(params, data, doctor.id, preWorkingStatus);
                     } else {
-                        console.log('呼叫失败-------------创建会话（inquireId）失败');
+                        console.log('呼叫失败-------------创建会话（inquireId）失败', code);
+
+                        if(code === -13002){
+                            tip = '对方不在线，请稍后再试';
+                            this.sendMissedCall(params.phone);
+                        }
+
                         this.setState({
-                            tip: '呼叫失败，请重新呼叫',
+                            tip: tip,
                             disabled: false
                         });
 
@@ -217,7 +235,7 @@ class CallbackFromCase extends Component {
                 ()=> {
                     console.log('呼叫失败-------------创建会话（inquireId）失败');
                     this.setState({
-                        tip: '呼叫失败，请重新呼叫',
+                        tip: tip,
                         disabled: false
                     });
 
