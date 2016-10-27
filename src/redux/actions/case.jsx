@@ -198,7 +198,7 @@ export const getCaseOpinions= (url) => {
         // 检查缓存 (可选):
         //shouldCallAPI: (state) => !state.users[userId],
         // 进行取：
-        callAPI: (token) => fetch(`${actions.WEB_API_FILE_URI}/parser/html/url?url=${url}`,{
+        callAPI: (token) => fetch(`${actions.WEB_API_URI}/attachment/parseHtml?url=${url}`,{
             method: 'GET',
             headers: {
                 [actions.HEADER_AUTH_FIELD]: actions.HEADER_AUTH_PREFIX + token
