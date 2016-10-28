@@ -9,7 +9,7 @@ import {autoSaveCase} from 'redux/actions/case';
 
 import * as global from 'util/global';
 import cookie from 'react-cookie';
-import * as socket from 'util/socket.jsx';
+import socket from 'util/socket.jsx';
 
 import {setCurrentCase} from 'redux/actions/case';
 import {
@@ -22,6 +22,8 @@ import {
 } from 'redux/actions/doctor';
 
 import Image from '../image/image';
+
+import pubSub from 'util/pubsub';
 
 const confirm = Modal.confirm;
 
@@ -84,6 +86,8 @@ export default class User extends Component {
                     title: '你确认要退出“我有医生”出诊系统吗？',
                     content: content,
                     onOk: ()=> {
+                        pubSub.logout();
+
                         router.replace(`/login`);
                         dispatch(signOut(this.props.data.email)).then(()=> {
                         });
@@ -120,6 +124,7 @@ export default class User extends Component {
 
                         dispatch(getDoctorEndInquery(true));
                         socket.seClose();
+                        pubSub.logout();
 
                         setTimeout(()=> {
                             router.replace(`/login`);

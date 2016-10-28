@@ -2,22 +2,13 @@ import React from 'react';
 import {connect} from 'react-redux';
 import {withRouter} from 'react-router';
 import cookie from 'react-cookie';
-import * as socket from 'util/socket.jsx';
+import socket from 'util/socket.jsx';
 
 import {setAuth} from "redux/actions/auth";
 import {getDoctorStartInquery, changeDoctorState, getDoctorQueueCountByUserId} from 'redux/actions/doctor';
 import {setCurrentCase} from 'redux/actions/case';
 import {setCurrentPatient} from 'redux/actions/patient';
 import {Spin} from 'antd';
-
-function parseCookie(val) {
-    if(val){
-        val = val.replace(/\\"/gi, '"');
-        return JSON.parse(val);
-    }else{
-        return null;
-    }
-}
 
 export function requireAuthentication(Component) {
 
@@ -33,13 +24,10 @@ export function requireAuthentication(Component) {
             this.checkAuth(isAuthenticated);
         }
 
-       /* componentWillReceiveProps(nextProps) {
-            this.checkAuth(nextProps.isAuthenticated);
-        }*/
-
         checkAuth(isAuthenticated) {
             let data = cookie.load('HEALTHWEB');
             let {dispatch} = this.props;
+
             if (!isAuthenticated) {
                 if (data && data.t && data.id) {
                     dispatch(setAuth({
@@ -75,6 +63,8 @@ export function requireAuthentication(Component) {
             }else{
                 dispatch(getDoctorQueueCountByUserId(data.id));
             }
+
+            socket.windowListener();
         }
 
         resetData() {

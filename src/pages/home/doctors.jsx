@@ -7,7 +7,7 @@ import {Link} from 'react-router';
 import {connect} from 'react-redux';
 import cookie from 'react-cookie';
 import  * as global from 'util/global'
-import * as socket from 'util/socket.jsx';
+import socket from 'util/socket.jsx';
 import {
     getDoctorQueueCountByUserId,
     getDoctorAttendance,

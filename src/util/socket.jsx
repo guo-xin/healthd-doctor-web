@@ -17,7 +17,7 @@ import pubSub from 'util/pubsub';
 let atmosphere = require('atmosphere.js');
 let socket;
 
-export const receiveMessages = ()=> {
+function receiveMessages() {
     let doctorId = store.getState().authStore.id;
 
     if (socket && socket.close) {
@@ -110,18 +110,18 @@ export const receiveMessages = ()=> {
     };
 
     socket = atmosphere.subscribe(request);
-};
+}
 
 //关闭消息推送
-export const seClose = ()=> {
+function seClose() {
     if (socket && socket.close) {
         socket.close();
         socket = null;
     }
-};
+}
 
 //页面相关的监听动作
-export const windowListen = ()=> {
+function windowListener() {
 
     window.onbeforeunload = function () {
         store.dispatch(autoSaveCase());
@@ -147,4 +147,10 @@ export const windowListen = ()=> {
         seClose();
         store.dispatch(getDoctorEndInquery());
     };
+}
+
+export default {
+    receiveMessages,
+    seClose,
+    windowListener
 };

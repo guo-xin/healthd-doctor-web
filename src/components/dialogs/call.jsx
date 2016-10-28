@@ -222,6 +222,10 @@ class Call extends Component {
             userPhone: incomingCallInfo.tel
         }));
 
+        dispatch(setCallInfo({
+            callState: -1
+        }));
+
         this.resetDocState();
     }
 
@@ -236,16 +240,19 @@ class Call extends Component {
     }
 
     setVisible(isVisible) {
+        let audio = this.refs.audio;
         if(!isVisible){
             clearTimeout(this.st);
         }
 
-        if(isVisible){
-            this.refs.audio.setAttribute('src', ringFile);
-            this.refs.audio.play();
-        }else{
-            this.refs.audio.setAttribute('src', '');
-            this.refs.audio.pause();
+        if(audio){
+            if(isVisible){
+                audio.setAttribute('src', ringFile);
+                audio.play();
+            }else{
+                audio.setAttribute('src', '');
+                audio.pause();
+            }
         }
 
         this.setState({
@@ -258,52 +265,53 @@ class Call extends Component {
 
         return (
             <div>
-            <Modal
-                wrapClassName={styles.dialog + " vertical-center-modal"}
-                closable={false}
-                maskClosable={false}
-                style={{ top: "-20px" }}
-                visible={isVisible}
-                onCancel={() => this.setVisible(false)}
-                footer={
-                <div>
-                    <Button size="large" type="ghost" onClick={()=>this.hangUp()}><img
-                        src={require('assets/images/hangup-gray.png')} alt=""/>挂断</Button>
+                <audio ref="audio" autoPlay={false} loop="loop" src={ringFile} style={{display: "none"}}></audio>
+                <Modal
+                    wrapClassName={styles.dialog + " vertical-center-modal"}
+                    closable={false}
+                    maskClosable={false}
+                    style={{ top: "-20px" }}
+                    visible={isVisible}
+                    onCancel={() => this.setVisible(false)}
+                    footer={
+                    <div>
+                        <Button size="large" type="ghost" onClick={()=>this.hangUp()}><img
+                            src={require('assets/images/hangup-gray.png')} alt=""/>挂断</Button>
 
-                   <Button size="large" className="answer-btn" onClick={()=>this.answer()} disabled={disabled} ><img
-                        src={require('assets/images/answer.png')} alt=""/>接听</Button>
-            </div>
-                }>
-
-
-
-                <div className={styles.pic}>
-                    <span>
-                        <Image src={user.head || global.defaultHead} defaultImg={global.defaultHead}>
-                        </Image>
-                    </span>
+                       <Button size="large" className="answer-btn" onClick={()=>this.answer()} disabled={disabled} ><img
+                            src={require('assets/images/answer.png')} alt=""/>接听</Button>
                 </div>
-                <div className={styles.detail}>
-                    <div className="top">
-                        <span className="name">患者：{user.realName || '--'}</span>
-                        <span className="age">{global.getAge(user.birthday) || '--岁'}</span>
-                        <span className="serial">ID:{global.formatPatientCode(user.patientCode) || '--'}</span>
-                        <span className="gender">
-                             <img src={global.getGenderUrl(user.sex)} alt=""/>
+                    }>
+
+
+
+                    <div className={styles.pic}>
+                        <span>
+                            <Image src={user.head || global.defaultHead} defaultImg={global.defaultHead}>
+                            </Image>
                         </span>
                     </div>
-                    <div className="middle clearfix">
-                        <ul>
-                            <li>问诊人：{user.userName || user.userMobilePhone || '--'}</li>
-                            <li>与问诊人关系：{global.getRelationText(user.relation) || '--'}</li>
-                            <li style={{width:"100%"}}>上次诊断：{user.diagnosisName || '--'}</li>
-                        </ul>
+                    <div className={styles.detail}>
+                        <div className="top">
+                            <span className="name">患者：{user.realName || '--'}</span>
+                            <span className="age">{global.getAge(user.birthday) || '--岁'}</span>
+                            <span className="serial">ID:{global.formatPatientCode(user.patientCode) || '--'}</span>
+                            <span className="gender">
+                                 <img src={global.getGenderUrl(user.sex)} alt=""/>
+                            </span>
+                        </div>
+                        <div className="middle clearfix">
+                            <ul>
+                                <li>问诊人：{user.userName || user.userMobilePhone || '--'}</li>
+                                <li>与问诊人关系：{global.getRelationText(user.relation) || '--'}</li>
+                                <li style={{width:"100%"}}>上次诊断：{user.diagnosisName || '--'}</li>
+                            </ul>
+                        </div>
                     </div>
-                </div>
 
-                <div className={styles.callTips}>{tip}</div>
-            </Modal>
-                <audio ref="audio" autoPlay={false} loop="loop" src={ringFile} style={{display: "none"}}></audio>
+                    <div className={styles.callTips}>{tip}</div>
+                </Modal>
+
             </div>
         );
     }

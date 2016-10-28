@@ -68,6 +68,19 @@ class Video extends React.Component {
             this.state.isShowVideoCtrl = false;
             this.togglePlay(false);
         });
+        
+        //订阅系统退出事件
+        pubSub.subLogout(()=>{
+            let client = this.client;
+
+            if(client){
+                client.close();
+                client = undefined;
+                this.client = null;
+            }
+
+            pubSub.clearAllSubscriptions();
+        })
     }
 
     componentWillUnmount() {
@@ -383,9 +396,9 @@ class Video extends React.Component {
 
         if(flag){
             this.state.isShowVideoCtrl = true;
-            player.play(callRecord.getUrl());
+            player && player.play(callRecord.getUrl());
         }else{
-            player.pause();
+            player && player.pause();
         }
     }
 

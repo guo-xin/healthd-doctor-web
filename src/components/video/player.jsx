@@ -5,14 +5,23 @@ import {message} from 'antd';
 class Player extends React.Component{
     url = '';
 
+    st = null;
+
     onPause(e) {
         let {togglePlayState} = this.props;
         togglePlayState(false);
     }
 
     onSeeked(e) {
+        console.log(this.refs.video.paused, this.refs.video.ended);
         let {togglePlayState} = this.props;
-        togglePlayState(true);
+
+        clearTimeout(this.st);
+        this.st = setTimeout(()=>{
+            clearTimeout(this.st);
+            togglePlayState(true);
+        }, 60);
+
     }
 
     onError(e) {
