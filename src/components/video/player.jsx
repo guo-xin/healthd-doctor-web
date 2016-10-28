@@ -13,7 +13,6 @@ class Player extends React.Component{
     }
 
     onSeeked(e) {
-        console.log(this.refs.video.paused, this.refs.video.ended);
         let {togglePlayState} = this.props;
 
         clearTimeout(this.st);
