@@ -491,7 +491,7 @@ class Detail extends React.Component {
                             userId: data.userId,
                             caseId: data.id,
                             patientId: data.patientId,
-                            inquiryId: props.inquiryId,
+                            inquiryId: currentCase.inquiryId,
                             state: 1
                         }));
                     }
@@ -502,9 +502,9 @@ class Detail extends React.Component {
 
                     //创建病历时更新诊前资料信息
                     if (caseState === -1) {
-                        if (props.inquiryId && currentCase.inquiryInfoId) {
+                        if (currentCase.inquiryId && currentCase.inquiryInfoId) {
                             props.dispatch(updateInquiryInfoByInquiryId({
-                                inquiryId: props.inquiryId,
+                                inquiryId: currentCase.inquiryId,
                                 inquiryInfoId: currentCase.inquiryInfoId
                             }));
                         }
