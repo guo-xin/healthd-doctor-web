@@ -13,6 +13,7 @@ import {
     cancelQueue,
     sendMissedCallMsg,
     reduceService,
+    hangupTolerant,
     callTimeoutOrReject
 } from 'redux/actions/call';
 import {getOCXAccount} from 'redux/actions/auth';
@@ -160,15 +161,13 @@ class Video extends React.Component {
         if (nextProps.isShowCallingDialog && nextProps.isShowCallingDialog != this.props.isShowCallingDialog) {
             if (nextProps.callType === 0) {
                 //开始响铃
-                this.refs.audio.setAttribute('src', ringFile);
-                this.refs.audio.play();
+                this.playRing();
             }
         }
 
         if (!nextProps.isShowCallingDialog && nextProps.isShowCallingDialog != this.props.isShowCallingDialog) {
             //停止响铃
-            this.refs.audio.setAttribute('src', '');
-            this.refs.audio.pause();
+            this.stopRing();
         }
     }
 
@@ -372,6 +371,8 @@ class Video extends React.Component {
                 }));
             }
         }
+        
+        this.clearRedisKey();
 
         this.callState = -1;
         dispatch(setCallState(-1, JSON.parse(msg)));
@@ -384,7 +385,7 @@ class Video extends React.Component {
 
     //呼叫释放
     OnCallReleased(msg) {
-        let {dispatch, inquiryId} = this.props;
+        let {dispatch, inquiryId, account} = this.props;
 
         //如果接听对话框打开，则关闭
         if (this.props.isShowCallingDialog) {
@@ -423,6 +424,7 @@ class Video extends React.Component {
             }));
         }
 
+        this.clearRedisKey();
 
         this.callState = -1;
         this.props.dispatch(setCallState(-1));
@@ -505,6 +507,44 @@ class Video extends React.Component {
         }));
 
         console.log('video--------------收到呼叫', msg);
+    }
+
+    clearRedisKey(){
+        let {dispatch, account} = this.props;
+
+        if(this.callType == 1){
+            let params;
+
+            if(this.inquiryCallType === 0){
+                params = {
+                    caller: account.voipId,
+                    called: this.phone
+                };
+            }else{
+                params = {
+                    caller: this.phone,
+                    called: account.voipId
+                };
+            }
+
+            dispatch(hangupTolerant(params));
+        }
+    }
+
+    playRing(){
+        let audio = this.refs.audio;
+        if(audio){
+            audio.setAttribute('src',ringFile);
+            audio.play();
+        }
+    }
+
+    stopRing(){
+        let audio = this.refs.audio;
+        if(audio){
+            audio.setAttribute('src', '');
+            audio.pause();
+        }
     }
 
     startTimer() {
@@ -901,7 +941,7 @@ class Video extends React.Component {
                 <audio ref="audio" autoPlay={false} loop="loop" src={ringFile} style={{display: "none"}}></audio>
 
                 <Call answer={()=>this.answer()} hangUp={::this.hangUpFromDialog} busy={()=>this.busy()}
-                      callbackFromCall={::this.callbackFromCall}/>
+                      callbackFromCall={::this.callbackFromCall} stopRing={::this.stopRing}/>
                 <Callback callback={::this.callback}/>
 
                 <CallbackFromCase callback={::this.callbackFromVideoArea}></CallbackFromCase>

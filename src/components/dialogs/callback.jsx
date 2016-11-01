@@ -66,13 +66,13 @@ class Callback extends Component {
             else {
                 //由呼叫中直接到挂断为呼叫失败
                 if (this.props.callState === 0) {
-                    let tip = '呼叫失败，请重新呼叫。';
+                    let tip = '信号不稳，请刷新后重试。';
                     let callMessage = nextProps.callMessage;
                     let callType = nextProps.callType;
 
                     if (callType == 1) {
                         if (callMessage.reason === 175001) {
-                            tip = '未响应，请稍后再试。';
+                            tip = '未响应，请检查网络，请稍后再试。';
                         }
                         else if (callMessage.reason && callMessage.reason.reason) {
                             let reason = callMessage.reason.reason;
@@ -189,7 +189,7 @@ class Callback extends Component {
                     } else {
                         console.log('呼叫失败-------------创建会话（inquireId）失败');
                         this.setState({
-                            tip: '呼叫失败，请重新呼叫',
+                            tip: '信号不稳，请刷新后重试。',
                             disabled: false
                         });
                     }
@@ -197,7 +197,7 @@ class Callback extends Component {
                 ()=> {
                     console.log('呼叫失败-------------创建会话（inquireId）失败');
                     this.setState({
-                        tip: '呼叫失败，请重新呼叫',
+                        tip: '信号不稳，请刷新后重试。',
                         disabled: false
                     });
                 }

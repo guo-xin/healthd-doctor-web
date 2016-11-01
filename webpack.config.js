@@ -92,13 +92,13 @@ module.exports = {
         proxy: [
             {
                 path: /\/v2\/(parser|oss|lucene)\/*/gi,
-                target: "https://test.d.healthdoc.cn/healthd-tools",
+                target: "https://stage.d.healthdoc.cn/healthd-tools",
                 secure: false,
                 changeOrigin: true
             },
             {
                 path: '/v2/*',
-                target: "https://test.d.healthdoc.cn",
+                target: "https://stage.d.healthdoc.cn",
                 secure: false,
                 changeOrigin: true
             }

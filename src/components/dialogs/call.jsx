@@ -172,11 +172,11 @@ class Call extends Component {
                 //由呼叫中直接到挂断为呼叫失败
                 if (this.props.callState === 0) {
                     /*this.setState({
-                     tip: '接听失败'
+                     tip: '信号不稳，接听失败。'
                      });*/
 
                     this.hangUp();
-                    message.error('接听失败');
+                    message.error('信号不稳，接听失败。');
                 } else {
                     if (!this.props.isVisible) {
                         this.state.tip = "";
@@ -205,13 +205,13 @@ class Call extends Component {
                     }, 100);
 
                 } else {
-                    message.error('接听失败');
+                    message.error('信号不稳，接听失败。');
                     console.log('呼叫失败-------------查询会话（inquireId）失败');
                     this.hangUp();
                 }
             },
             ()=> {
-                message.error('接听失败');
+                message.error('信号不稳，接听失败。');
                 console.log('呼叫失败-------------查询会话（inquireId）失败');
                 this.hangUp();
             }
@@ -283,14 +283,14 @@ class Call extends Component {
                         callbackFromCall(phone, incomingCallInfo.workingStatus);
                     }
                 } else {
-                    message.error('接听失败');
+                    message.error('信号不稳，接听失败。');
                     this.setVisible(false);
                     console.log('呼叫失败-------------创建会话（inquireId）失败');
 
                 }
             },
             ()=> {
-                message.error('接听失败');
+                message.error('信号不稳，接听失败。');
                 this.setVisible(false);
                 console.log('呼叫失败-------------创建会话（inquireId）失败');
             }
@@ -299,7 +299,18 @@ class Call extends Component {
     }
 
     setVisible(isVisible) {
+        if(!isVisible){
+            this.stopRing();
+        }
+        
         this.props.dispatch(showCallingDialog(isVisible));
+    }
+
+    stopRing(){
+        let stopRing = this.props.stopRing;
+        if(typeof stopRing == 'function'){
+            stopRing();
+        }
     }
 
     render() {

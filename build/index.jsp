@@ -13,8 +13,8 @@
         window.fileApi = "healthd-tools/v2";
         window.msgApi = "platform-message";
     </script>
-<link rel="shortcut icon" href="healthd.ico"><link href="./css/app-e9a4ed3f746cc312b7e4.css" rel="stylesheet"></head>
+<link rel="shortcut icon" href="healthd.ico"><link href="./css/app-ecae4f8b7b8864cdd2a2.css" rel="stylesheet"></head>
 <body>
 <div id="app"></div>
-<script type="text/javascript" src="vendor.bundle.js"></script><script type="text/javascript" src="index-e9a4ed3.js"></script></body>
+<script type="text/javascript" src="vendor.bundle.js"></script><script type="text/javascript" src="index-ecae4f8.js"></script></body>
 </html>

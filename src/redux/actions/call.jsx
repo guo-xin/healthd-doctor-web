@@ -288,3 +288,26 @@ export const addRecordForTimeoutAndHangup = (params) => {
         })
     };
 };
+
+
+//视频挂断事件模拟回调
+export const hangupTolerant = (params) => {
+    let action = actions.HANG_UP_TOLERANT;
+
+    return {
+        // 要在之前和之后发送的 action types
+        types: [action + '_REQUEST', action + '_SUCCESS', action + '_FAILURE'],
+        // 检查缓存 (可选):
+        //shouldCallAPI: (state) => !state.users[userId],
+        // 进行取：
+        callAPI: (token) => fetch(`${actions.WEB_API_URI}/call/hang-up-tolerant`, {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json; charset=UTF-8',
+                [actions.HEADER_AUTH_FIELD]: actions.HEADER_AUTH_PREFIX + token
+            },
+            body: JSON.stringify(params)
+        })
+    };
+};

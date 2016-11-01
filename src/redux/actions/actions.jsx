@@ -40,6 +40,8 @@ export const QUERY_SERVICE = "QUERY_SERVICE";//挂断后查询服务包次数
 export const SEND_MISSED_CALL_MSG = "SEND_MISSED_CALL_MSG"; //未接来电短信通知
 
 export const PHONE_TIMEOUT_AND_HANGUP = "PHONE_TIMEOUT_AND_HANGUP"; //电话预约之后医生挂断和超时未接调用更新通话记录状态接口
+
+export const HANG_UP_TOLERANT = "HANG_UP_TOLERANT"; //视频挂断事件模拟回调
 /* ---------- 通话相关 end ---------- */
 
 
