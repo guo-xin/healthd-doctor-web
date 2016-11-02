@@ -59,6 +59,9 @@ class Todo extends React.Component {
         const {todoCases = {}} = this.props;
         let results = todoCases.results || [], list = [];
         Array.isArray(results) && ( list = results.map((item, index) => {
+            if(!item.inquiryId){
+                return;
+            }
             return (
                 <Col key={index} span="8" className="item">
                     <div className={styles.card}>
