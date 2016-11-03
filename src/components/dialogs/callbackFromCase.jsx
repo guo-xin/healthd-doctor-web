@@ -48,7 +48,7 @@ class CallbackFromCase extends Component {
 
                     if (callType == 1) {
                         if (callMessage.reason === 175001) {
-                            tip = '未响应，请稍后再试。';
+                            tip = '未响应，请检查网络，稍后再试。';
                         }
                         else if (callMessage.reason && callMessage.reason.reason) {
                             let reason = callMessage.reason.reason;
@@ -78,6 +78,23 @@ class CallbackFromCase extends Component {
 
                             }
 
+                        }
+                    }else{
+                        if (callMessage.reason && callMessage.reason.reason) {
+                            let reason = callMessage.reason.reason;
+
+                            switch (+reason) {
+                                case 175408:
+                                    tip = '对方忙碌，请稍后再试。';
+                                    break;
+
+                                case 175480:
+                                    tip = '对方忙碌，请稍后再试。';
+                                    break;
+
+                                default:
+
+                            }
                         }
                     }
 
