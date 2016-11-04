@@ -98,6 +98,10 @@ class Callback extends Component {
                                     tip = '未响应，请检查网络，稍后再试。';
                                     break;
 
+                                case 175603:
+                                    tip = '对方忙碌，请稍后再试。';
+                                    break;
+
                                 default:
 
                             }
@@ -114,6 +118,10 @@ class Callback extends Component {
                                     break;
 
                                 case 175480:
+                                    tip = '对方忙碌，请稍后再试。';
+                                    break;
+
+                                case 175603:
                                     tip = '对方忙碌，请稍后再试。';
                                     break;
 
