@@ -3,6 +3,12 @@ const fetch = actions.fetch;
 
 export const showCalcDialog = actions.create(actions.SHOW_CALC_DIALOG, 'isShowCalcDialog');
 
+export const showCallDialog = actions.create(actions.SHOW_CALL_DIALOG, 'isShowCallDialog');
+
+export const showCallbackDialog = actions.create(actions.SHOW_CALLBACK_DIALOG, 'isShowCallbackDialog');
+
+export const showCallbackInCaseDialog = actions.create(actions.SHOW_CALLBACK_IN_CASE_DIALOG, 'isShowCallbackInCaseDialog');
+
 export const setUserForVideoArea = actions.create(actions.SET_USER_FOR_VIDEO_AREA, 'user');
 
 export const setCallInfo = actions.create(actions.SET_CALL_INFO, 'data');

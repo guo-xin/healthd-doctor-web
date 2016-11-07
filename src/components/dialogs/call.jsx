@@ -5,6 +5,7 @@ import {withRouter} from 'react-router';
 import {connect} from 'react-redux';
 import {getUserByMPTV} from 'redux/actions/user';
 import {
+    showCallDialog,
     agoraAccept,
     agoraVoipInviteRefuse,
     setCallInfo
@@ -22,7 +23,6 @@ let ringFile = require('assets/ring.wav');
 class Call extends Component {
     state = {
         incomingCallInfo: {}, //app来电消息推送内容
-        isVisible: false,
         user: {}, //当前来电用户详细信息
         disabled: false,
         tip: ''
@@ -255,13 +255,12 @@ class Call extends Component {
             }
         }
 
-        this.setState({
-            isVisible: isVisible
-        });
+        this.props.dispatch(showCallDialog(isVisible));
     }
 
     render() {
-        let {isVisible, user={}, tip, disabled} = this.state;
+        let {user={}, tip, disabled} = this.state;
+        let {isVisible} = this.props;
 
         return (
             <div>
@@ -318,8 +317,10 @@ class Call extends Component {
 }
 
 const mapStateToProps = (globalStore) => {
-    const {} = globalStore;
-    return {}
+    const { callStore } = globalStore;
+    return {
+        isVisible: callStore.isShowCallDialog
+    }
 };
 
 Call = connect(mapStateToProps)(Call);

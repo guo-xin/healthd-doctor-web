@@ -4,6 +4,7 @@ import {Modal, Button, message} from 'antd';
 import {withRouter} from 'react-router';
 import {connect} from 'react-redux';
 import {
+    showCallbackDialog,
     agoraCall,
     setCallInfo,
     agoraVoipInviteBye,
@@ -20,7 +21,6 @@ import pubSub from 'util/pubsub';
 
 class Callback extends Component {
     state = {
-        isVisible: false,
         disabled: false,
         callbackUser: {},
         description: '',
@@ -69,7 +69,7 @@ class Callback extends Component {
         //订阅app接听事件
         pubSub.subAppAccept(()=>{
             clearTimeout(this.st);
-            if(this.state.isVisible){
+            if(this.props.isVisible){
                 this._callback();
             }
         });
@@ -82,8 +82,8 @@ class Callback extends Component {
     }
 
     appHangUp(){
-        if(this.state.isVisible){
-            let {dispatch} = this.props;
+        let {dispatch, isVisible} = this.props;
+        if(isVisible){
             let {workingStatus, phone} = this.joinChannelData;
 
             //将医生状态置为占线前的状态
@@ -274,13 +274,12 @@ class Callback extends Component {
     }
 
     setVisible(isVisible) {
-        this.setState({
-            isVisible: isVisible
-        });
+        this.props.dispatch(showCallbackDialog(isVisible));
     }
 
     render() {
-        let {disabled, tip, callbackUser={}, isVisible} = this.state;
+        let {disabled, tip, callbackUser={}} = this.state;
+        let {isVisible} = this.props;
         let user = callbackUser || {};
 
         return (
@@ -329,9 +328,10 @@ class Callback extends Component {
 }
 
 const mapStateToProps = (globalStore) => {
-    const {doctorStore} = globalStore;
+    const {doctorStore, callStore} = globalStore;
 
     return {
+        isVisible: callStore.isShowCallbackDialog,
         doctor: Object.assign({}, doctorStore.data)
     }
 };

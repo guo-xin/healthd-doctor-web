@@ -6,6 +6,7 @@ import {withRouter} from 'react-router';
 import {connect} from 'react-redux';
 import {getUserById} from 'redux/actions/user';
 import {
+    showCallbackInCaseDialog,
     agoraCall,
     setCallInfo,
     agoraVoipInviteBye,
@@ -20,7 +21,6 @@ import pubSub from 'util/pubsub';
 
 class CallbackFromCase extends Component {
     state = {
-        isVisible: false,
         disabled: false,
         userId: null,
         user: {},
@@ -58,7 +58,7 @@ class CallbackFromCase extends Component {
         //订阅app接听事件
         pubSub.subAppAccept(()=>{
             clearTimeout(this.st);
-            if(this.state.isVisible){
+            if(this.props.isVisible){
                 this._callback();
             }
         });
@@ -101,8 +101,8 @@ class CallbackFromCase extends Component {
     }
 
     appHangUp(){
-        if(this.state.isVisible){
-            let {dispatch} = this.props;
+        let {dispatch, isVisible} = this.props;
+        if(isVisible){
             let {workingStatus, phone} = this.joinChannelData;
 
             //将医生状态置为占线前的状态
@@ -270,9 +270,7 @@ class CallbackFromCase extends Component {
     }
 
     setVisible(isVisible) {
-        this.setState({
-            isVisible: isVisible
-        });
+        this.props.dispatch(showCallbackInCaseDialog(isVisible));
     }
 
     getDiagnosisName() {
@@ -287,9 +285,9 @@ class CallbackFromCase extends Component {
     }
 
     render() {
-        let {currentCase={}, patients={}} = this.props;
+        let {isVisible, currentCase={}, patients={}} = this.props;
 
-        let {isVisible, disabled, tip, user={}} = this.state;
+        let {disabled, tip, user={}} = this.state;
 
         let diagnosisName = this.getDiagnosisName();
         let patient = patients[currentCase.patientId] || {};
@@ -341,9 +339,10 @@ class CallbackFromCase extends Component {
 }
 
 const mapStateToProps = (globalStore) => {
-    const {doctorStore, caseStore, patientStore, userStore} = globalStore;
+    const {doctorStore, caseStore, patientStore, userStore, callStore} = globalStore;
 
     return {
+        isVisible: callStore.isShowCallbackInCaseDialog,
         doctor: Object.assign({}, doctorStore.data),
         patients: Object.assign({}, patientStore.patients),
         users: Object.assign({}, userStore.users),

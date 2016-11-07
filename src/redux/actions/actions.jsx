@@ -20,9 +20,12 @@ export const AGORA_VOIP_INVITE_BYE = "AGORA_VOIP_INVITE_BYE";
 export const AGORA_VOIP_INVITE_REFUSE = "AGORA_VOIP_INVITE_REFUSE";
 export const SUBSCRIBE_SERVER_EVENT = "SUBSCRIBE_SERVER_EVENT";
 
+export const SHOW_CALL_DIALOG = "SHOW_CALL_DIALOG"; //设置来电对话框是否显示
+export const SHOW_CALLBACK_DIALOG = "SHOW_CALLBACK_DIALOG"; //设置回呼对话框是否显示
+export const SHOW_CALLBACK_IN_CASE_DIALOG = "SHOW_CALLBACK_IN_CASE_DIALOG"; //设置病历中回呼对话框是否显示
+export const SHOW_CALC_DIALOG = "SHOW_CALC_DIALOG"; //设置扣次对话框是否显示
 export const SET_CALL_INFO = "SET_CALL_INFO"; //设置通话信息
 export const SET_USER_FOR_VIDEO_AREA = "SET_USER_FOR_VIDEO_AREA"; //设置视频区域用户信息
-export const SHOW_CALC_DIALOG = "SHOW_CALC_DIALOG"; //设置扣次对话框是否显示
 export const GET_CALL_RECORD = "GET_CALL_RECORD"; //查询通话记录
 export const UNREAD_INQUIRY = "UNREAD_INQUIRY";//未读问诊推送
 export const MISSED_CALL = "MISSED_CALL";//未接来电
