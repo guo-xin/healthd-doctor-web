@@ -8,7 +8,7 @@ import {connect} from 'react-redux';
 
 import {getInquireNumber} from 'redux/actions/inquire';
 
-export  default class Archive extends Component {
+class Archive extends Component {
     state = {
         loading: false
     };

@@ -27,7 +27,7 @@ import pubSub from 'util/pubsub';
 
 const confirm = Modal.confirm;
 
-export default class User extends Component {
+class User extends Component {
     status = {
         0: '在线',
         1: '占线',
