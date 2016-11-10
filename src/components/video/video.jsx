@@ -41,6 +41,8 @@ class Video extends React.Component {
     videoProfile = '480P_2';
     remoteStreamList = [];
 
+    warningTimer = null; //警告
+
     componentDidMount() {
         let {dispatch, doctorId} = this.props;
 
@@ -108,10 +110,12 @@ class Video extends React.Component {
         if (client) {
             client.init(this.appId, ()=> {
                 console.log("AgoraRTC client 创建成功");
+
                 if (this.secret) {
                     client.setEncryptionSecret(this.secret);
                 }
             }, (err) => {
+                message.error('软件异常，请刷新或重启电脑！');
                 if (err) {
                     console.log("AgoraRTC client 创建失败", err);
                 }
@@ -189,6 +193,8 @@ class Video extends React.Component {
                     videoEnabled: callType==2,
                     audioEnabled: true
                 });
+
+                this.stopWarning();
             }
         }
     }
@@ -253,6 +259,7 @@ class Video extends React.Component {
         let localStream = this.localStream;
         let client = this.client;
         let {callType} = this.props;
+        let self = this;
 
         if (localStream) {
             // local stream exist already
@@ -277,12 +284,13 @@ class Video extends React.Component {
 
             localStream.play('agora-local');
 
-
             client.publish(localStream, function (err) {
                 console.log("Publish local stream error: " + err);
             });
 
             client.on('stream-published');
+
+            self.startWarning();
 
         }, function (err) {
             console.log("Local stream init failed.", err);
@@ -326,6 +334,7 @@ class Video extends React.Component {
         this.localStream = null;
         this.remoteStreamList = [];
 
+        this.stopWarning();
         this.hangup();
         this.resetState();
     }
@@ -392,6 +401,18 @@ class Video extends React.Component {
         pubSub.showCallbackDialogInCase({
             callType: callType
         });
+    }
+
+    startWarning(){
+        this.warningTimer = setTimeout(()=>{
+            this.refs.warning.className = styles.warning + ' ' + styles.show;
+        }, 10*1000);
+    }
+
+    stopWarning(){
+        this.refs.warning.className = styles.warning;
+        clearTimeout(this.warningTimer);
+        this.warningTimer = null;
     }
 
     togglePlayState(flag){
@@ -464,7 +485,11 @@ class Video extends React.Component {
                             </div>
                         </div>
                     </div>
-                    
+
+                    <div ref="warning" className={styles.warning}>
+                        网络不稳
+                    </div>
+
                 </div>
                 <CallRecord ref="callRecord"
                             togglePlay={::this.togglePlay}
