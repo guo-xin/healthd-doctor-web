@@ -157,11 +157,21 @@ class Video extends React.Component {
 
 
         client.on('error', function (event) {
+            console.log('An error has occurred in agora', event);
             var message = event.msg;
-            if (message.reason === 'CONNECTION_INTERRUPTED') {
-                console.log('connection interrupted');
-            } else if (message.reason === 'CONNECTION_LOST') {
-                console.log('connection lost');
+            if(message && message.reason){
+                switch(message.reason){
+                    case 'CONNECTION_INTERRUPTED':
+                        console.log('connection interrupted');
+                        break;
+
+                    case 'CONNECTION_LOST':
+                        console.log('connection lost');
+                        break;
+
+                    default:
+                        ;
+                }
             }
         });
     }
@@ -254,13 +264,13 @@ class Video extends React.Component {
 
         localStream = AgoraRTC.createStream({
             streamID: uid,
-            audio: true,
             video: callType == 2,
-            screen: false,
             local: true
         });
 
-        localStream.setVideoProfile(this.videoProfile);
+        if(callType == 2){
+            localStream.setVideoProfile(this.videoProfile);
+        }
 
         localStream.init(function () {
             console.log("Get UserMedia successfully");
