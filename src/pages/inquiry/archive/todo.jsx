@@ -85,7 +85,7 @@ class Todo extends React.Component {
                                             问诊人：{item.userName || item.userMobilePhone || '--'}</li>
                                         <li>与问诊人关系：{global.getRelationText(item.relation)}</li>
                                         <li>就诊次数：第{item.caseCount || 0}次</li>
-                                        <li className="lastInquery">上次诊断：{item.diagnosisName || '--'}</li>
+                                        <li className="lastInquery">本次诊断：{item.diagnosisName || '--'}</li>
                                     </ul>
                                 </div>
 
