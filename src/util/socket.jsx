@@ -145,7 +145,7 @@ function windowListener() {
         }, {expires: exp});
 
         seClose();
-        store.dispatch(getDoctorEndInquery());
+        store.dispatch(getDoctorEndInquery(true));
     };
 }
 

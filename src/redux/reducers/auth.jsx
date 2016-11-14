@@ -42,7 +42,7 @@ const auth = (state = {
                     state.headPic = data.headPic || '';
 
                     let exp = new Date();
-                    exp.setTime(exp.getTime() + 14 * 60 * 60 * 1000);
+                    exp.setTime(exp.getTime() + 16 * 60 * 60 * 1000);
 
                     cookie.save('HEALTHWEB',{
                         id: state.id,
