@@ -1,7 +1,7 @@
 require("file?name=assets/js/[name].js!../../assets/js/AgoraRtcAgentSDK.js");
 import styles from './video.less';
 import React from 'react';
-import {Button, message} from 'antd';
+import {Button, message, notification} from 'antd';
 import Call from 'components/dialogs/call';
 import {connect} from 'react-redux';
 
@@ -115,7 +115,12 @@ class Video extends React.Component {
                     client.setEncryptionSecret(this.secret);
                 }
             }, (err) => {
-                message.error('软件异常，请刷新或重启电脑！');
+                notification.error({
+                    message: '系统提示',
+                    description: '插件运行异常，请手动重启插件。',
+                    duration: null
+                });
+
                 if (err) {
                     console.log("AgoraRTC client 创建失败", err);
                 }
@@ -162,9 +167,17 @@ class Video extends React.Component {
 
         client.on('error', function (event) {
             console.log('An error has occurred in agora', event);
-            var message = event.msg;
-            if(message && message.reason){
-                switch(message.reason){
+            var reason = event.reason;
+            if(reason){
+                switch(reason){
+                    case 'CLOSE_BEFORE_OPEN':
+                        console.log('CLOSE_BEFORE_OPEN');
+                        break;
+
+                    case 'LOST_CONNECTION_TO_AGENT':
+                        console.log('LOST_CONNECTION_TO_AGENT');
+                        break;
+
                     case 'CONNECTION_INTERRUPTED':
                         console.log('connection interrupted');
                         break;
