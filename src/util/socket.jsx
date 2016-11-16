@@ -83,6 +83,11 @@ function receiveMessages() {
                             //app挂断推送
                             case 'apphangup':
 
+                                //设置通话状态
+                                store.dispatch(setCallInfo({
+                                    callState: -1
+                                }));
+
                                 if(obj.data){
                                     pubSub.appHangUp();
                                 }
