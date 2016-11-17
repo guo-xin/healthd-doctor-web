@@ -4,7 +4,7 @@ import styles from './editDoctor.less';
 import {withRouter} from 'react-router';
 import {connect} from 'react-redux';
 
-import {postDoctorChangeIntroduce} from 'redux/actions/doctor';
+import {postDoctorChangeIntroduce, getDoctorByUserId} from 'redux/actions/doctor';
 const FormItem = Form.Item;
 
 
@@ -19,7 +19,7 @@ class Information extends React.Component {
             2:'3至5年',
             3:'5至10年',
             4:'大于10年'
-    }
+    };
 
     constructor(props) {
         super(props);
@@ -69,6 +69,7 @@ class Information extends React.Component {
         let hide = message.loading('正在保存...', 0);
 
         dispatch(postDoctorChangeIntroduce(params)).then(()=> {
+            dispatch(getDoctorByUserId());
             hide();
             message.success('更改成功！');
             this.props.router.replace('/home');

@@ -40,7 +40,7 @@ class EditDoctor extends React.Component {
 
     render() {
         let {flag} = this.state;
-        const {data = {}, result = {}, doctorId = {}} = this.props;
+        const {data = {}, doctorId = {}} = this.props;
 
         return (
             <div className={styles.wrapper}>
@@ -59,7 +59,7 @@ class EditDoctor extends React.Component {
                         </div>
                         <div className={styles.right}>
                             <div style={{"display":(flag===0?"block":"none")}}>
-                                <Safe data={data} result={result} doctorId={doctorId}/>
+                                <Safe data={data} doctorId={doctorId}/>
                             </div>
                             <div style={{"display":(flag!== 0?"block":"none")}}>
                                 <Information data={data} doctorId={doctorId}/>
@@ -77,7 +77,6 @@ const mapStateToProps = (globalStore, ownProps) => {
 
     return {
         data: Object.assign({}, doctorStore.data),
-        result: doctorStore.result,
         doctorId: authStore.id
     };
 };

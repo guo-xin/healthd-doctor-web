@@ -5,19 +5,9 @@ import Image from 'components/image/image';
 
 import {Carousel} from 'antd'
 import {connect} from 'react-redux';
-import {getDoctorByUserId} from 'redux/actions/doctor';
 
 import styles from './home.less'
 class Home extends React.Component {
-    componentDidMount() {
-        this.getDoctorList();
-    }
-
-    getDoctorList() {
-        const {dispatch} = this.props;
-        dispatch(getDoctorByUserId());
-    }
-
     render() {
         const {data = {}} = this.props;
         return (
@@ -46,8 +36,7 @@ const mapStateToProps = (globalStore, ownProps) => {
     const {doctorStore, authStore}  = globalStore;
 
     return {
-        data: doctorStore.data,
-        doctorId: authStore.id
+        data: doctorStore.data
     };
 };
 

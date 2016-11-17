@@ -12,7 +12,7 @@ class Schedule extends Component {
     };
 
     componentDidMount() {
-        this.getScheduleList();
+        //this.getScheduleList();
     }
 
 
@@ -188,7 +188,7 @@ class Schedule extends Component {
 const mapStateToProps = (globalStore, ownProps) => {
     const {doctorStore, authStore}  = globalStore;
     return {
-        data: doctorStore.scheduletList,
+        data: doctorStore.scheduleList,
         doctorId: authStore.id
     };
 };

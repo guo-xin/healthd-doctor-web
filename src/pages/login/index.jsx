@@ -32,8 +32,9 @@ class SendEmail extends Component {
                     loading: true
                 });
                 let hide = message.loading('正在加载...', 0);
-                dispatch(getDoctorResetPwd(email)).then(()=> {
-                    if (this.props.result === 1) {
+                dispatch(getDoctorResetPwd(email)).then((action)=> {
+                    let result = (action.response || {}).result;
+                    if (result === 1) {
                         let {setFields, getFieldValue} = this.props.form;
                         setFields({
                             change: {
@@ -47,7 +48,7 @@ class SendEmail extends Component {
                         this.handleCancel();
                     }
                     hide();
-                }, () => {
+                }, (error) => {
                     hide();
                     message.error('请求失败！');
                 });
@@ -228,7 +229,7 @@ class Login extends Component {
                                         {required: true, message: '请输入密码'}
                                     ]
                                 })} />
-                            <SendEmail result={this.props.response}/>
+                            <SendEmail/>
                         </FormItem>
 
                         <FormItem>
@@ -250,8 +251,7 @@ Login = Form.create()(Login);
 
 const mapStateToProps = (state) => {
     return {
-        isAuthenticated: state.authStore.isAuthenticated,
-        response: state.doctorStore.response
+        isAuthenticated: state.authStore.isAuthenticated
     };
 };
 

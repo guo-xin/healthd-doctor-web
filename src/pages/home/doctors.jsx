@@ -5,49 +5,17 @@ import {Button, Modal} from 'antd';
 import {Link} from 'react-router';
 
 import {connect} from 'react-redux';
-import cookie from 'react-cookie';
 import  * as global from 'util/global'
 import socket from 'util/socket.jsx';
 import {
-    getDoctorQueueCountByUserId,
     getDoctorAttendance,
-    getDoctorByUserIdDate,
     getDoctorStartInquery,
-    getDoctorEndInquery,
-    getDoctorByUserId
+    getDoctorEndInquery
 } from 'redux/actions/doctor';
 
 const confirm = Modal.confirm;
 
 class Doctors extends Component {
-    state = ({
-        toggleInquery: true
-    });
-
-    componentDidMount() {
-        this.getDoctorInquery();
-    }
-
-    getDoctorInquery() {
-        let doctorS = cookie.load('doctorStatu');
-        if (doctorS && doctorS.attendance === false) {
-            this.setState({
-                toggleInquery: false
-            });
-        } else {
-            const {dispatch} = this.props;
-            dispatch(getDoctorByUserId()).then(()=> {
-                const {data = {}} = this.props;
-                if ((data.workingStatus || data.workingStatus === 0) && data.workingStatus !== 9) {
-                    this.setState({
-                        toggleInquery: false
-                    });
-                }
-            });
-        }
-
-    };
-    
 
     showConfirm1() {
         confirm({
@@ -55,13 +23,10 @@ class Doctors extends Component {
             content: '出诊开始后，您需要尽量专注在此工作平台上',
             onOk: ()=> {
                 const {dispatch} = this.props;
-                dispatch(getDoctorStartInquery()).then(()=> {
-                    if (this.props.result === 0) {
-                        this.setState({
-                            toggleInquery: false
-                        });
+                dispatch(getDoctorStartInquery()).then((action)=> {
+                    let result = (action.response || {}).result;
+                    if (result === 0) {
                         socket.receiveMessages();
-                        dispatch(getDoctorByUserId());
                     }
                 });
             },
@@ -71,14 +36,12 @@ class Doctors extends Component {
     }
 
     showConfirm2() {
-        const {dispatch, doctorId = {}, queue = {}, scheduletList = []}= this.props;
+        const {doctorId = {}, queue = {}, scheduleList = []}= this.props;
         let dateInfo = global.getDateRange();
         let content = "";
         let time = '';
-        dispatch(getDoctorByUserIdDate(doctorId, dateInfo.startTime, dateInfo.endTime));
-        dispatch(getDoctorQueueCountByUserId(doctorId));
 
-        scheduletList.slice(0, 7).map((obj, index)=> {
+        scheduleList.slice(0, 7).map((obj, index)=> {
             if (index === dateInfo.weekday - 1) {
                 obj.schedulingList.map((item)=> {
                     if (Date.parse(dateInfo.date) > item.startTime && Date.parse(dateInfo.date) < item.endTime) {
@@ -101,14 +64,10 @@ class Doctors extends Component {
             content: content,
             onOk: ()=> {
                 const {dispatch} = this.props;
-                dispatch(getDoctorEndInquery()).then(()=> {
-                    if (this.props.result === 0) {
-                        this.setState({
-                            toggleInquery: true
-                        });
-
+                dispatch(getDoctorEndInquery()).then((action)=> {
+                    let result = (action.response || {}).result;
+                    if (result === 0) {
                         socket.seClose();
-                        dispatch(getDoctorByUserId());
                     }
                 });
             },
@@ -137,7 +96,7 @@ class Doctors extends Component {
                     <pre>{data.specialSkill}</pre>
                 </div>
                 <div className={styles.footer}>
-                    {this.state.toggleInquery ?
+                    {data.workingStatus == 9 ?
                         (<Button className={styles.btnWork} type="primary" size="large"
                                  onClick={()=>this.showConfirm1()}>出诊开始</Button>)
                         :
@@ -155,8 +114,7 @@ const mapStateToProps = (globalStore, ownProps) => {
     return {
         data: doctorStore.data,
         information: doctorStore.information,
-        result: doctorStore.result,
-        scheduletList: doctorStore.scheduletList,
+        scheduleList: doctorStore.scheduleList,
         queue: doctorStore.queue,
         doctorId: authStore.id
     };

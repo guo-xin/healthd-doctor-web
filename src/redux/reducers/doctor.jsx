@@ -2,40 +2,34 @@ import * as actions from '../actions/actions'
 
 const doctor = (state = {
     information: {}, //医生出诊状态
-    data: {}, //医生个人信息，
-    scheduletList: [], //医生排班
-    queue: {},  //排队人数
-    inquiry: {}, //问诊人数
-    result: {}, //返回的结果
-    response: {}, //重置密码
+    data: {
+        workingStatus: 9
+    }, //医生个人信息，
+    scheduleList: [], //医生排班
+    queue: {
+        queueCount: 0
+    },  //排队人数
+    inquiry: {
+        inquiryCount: 0
+    }, //问诊人数
     message: []//图片消息通知
 }, action) => {
-
-    let obj;
+    let obj, result = (action.response || {}).result;
     switch (action.type) {
-        case actions.SET_DOCTOR_CLOSE + "_SUCCESS":
-            obj = Object.assign({}, state, {
-                result: action.response.result
-            },);
-            return obj;
-
-        case actions.GET_DOCTOR_RESET_PWD + "_SUCCESS":
-            obj = Object.assign({}, state, {
-                response: action.response.result
-            });
-            return obj;
-
+        
         case actions.DOCTOR_START_INQUERY + "_SUCCESS":
-            obj = Object.assign({}, state, {
-                result: action.response.result
-            });
-            return obj;
+            if(result===0){
+                state.data = Object.assign({}, state.data, {workingStatus:0});
+            }
+
+            return Object.assign({}, state);
 
         case actions.DOCTOR_END_INQUERY + "_SUCCESS":
-            obj = Object.assign({}, state, {
-                result: action.response.result
-            });
-            return obj;
+            if(result===0){
+                state.data = Object.assign({}, state.data, {workingStatus:9});
+            }
+
+            return Object.assign({}, state);
 
         case actions.DOCTOR_ATTENDANCE + "_SUCCESS":
             obj = Object.assign({}, state, {
@@ -45,7 +39,7 @@ const doctor = (state = {
 
         case actions.DOCTOR_BY_USER_ID_DATE + "_SUCCESS":
             obj = Object.assign({}, state, {
-                scheduletList: action.response.data
+                scheduleList: action.response.data
             });
             return obj;
 
@@ -97,51 +91,22 @@ const doctor = (state = {
             });
             return obj;
 
-        case actions.POST_DOCTOR + "_SUCCESS":
-            return state;
-
-        case actions.POST_DOCTOR_CHECK_PWD + "_SUCCESS":
-            obj = Object.assign({}, state, {
-                result: action.response.result
-            },);
-            return obj;
-
-        case actions.POST_DOCTOR_CHECK_PHONE + "_SUCCESS":
-            obj = Object.assign({}, state, {
-                result: action.response
-            },);
-            return obj;
 
         case actions.POST_DOCTOR_CHECK_CODE + "_SUCCESS":
-
-            if (action.response.result === 0) {
+            if (result === 0) {
                 state.data.phone = action.phone;
             }
 
-            obj = Object.assign({}, state, {
-                result: action.response.result
-            },);
-            return obj;
-
-        case actions.POST_DOCTOR_CHANGE_PWD + "_SUCCESS":
-            obj = Object.assign({}, state, {
-                result: action.response.result
-            },);
-            return obj;
+            return Object.assign({}, state);
 
         case actions.CHANGE_DOCTOR_STATE + "_SUCCESS":
-            if (action.response.result === 0) {
+            if (result === 0) {
                 state.data.workingStatus = +action.workingStatus;
             }
 
-            obj = Object.assign({}, state, {
-                result: action.response.result
-            });
-
-            return obj;
+            return Object.assign({}, state);
 
         case actions.NOTICE_CHANGE_DOCTOR_STATE + "_REQUEST":
-
             if (action) {
                 state.data.workingStatus = +action.workingStatus;
 

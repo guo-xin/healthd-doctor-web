@@ -74,7 +74,7 @@ class User extends Component {
         if (this.props.callState !== -1) {
             return;
         } else {
-            const {dispatch, data = {}, doctorId = {}, queue = {}, scheduletList = [], router} = this.props;
+            const {dispatch, data = {}, doctorId = {}, queue = {}, scheduleList = [], router} = this.props;
             let dateInfo = global.getDateRange();
             let content = "";
             let time = '';
@@ -98,7 +98,7 @@ class User extends Component {
             } else {
                 //dispatch(getDoctorQueueCountByUserId(doctorId));
 
-                scheduletList.slice(0, 7).map((obj, index)=> {
+                scheduleList.slice(0, 7).map((obj, index)=> {
                     if (index === dateInfo.weekday - 1) {
                         obj.schedulingList.map((item)=> {
                             if (Date.parse(dateInfo.date) > item.startTime && Date.parse(dateInfo.date) < item.endTime) {
@@ -266,7 +266,7 @@ const mapStateToProps = (globalStore, ownProps) => {
     return {
         data: Object.assign({}, doctorStore.data),
         doctorId: authStore.id,
-        scheduletList: doctorStore.scheduletList,
+        scheduleList: doctorStore.scheduleList,
         queue: doctorStore.queue,
         message: doctorStore.message,
         callState: callStore.callState

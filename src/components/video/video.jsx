@@ -22,6 +22,21 @@ import {setDoctorQueueCount, noticeChangeDoctorState} from 'redux/actions/doctor
 
 import pubSub from 'util/pubsub';
 
+let isShowTip = true;
+function showTip() {
+    if(isShowTip){
+        isShowTip = false;
+        notification.error({
+            message: '系统提示',
+            description: '插件运行异常，请手动重启插件。',
+            duration: null,
+            onClose: function () {
+                isShowTip = true;
+            }
+        });
+    }
+}
+
 class Video extends React.Component {
     state = {
         isConnecting: false,
@@ -115,11 +130,8 @@ class Video extends React.Component {
                     client.setEncryptionSecret(this.secret);
                 }
             }, (err) => {
-                notification.error({
-                    message: '系统提示',
-                    description: '插件运行异常，请手动重启插件。',
-                    duration: null
-                });
+
+                showTip();
 
                 if (err) {
                     console.log("AgoraRTC client 创建失败", err);

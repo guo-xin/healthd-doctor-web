@@ -2,6 +2,7 @@ import * as store from 'redux/store';
 import cookie from 'react-cookie';
 import {setCallInfo} from 'redux/actions/call';
 import {autoSaveCase} from 'redux/actions/case';
+import {notification} from 'antd';
 
 import {
     noticeChangeDoctorState,
@@ -16,6 +17,20 @@ import pubSub from 'util/pubsub';
 
 let atmosphere = require('atmosphere.js');
 let socket;
+let isShowTip = true;
+function showTip(){
+    if(isShowTip){
+        isShowTip = false;
+        notification.warning({
+            message: '系统提示',
+            description: '网络不给力。',
+            duration: null,
+            onClose: function () {
+                isShowTip = true;
+            }
+        });
+    }
+}
 
 function receiveMessages() {
     let doctorId = store.getState().authStore.id;
@@ -31,6 +46,11 @@ function receiveMessages() {
         url: url,
         trackMessageLength: true,
         transport: 'websocket'
+    };
+
+    request.onError = function (response) {
+        showTip();
+        console.log('An error happen in web socket', response);
     };
 
     request.onMessage = function (response) {

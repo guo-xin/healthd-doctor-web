@@ -3,7 +3,7 @@ import {Form, Input, Button, message, Modal} from 'antd';
 import styles from './editDoctor.less';
 import {withRouter} from 'react-router';
 import {connect} from 'react-redux';
-
+import pubSub from 'util/pubsub';
 import {postDoctorCheckPwd, postDoctorCheckPhone, postDoctorCheckCode, postDoctorChangePwd} from 'redux/actions/doctor';
 const createForm = Form.create;
 const FormItem = Form.Item;
@@ -40,8 +40,9 @@ class ChangePhone extends React.Component {
                     loading: true
                 });
                 let hide = message.loading('正在加载...', 0);
-                dispatch(postDoctorCheckPwd(params)).then(()=> {
-                    if (this.props.result === 1) {
+                dispatch(postDoctorCheckPwd(params)).then((action)=> {
+                    let result = (action.response || {}).result;
+                    if (result === 1) {
                         let {setFields, getFieldValue} = this.props.form;
                         setFields({
                             pass: {
@@ -80,8 +81,9 @@ class ChangePhone extends React.Component {
                     loading: true
                 });
                 let hide = message.loading('正在加载...', 0);
-                dispatch(postDoctorCheckPhone(params)).then(()=> {
-                    if (this.props.result.result === 1) {
+                dispatch(postDoctorCheckPhone(params)).then((action)=> {
+                    let result = (action.response || {}).result;
+                    if (result === 1) {
                         let {setFields, getFieldValue} = this.props.form;
                         if (this.props.result.message) {
                             setFields({
@@ -139,8 +141,9 @@ class ChangePhone extends React.Component {
                     loading: true
                 });
                 let hide = message.loading('正在加载...', 0);
-                dispatch(postDoctorCheckCode(params)).then(()=> {
-                    if (this.props.result === 1) {
+                dispatch(postDoctorCheckCode(params)).then((action)=> {
+                    let result = (action.response || {}).result;
+                    if (result === 1) {
                         let {setFields, getFieldValue} = this.props.form;
                         if (this.props.form.getFieldsValue().check) {
                             setFields({
@@ -366,8 +369,9 @@ class ChangePwd extends React.Component {
                     loading: true
                 });
                 let hide = message.loading('正在加载...', 0);
-                dispatch(postDoctorCheckPwd(params)).then(()=> {
-                    if (this.props.result === 1) {
+                dispatch(postDoctorCheckPwd(params)).then((action)=> {
+                    let result = (action.response || {}).result;
+                    if (result === 1) {
                         let {setFields, getFieldValue} = this.props.form;
                         setFields({
                             change: {
@@ -384,8 +388,9 @@ class ChangePwd extends React.Component {
                             }
                         });
                     } else {
-                        dispatch(postDoctorChangePwd(param)).then(()=> {
-                            if (this.props.result === 1) {
+                        dispatch(postDoctorChangePwd(param)).then((action)=> {
+                            let result = (action.response || {}).result;
+                            if (result === 1) {
                                 let {setFields, getFieldValue} = this.props.form;
                                 setFields({
                                     change: {
@@ -406,7 +411,10 @@ class ChangePwd extends React.Component {
                                 this.state.loading = false;
                                 this.state.visible = false;
                                 message.success('更改成功！');
-                                this.props.router.replace(`/login`);
+
+                                pubSub.logout();
+
+                                this.props.router.replace('/login');
                             }
                             hide();
                         }, () => {
@@ -552,7 +560,7 @@ class Safe extends React.Component {
                                     <label className={styles.labelContent}>{this.props.data.name}</label>
                                 </FormItem>
                             </div>
-                            <ChangePwd result={this.props.result} doctorId={this.props.doctorId}/>
+                            <ChangePwd doctorId={this.props.doctorId}/>
                             <div className="col">
                             </div>
                             <div className="col">
@@ -573,7 +581,7 @@ class Safe extends React.Component {
                                     <label className={styles.labelContent}>{telphone}</label>
                                 </FormItem>
                             </div>
-                            <ChangePhone result={this.props.result} doctorId={this.props.doctorId}/>
+                            <ChangePhone doctorId={this.props.doctorId}/>
                         </div>
                     </Form>
                 </div>
