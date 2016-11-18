@@ -310,7 +310,7 @@ class Emr extends React.Component {
 
                         </FormItem>
                         <FormItem
-                            label="诊断">
+                            label="初步印象">
                             <Diagnosis isEditable={isEditable} setIsHasDiagnosis={::this.setIsHasDiagnosis}></Diagnosis>
                             {isEditable && <Input {...getFieldProps('diagnosisInfo', {
                                 rules: [
@@ -319,7 +319,7 @@ class Emr extends React.Component {
                             })} style={{display:"none"}}/>}
                         </FormItem>
                         <FormItem
-                            label="诊疗意见">
+                            label="医生建议">
                             {isEditable ? <Input type="textarea" {...getFieldProps('opinionsText', {
                                 rules: [
                                     {required: true, message: "诊疗意见不能为空，请录入"},

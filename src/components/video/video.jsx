@@ -315,7 +315,9 @@ class Video extends React.Component {
 
             client.on('stream-published');
 
-            self.startWarning();
+            if(callType == 2){
+                self.startWarning();
+            }
 
         }, function (err) {
             console.log("Local stream init failed.", err);

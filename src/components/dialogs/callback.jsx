@@ -31,6 +31,8 @@ class Callback extends Component {
 
     joinChannelData = {};
 
+    inquiryId = null;
+
     toCasePage() {
         let {dispatch, router} = this.props;
         let {callbackUser={}} = this.state;
@@ -40,7 +42,7 @@ class Callback extends Component {
         dispatch(setCurrentCase({
             description: this.state.description,
             inquiryInfoId: callbackUser.inquiryInfoId,
-            inquiryId: callbackUser.inquiryId,
+            inquiryId: this.inquiryId,
             userId: callbackUser.userId,
             patientId: callbackUser.patientId,
             caseId: null,
@@ -62,6 +64,9 @@ class Callback extends Component {
             this.state.callbackUser = data.callbackUser;
             this.state.callType = data.callType;
             this.state.disabled = false;
+
+            this.inquiryId = (data.callbackUser || {}).inquiryId;
+
             this.getPatientDesc();
             this.setVisible(true);
         });
@@ -139,6 +144,8 @@ class Callback extends Component {
             phone: params.phone,
             callType: params.callType
         };
+
+        this.inquiryId = this.inquiryId || data.inquiryId;
 
         this.st = setTimeout(()=>{
             //超时时调用
