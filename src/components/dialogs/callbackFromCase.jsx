@@ -189,6 +189,10 @@ class CallbackFromCase extends Component {
                 operatorRoleCode: preWorkingStatus === 4 ? 105 : 104
             };
 
+            if(userId){
+                params.userId = userId;
+            }
+
             if(currentCase.patientId){
                 params.patientId = currentCase.patientId;
             }

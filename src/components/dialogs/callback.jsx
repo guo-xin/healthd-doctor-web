@@ -206,12 +206,20 @@ class Callback extends Component {
             operatorRoleCode: preWorkingStatus === 4 ? 105 : 104
         };
 
+        if (callbackUser.userId) {
+            params.userId = callbackUser.userId;
+        }
+
         if (callbackUser.patientId) {
             params.patientId = callbackUser.patientId;
         }
 
         if (callbackUser.inquiryInfoId) {
             params.inquiryInfoId = callbackUser.inquiryInfoId;
+        }
+
+        if (callbackUser.inquiryId) {
+            params.inquiryId = callbackUser.inquiryId;
         }
 
         //将医生状态置为占线

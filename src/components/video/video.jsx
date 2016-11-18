@@ -18,7 +18,7 @@ import {
     setUserForVideoArea
 } from 'redux/actions/call';
 import {getOCXAccount} from 'redux/actions/auth';
-import {setDoctorQueueCount, noticeChangeDoctorState} from 'redux/actions/doctor';
+import {getDoctorQueueCountByUserId, noticeChangeDoctorState} from 'redux/actions/doctor';
 
 import pubSub from 'util/pubsub';
 
@@ -384,7 +384,7 @@ class Video extends React.Component {
     }
 
     hangup(){
-        let {dispatch} = this.props;
+        let {dispatch, doctorId} = this.props;
         let params = this.hangupParams;
 
         if(this.hangupByDoctor){
@@ -397,6 +397,10 @@ class Video extends React.Component {
         }
 
         dispatch(agoraVoipInviteBye(params));
+
+        setTimeout(function () {
+            dispatch(getDoctorQueueCountByUserId(doctorId));
+        }, 500);
     }
 
     //接通视频后或电话后挂断

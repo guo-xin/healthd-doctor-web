@@ -31,8 +31,6 @@ import {
     setUserForVideoArea
 } from 'redux/actions/call';
 
-const confirm = Modal.confirm;
-
 function isHaveValue(obj) {
     let flag = false;
     if (obj) {
