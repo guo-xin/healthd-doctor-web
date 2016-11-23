@@ -49,7 +49,6 @@ class Video extends React.Component {
     /*声网*/
     key = '';
     recordingKey = '';
-    appId = '7eca1d509eaa4075bcfa068032a19ee0';
     client = null;
     localStream = null;
     lastLocalStreamId = null;
@@ -69,8 +68,9 @@ class Video extends React.Component {
             dispatch(subscribeServerEvent(doctorId)).then(
                 (action)=> {
                     let res = action.response || {};
-                    if (res.result === 0) {
-                        this.init();
+                    let data = res.data || {};
+                    if (res.result === 0 && data.appId) {
+                        this.init(data.appId);
                     }
                 }
             );
@@ -118,12 +118,12 @@ class Video extends React.Component {
     }
 
     //初始化声网控件
-    init() {
+    init(appId) {
         let client = AgoraRTC.createRtcClient();
         this.client = client;
 
         if (client) {
-            client.init(this.appId, ()=> {
+            client.init(appId, ()=> {
                 console.log("AgoraRTC client 创建成功");
 
                 if (this.secret) {
