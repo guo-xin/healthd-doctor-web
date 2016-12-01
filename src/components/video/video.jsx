@@ -52,7 +52,7 @@ class Video extends React.Component {
     client = null;
     localStream = null;
     lastLocalStreamId = null;
-    videoProfile = '480P_2';
+    videoProfile = '720P';
     remoteStreamList = [];
 
     warningTimer = null; //警告
