@@ -5,7 +5,6 @@ import Emr from './emr';
 import Toolbar from '../tools/toolbar';
 import {message, Modal} from 'antd';
 import styles from './detail.less';
-import Calc from 'components/dialogs/calc';
 
 import {connect} from 'react-redux';
 import {withRouter} from 'react-router';
@@ -26,7 +25,6 @@ import {
     unReadInquiry,
     queryService,
     reduceService,
-    showCalcDialog,
     getCallRecords,
     setUserForVideoArea
 } from 'redux/actions/call';
@@ -435,16 +433,6 @@ class Detail extends React.Component {
             historyCaseId: caseData.id,
             isServiceCount: isServiceCount
         }));
-    }
-
-    //计次
-    calc() {
-        this._archive(1);
-    }
-
-    //免单
-    free() {
-        this._archive(0);
     }
 
     //设置是否可编辑
@@ -923,7 +911,7 @@ class Detail extends React.Component {
                 this.isArchive = false;
                 return;
             } else {
-                props.dispatch(showCalcDialog(true));
+                this._archive(0);
                 this.isArchive = false;
             }
         });
@@ -939,7 +927,6 @@ class Detail extends React.Component {
 
         return (
             <div className={wrapperClass}>
-                <Calc free={::this.free} calc={::this.calc}/>
                 <div className={styles.operations}>
                     <Operation back={::this.back} save={::this.save} archive={::this.archive} caseState={caseState}
                                operationsState={operationsState}/>

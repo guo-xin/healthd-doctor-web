@@ -243,7 +243,7 @@ class Diagnosis extends React.Component {
             }
         },
         {
-            title: '描述',
+            title: '备注',
             dataIndex: 'diagnosisDesc',
             className: 'cell-desc',
             width: '34%',
