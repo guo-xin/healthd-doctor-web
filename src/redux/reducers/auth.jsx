@@ -10,7 +10,7 @@ const auth = (state = {
     expires: -1,
     isResetting: true
 }, action) => {
-    let data, result;
+    let data, result, exp;
 
     switch (action.type) {
         //设置登录认证信息
@@ -41,7 +41,7 @@ const auth = (state = {
                     state.id = data.id || '';
                     state.headPic = data.headPic || '';
 
-                    let exp = new Date();
+                    exp = new Date();
                     exp.setTime(exp.getTime() + 16 * 60 * 60 * 1000);
 
                     cookie.save('HEALTHWEB',{
@@ -66,6 +66,15 @@ const auth = (state = {
 
         //退出
         case actions.SIGN_OUT + "_SUCCESS":
+            exp = new Date();
+            exp.setTime(exp.getTime() + 16 * 60 * 60 * 1000);
+
+            cookie.save('HEALTHWEB',{
+                id: state.id,
+                u: state.userName,
+                h: state.headPic
+            }, {expires: exp});
+
             state.userName = '';
             state.token = '';
             state.id = '';
